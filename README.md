@@ -188,6 +188,6 @@ gpu.updateDisplay(id)
 
 ## Compatibility
 
-- Minecraft 1.19+ (Forge)
+- Minecraft 1.20.1 (Forge)
 - ComputerCraft / CC: Tweaked
 - Works with any CC monitor size/configuration
