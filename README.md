@@ -3,6 +3,8 @@ High-performance ComputerCraft peripheral for rendering full RGB graphics direct
 
 # DirectGPU
 
+Forge 1.20.1
+
 A high-performance ComputerCraft peripheral for rendering graphics directly to monitors using OpenGL, bypassing CC's text-based rendering system.
 
 ## Features
