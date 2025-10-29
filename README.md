@@ -1,27 +1,39 @@
-# DirectGPU
+DirectGPU
 
 A high-performance ComputerCraft peripheral for Minecraft that enables hardware-accelerated graphics rendering directly to monitors. Stream images, create interactive UIs, or build pixel art - all at 164×81 resolution per block.
-## Features
 
-- **True RGB Graphics** - 24-bit color with 164×81 pixels per monitor block
--  **Hardware Accelerated** - OpenGL rendering bypasses CC's text system
--  **Touch Input** - Full mouse and keyboard event support
--  **Auto-Detection** - Automatically finds and configures nearby monitors
--  **Drawing Primitives** - Lines, rectangles, and image loading
--  **Image Support** - Load PNG/JPEG images via Base64
--  **Flexible Sizing** - Works with any monitor array up to 8×6 blocks
--  **Thread-Safe** - Safe concurrent access from multiple computers
+Features
 
-## Installation
+    True RGB Graphics - 24-bit color with 164×81 pixels per monitor block
 
-1. Download the latest DirectGPU JAR from releases
-2. Place in your Minecraft `mods` folder
-3. Ensure you have **Forge** and **ComputerCraft** (or CC: Tweaked) installed
-4. Launch Minecraft and enjoy!
+    Hardware Accelerated - OpenGL rendering bypasses CC's text system
 
-## Quick Start
+    Touch Input - Full mouse and keyboard event support
 
-```lua
+    Auto-Detection - Automatically finds and configures nearby monitors
+
+    Drawing Primitives - Lines, rectangles, and image loading
+
+    Image Support - Load PNG/JPEG via Base64 or high-performance binary dictionary
+
+    Flexible Sizing - Works with any monitor array up to 8×6 blocks
+
+    Thread-Safe - Safe concurrent access from multiple computers
+
+Installation
+
+    Download the latest DirectGPU JAR from releases
+
+    Place in your Minecraft mods folder
+
+    Ensure you have Forge and ComputerCraft (or CC: Tweaked) installed
+
+    Launch Minecraft and enjoy!
+
+Quick Start
+
+Lua
+
 -- Find the DirectGPU peripheral
 local gpu = peripheral.find("directgpu")
 
@@ -38,108 +50,101 @@ gpu.updateDisplay(display)
 
 -- Clean up when done
 gpu.clearDisplay()
-```
 
-## How It Works
+How It Works
 
-DirectGPU creates a peripheral on the **bottom side** of ComputerCraft computers. When you call `createDisplay()`, it:
+DirectGPU creates a peripheral on the bottom side of ComputerCraft computers. When you call createDisplay(), it:
 
-1. Finds monitor blocks in the world
-2. Creates an OpenGL texture matching the monitor array size
-3. Renders the texture directly onto the monitor blocks in 3D space
-4. Captures mouse clicks via raycasting against the rendered surface
+    Finds monitor blocks in the world
+
+    Creates an OpenGL texture matching the monitor array size
+
+    Renders the texture directly onto the monitor blocks in 3D space
+
+    Captures mouse clicks via raycasting against the rendered surface
 
 This approach provides dramatically higher resolution and performance compared to CC's built-in text-based rendering.
 
----
+API Reference
 
-## API Reference
+Display Management
 
-### Display Management
+createDisplayAuto() → displayId
 
-#### `createDisplayAuto()` → `displayId`
 Automatically detects the nearest monitor within 16 blocks and creates a display.
+Lua
 
-```lua
 local display = gpu.createDisplayAuto()
-```
 
-**Returns:** Display ID (number)  
-**Throws:** Error if no monitor is found
+Returns: Display ID (number) Throws: Error if no monitor is found
 
----
+createDisplay(facing, width, height) → displayId
 
-#### `createDisplay(facing, width, height)` → `displayId`
 Creates a display 2 blocks above the computer.
+Lua
 
-```lua
 local display = gpu.createDisplay("north", 3, 2)
-```
 
-**Parameters:**
-- `facing` (string): Direction - `"north"`, `"south"`, `"east"`, `"west"`, `"up"`, `"down"`
-- `width` (number): Monitor width in blocks (1-8)
-- `height` (number): Monitor height in blocks (1-6)
+Parameters:
 
-**Returns:** Display ID
+    facing (string): Direction - "north", "south", "east", "west", "up", "down"
 
----
+    width (number): Monitor width in blocks (1-8)
 
-#### `createDisplayAt(x, y, z, facing, width, height)` → `displayId`
+    height (number): Monitor height in blocks (1-6)
+
+Returns: Display ID
+
+createDisplayAt(x, y, z, facing, width, height) → displayId
+
 Creates a display at specific world coordinates.
+Lua
 
-```lua
 local display = gpu.createDisplayAt(100, 64, 200, "south", 4, 3)
-```
 
-**Parameters:**
-- `x`, `y`, `z` (number): World coordinates
-- `facing`, `width`, `height`: Same as `createDisplay()`
+Parameters:
 
----
+    x, y, z (number): World coordinates
 
-#### `removeDisplay(displayId)` → `success`
+    facing, width, height: Same as createDisplay()
+
+removeDisplay(displayId) → success
+
 Removes a specific display and frees its resources.
+Lua
 
-```lua
 gpu.removeDisplay(display)
-```
 
-**Returns:** `true` if successful, `false` otherwise
+Returns: true if successful, false otherwise
 
----
+clearDisplay()
 
-#### `clearDisplay()`
 Removes all displays created by this computer.
+Lua
 
-```lua
 gpu.clearDisplay()
-```
 
----
+listDisplays() → displayIds
 
-#### `listDisplays()` → `displayIds`
 Returns a list of all display IDs currently active.
+Lua
 
-```lua
 local displays = gpu.listDisplays()
 for _, id in ipairs(displays) do
     print("Display: " .. id)
 end
-```
 
----
+getDisplayInfo(displayId) → info
 
-#### `getDisplayInfo(displayId)` → `info`
 Returns detailed information about a display.
+Lua
 
-```lua
 local info = gpu.getDisplayInfo(display)
 print(info.pixelWidth .. "x" .. info.pixelHeight)
-```
 
-**Returns:**
-```lua
+Returns:
+Lua
+
 {
     x = 100,              -- World X coordinate
     y = 64,               -- World Y coordinate  
@@ -150,213 +155,228 @@ print(info.pixelWidth .. "x" .. info.pixelHeight)
     pixelWidth = 492,     -- Width in pixels (width * 164)
     pixelHeight = 162     -- Height in pixels (height * 81)
 }
-```
 
----
+Drawing Functions
 
-### Drawing Functions
+setPixel(displayId, x, y, r, g, b)
 
-#### `setPixel(displayId, x, y, r, g, b)`
 Sets a single pixel to the specified RGB color.
+Lua
 
-```lua
 gpu.setPixel(display, 100, 50, 255, 128, 0)
-```
 
-**Parameters:**
-- `x`, `y` (number): Pixel coordinates (0-indexed from top-left)
-- `r`, `g`, `b` (number): RGB values (0-255)
+Parameters:
 
----
+    x, y (number): Pixel coordinates (0-indexed from top-left)
 
-#### `getPixel(displayId, x, y)` → `color`
+    r, g, b (number): RGB values (0-255)
+
+getPixel(displayId, x, y) → color
+
 Returns the RGB color of a pixel.
+Lua
 
-```lua
 local color = gpu.getPixel(display, 100, 50)
 print(string.format("RGB: %d, %d, %d", color.r, color.g, color.b))
-```
 
-**Returns:** `{r, g, b}` table
+Returns: {r, g, b} table
 
----
+clear(displayId, r, g, b)
 
-#### `clear(displayId, r, g, b)`
 Fills the entire display with a solid color.
+Lua
 
-```lua
 gpu.clear(display, 0, 0, 0)  -- Clear to black
-```
 
----
+drawRect(displayId, x, y, width, height, r, g, b)
 
-#### `drawRect(displayId, x, y, width, height, r, g, b)`
 Draws a filled rectangle.
+Lua
 
-```lua
 gpu.drawRect(display, 10, 10, 100, 50, 255, 0, 0)
-```
 
-**Parameters:**
-- `x`, `y`: Top-left corner position
-- `width`, `height`: Rectangle dimensions
-- `r`, `g`, `b`: Fill color
+Parameters:
 
----
+    x, y: Top-left corner position
 
-#### `drawLine(displayId, x1, y1, x2, y2, r, g, b)`
+    width, height: Rectangle dimensions
+
+    r, g, b: Fill color
+
+drawLine(displayId, x1, y1, x2, y2, r, g, b)
+
 Draws a line between two points using Bresenham's algorithm.
+Lua
 
-```lua
 gpu.drawLine(display, 0, 0, 163, 80, 255, 255, 255)
-```
 
----
+loadImage(displayId, base64Data)
 
-#### `loadImage(displayId, base64Data)`
 Loads a PNG or JPEG image from Base64-encoded data. The image is automatically scaled to fit the display with letterboxing.
+Lua
 
-```lua
 local imageData = "iVBORw0KGgo..."  -- Base64 string
 gpu.loadImage(display, imageData)
-```
 
-**Note:** The Java backend handles scaling and aspect ratio preservation automatically.
+Note: The Java backend handles scaling and aspect ratio preservation automatically. Use this for single, static images. For video, see loadJPEGDict.
 
----
+loadJPEGDict(displayId, binaryData) → stats
 
-#### `updateDisplay(displayId)`
+Loads a JPEG image from binary data using dictionary compression. This is highly efficient for video streams, as it only transmits the 8x8 pixel blocks that have changed from the previous frame.
+Lua
+
+-- Assumes 'imageData' is a binary string from http.get(..., ..., true)
+local success, stats = pcall(function()
+    return gpu.loadJPEGDict(display, imageData)
+end)
+
+if success then
+    print("Cache hit: " .. string.format("%.1f%%", stats.compressionRatio * 100))
+end
+
+Parameters:
+
+    displayId (number): The display to load the image onto.
+
+    binaryData (string): The raw binary JPEG data (not Base64).
+
+Returns (stats): A table containing compression statistics.
+Lua
+
+{
+    totalChunks = 1440,   -- Total 8x8 blocks in the image
+    newChunks = 120,      -- Blocks that were different and sent
+    cachedChunks = 1320,  -- Blocks that were unchanged (reused from cache)
+    compressionRatio = 0.916 -- (cachedChunks / totalChunks)
+}
+
+Note: This is the preferred method for streaming video. It dramatically reduces bandwidth and improves performance.
+
+updateDisplay(displayId)
+
 Marks the display as dirty, triggering a render update on the next frame.
+Lua
 
-```lua
 gpu.setPixel(display, 10, 10, 255, 0, 0)
 gpu.updateDisplay(display)  -- Force render
-```
 
-**Performance Tip:** Batch multiple drawing operations before calling `updateDisplay()`.
+Performance Tip: Batch multiple drawing operations before calling updateDisplay().
 
----
-
-### Touch Input
+Touch Input
 
 Touch input captures mouse clicks and keyboard events when you interact with the physical monitor blocks in the world.
 
-#### `pullEvent(displayId)` → `event` or `nil`
-Retrieves the next input event from the queue.
+pullEvent(displayId) → event or nil
 
-```lua
+Retrieves the next input event from the queue.
+Lua
+
 local event = {gpu.pullEvent(display)}
 if event then
     print("Event type: " .. event[1])
 end
-```
 
-**Returns:** `nil` if no events are available
+Returns: nil if no events are available
 
-**Event Types:**
+Event Types:
 
-**Mouse Click (Left Button):**
-```lua
+Mouse Click (Left Button):
+Lua
+
 {"mouse_click", x, y, button}
-```
 
-**Mouse Click (Right Button):**
-```lua
+Mouse Click (Right Button):
+Lua
+
 {"mouse_click_right", x, y, button}
-```
 
-**Mouse Drag (Left):**
-```lua
+Mouse Drag (Left):
+Lua
+
 {"mouse_drag", x, y, button}
-```
 
-**Mouse Drag (Right):**
-```lua
+Mouse Drag (Right):
+Lua
+
 {"mouse_drag_right", x, y, button}
-```
 
-**Mouse Release (Left):**
-```lua
+Mouse Release (Left):
+Lua
+
 {"mouse_up", x, y, button}
-```
 
-**Mouse Release (Right):**
-```lua
+Mouse Release (Right):
+Lua
+
 {"mouse_up_right", x, y, button}
-```
 
-**Key Press:**
-```lua
+Key Press:
+Lua
+
 {"key", keyName}
-```
 
-**Character Typed:**
-```lua
+Character Typed:
+Lua
+
 {"char", character}
-```
 
-**Event Parameters:**
-- `x`, `y`: Pixel coordinates (0-indexed, top-left origin)
-- `button`: Mouse button (1=left, 2=right, 3=middle)
-- `keyName`: CC key name (e.g., `"enter"`, `"space"`, `"a"`)
-- `character`: Typed character string
+Event Parameters:
 
----
+    x, y: Pixel coordinates (0-indexed, top-left origin)
 
-#### `hasEvent(displayId)` → `boolean`
+    button: Mouse button (1=left, 2=right, 3=middle)
+
+    keyName: CC key name (e.g., "enter", "space", "a")
+
+    character: Typed character string
+
+hasEvent(displayId) → boolean
+
 Checks if there are pending events without removing them.
+Lua
 
-```lua
 if gpu.hasEvent(display) then
     local event = {gpu.pullEvent(display)}
     -- Process event
 end
-```
 
----
+clearEvents(displayId)
 
-#### `clearEvents(displayId)`
 Clears all pending events from the queue.
+Lua
 
-```lua
 gpu.clearEvents(display)
-```
 
----
+sendKey(displayId, keyName)
 
-#### `sendKey(displayId, keyName)`
 Programmatically injects a key event into the display's event queue.
+Lua
 
-```lua
 gpu.sendKey(display, "enter")
-```
 
----
+sendChar(displayId, character)
 
-#### `sendChar(displayId, character)`
 Programmatically injects a character event.
+Lua
 
-```lua
 gpu.sendChar(display, "A")
-```
 
----
+Utilities
 
-### Utilities
+autoDetectMonitor() → info
 
-#### `autoDetectMonitor()` → `info`
 Scans for the nearest monitor within 16 blocks.
+Lua
 
-```lua
 local monitor = gpu.autoDetectMonitor()
 if monitor.found then
     print(string.format("Found %dx%d monitor at (%d, %d, %d)", 
         monitor.width, monitor.height, monitor.x, monitor.y, monitor.z))
 end
-```
 
-**Returns:**
-```lua
+Returns:
+Lua
+
 {
     found = true,
     x = 100,
@@ -366,26 +386,22 @@ end
     height = 2,
     facing = "north"
 }
-```
 
----
+getStats() → stats
 
-#### `getStats()` → `stats`
 Returns system statistics.
+Lua
 
-```lua
 local stats = gpu.getStats()
 print("Active displays: " .. stats.displays)
 print("Total pixels: " .. stats.totalPixels)
-```
 
----
+Examples
 
-## Examples
+Gradient Background
 
-### Gradient Background
+Lua
 
-```lua
 local gpu = peripheral.find("directgpu")
 local display = gpu.createDisplayAuto()
 local info = gpu.getDisplayInfo(display)
@@ -405,13 +421,11 @@ for y = 0, info.pixelHeight - 1 do
 end
 
 gpu.updateDisplay(display)
-```
 
----
+Interactive Paint Program
 
-### Interactive Paint Program
+Lua
 
-```lua
 local gpu = peripheral.find("directgpu")
 local display = gpu.createDisplayAuto()
 
@@ -463,13 +477,11 @@ parallel.waitForAny(
 )
 
 gpu.clearDisplay()
-```
 
----
+Button UI
 
-### Button UI
+Lua
 
-```lua
 local gpu = peripheral.find("directgpu")
 local display = gpu.createDisplayAuto()
 
@@ -517,46 +529,27 @@ while true do
     end
     sleep(0.05)
 end
-```
 
----
+Webcam Streamer (High-Performance)
 
-### Webcam Streamer
+This example uses http.get in binary mode and loadJPEGDict for maximum performance. For high-FPS streaming, see the async dictionary-compressed example in your dict.lua script.
+Lua
 
-```lua
 local gpu = peripheral.find("directgpu")
 local display = gpu.createDisplayAuto()
 local info = gpu.getDisplayInfo(display)
 
 print("Webcam Viewer - " .. info.pixelWidth .. "x" .. info.pixelHeight)
 
-local CAMERA_URL = "http://example.com/camera.jpg"
-local TARGET_FPS = 5
-
--- Base64 encoding function
-local b64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-local function encodeBase64(data)
-    local result = {}
-    for i = 1, #data, 3 do
-        local b1, b2, b3 = data:byte(i, i+2)
-        b2 = b2 or 0
-        b3 = b3 or 0
-        local n = b1 * 65536 + b2 * 256 + b3
-        table.insert(result, b64chars:sub(math.floor(n/262144)%64+1, math.floor(n/262144)%64+1))
-        table.insert(result, b64chars:sub(math.floor(n/4096)%64+1, math.floor(n/4096)%64+1))
-        table.insert(result, b64chars:sub(math.floor(n/64)%64+1, math.floor(n/64)%64+1))
-        table.insert(result, b64chars:sub(n%64+1, n%64+1))
-    end
-    local padding = (3 - (#data % 3)) % 3
-    for i = 1, padding do
-        result[#result - i + 1] = "="
-    end
-    return table.concat(result)
-end
+local CAMERA_URL = "http://213.144.145.239:8090/cam_2.jpg"
+local TARGET_FPS = 10
 
 local function fetchFrame()
-    local url = CAMERA_URL .. "?t=" .. os.epoch("utc")
-    local handle = http.get(url, {}, true)  -- Binary mode
+    -- Add a random param to bypass server/client cache
+    local url = CAMERA_URL .. "?t=" .. math.random(1, 1000000)
+    
+    -- Make a blocking, binary HTTP request
+    local handle = http.get(url, {}, true)  -- true = binary mode
     
     if not handle then return false end
     
@@ -565,9 +558,16 @@ local function fetchFrame()
     
     if #imageData < 100 then return false end
     
-    local base64Data = encodeBase64(imageData)
-    gpu.loadImage(display, base64Data)
-    gpu.updateDisplay(display)
+    -- Load the binary data using dictionary compression
+    local success, stats = pcall(function()
+        return gpu.loadJPEGDict(display, imageData)
+    end)
+    
+    if success then
+        gpu.updateDisplay(display)
+        -- Optional: print cache hit rate
+        -- print(string.format("Cache: %.1f%%", stats.compressionRatio * 100))
+    end
     
     return true
 end
@@ -596,104 +596,118 @@ parallel.waitForAny(
 )
 
 gpu.clearDisplay()
-```
 
----
+Touch Input Usage
 
-## Touch Input Usage
+Important: Touch input only works when not in any GUI:
 
-**Important:** Touch input only works when **not** in any GUI:
+    Run your Lua script in the CC computer
 
-1. Run your Lua script in the CC computer
-2. **Close the terminal** (press E or Esc)
-3. Look at the physical monitor blocks in the world
-4. Click directly on the monitor to interact
+    Close the terminal (press E or Esc)
+
+    Look at the physical monitor blocks in the world
+
+    Click directly on the monitor to interact
 
 Touch events use 3D raycasting against the rendered display surface. The input system automatically handles:
-- Left and right mouse buttons
-- Click, drag, and release events
-- Coordinate translation to pixel space
-- Event queuing per display
 
-**Coordinate System:**
-- Origin (0, 0) is at the **top-left** corner
-- X increases to the **right**
-- Y increases **downward**
-- Coordinates are in pixels, not blocks
+    Left and right mouse buttons
 
----
+    Click, drag, and release events
 
-## Performance Tips
+    Coordinate translation to pixel space
 
-1. **Batch drawing operations** - Call `updateDisplay()` once after multiple changes
-2. **Use primitives** - `drawRect()` and `drawLine()` are faster than individual pixels
-3. **Limit updates** - Don't call `updateDisplay()` more than 60 times per second
-4. **Clear efficiently** - Use `clear()` instead of drawing black pixels
-5. **Event polling** - Add `sleep()` between event checks to reduce CPU usage
-6. **Keep displays nearby** - Maximum render distance is 64 blocks
-7. **Clean up** - Always call `clearDisplay()` when done
+    Event queuing per display
 
----
+Coordinate System:
 
-## Technical Specifications
+    Origin (0, 0) is at the top-left corner
 
-| Specification | Value |
-|--------------|-------|
-| Resolution per block | 164×81 pixels |
-| Color depth | 24-bit RGB (8 bits/channel) |
-| Maximum monitor size | 8×6 blocks |
-| Maximum total displays | 50 |
-| Maximum total pixels | 10 megapixels |
-| Render distance | 64 blocks |
-| Memory per 1×1 display | ~40 KB |
-| Texture update rate | Limited to 60 FPS |
-| Input latency | Sub-tick (<50ms) |
+    X increases to the right
 
----
+    Y increases downward
 
-## Troubleshooting
+    Coordinates are in pixels, not blocks
 
-### "Display not found" error
-- Ensure the monitor exists at the specified coordinates
-- Use `autoDetectMonitor()` to verify monitor detection
-- Check that monitors form a complete rectangle
+Performance Tips
 
-### Touch input not working
-- Close the CC computer terminal first
-- Make sure you're clicking on the physical monitor blocks in world
-- Verify the display ID is correct
-- Check `hasEvent()` returns true before calling `pullEvent()`
+    Batch drawing operations - Call updateDisplay() once after multiple changes
 
-### Low FPS or stuttering
-- Reduce update frequency in your script
-- Use smaller monitor arrays
-- Batch drawing operations
-- Check CPU usage with `/forge tps`
+    Use primitives - drawRect() and drawLine() are faster than individual pixels
 
-### Image not loading
-- Verify Base64 data is valid
-- Check image format is PNG or JPEG
-- Ensure image data isn't truncated
-- Try a smaller test image first
+    Limit updates - Don't call updateDisplay() more than 60 times per second
 
----
+    Clear efficiently - Use clear() instead of drawing black pixels
 
-## Credits
+    Event polling - Add sleep() between event checks to reduce CPU usage
 
-**Author:** Tom (GitHub: @tiktop101)  
-**Minecraft Version:** 1.20.1  
-**Forge Version:** 47.x.x  
-**ComputerCraft:** CC: Tweaked
+    Keep displays nearby - Maximum render distance is 64 blocks
 
-## License
+    Clean up - Always call clearDisplay() when done
+
+Technical Specifications
+
+Specification	Value
+Resolution per block	164×81 pixels
+Color depth	24-bit RGB (8 bits/channel)
+Maximum monitor size	8×6 blocks
+Maximum total displays	50
+Maximum total pixels	10 megapixels
+Render distance	64 blocks
+Memory per 1×1 display	~40 KB
+Texture update rate	Limited to 60 FPS
+Input latency	Sub-tick (<50ms)
+
+Troubleshooting
+
+"Display not found" error
+
+    Ensure the monitor exists at the specified coordinates
+
+    Use autoDetectMonitor() to verify monitor detection
+
+    Check that monitors form a complete rectangle
+
+Touch input not working
+
+    Close the CC computer terminal first
+
+    Make sure you're clicking on the physical monitor blocks in world
+
+    Verify the display ID is correct
+
+    Check hasEvent() returns true before calling pullEvent()
+
+Low FPS or stuttering
+
+    Reduce update frequency in your script
+
+    Use smaller monitor arrays
+
+    Batch drawing operations
+
+    Check CPU usage with /forge tps
+
+Image not loading
+
+    Verify image data is valid (e.g., correct Base64 for loadImage or binary for loadJPEGDict)
+
+    Check image format is PNG or JPEG
+
+    Ensure image data isn't truncated
+
+    Try a smaller test image first
+
+Credits
+
+Author: Tom (GitHub: @tiktop101) Minecraft Version: 1.20.1 Forge Version: 47.x.x ComputerCraft: CC: Tweaked
+
+License
 
 This project is licensed under the ARR License.
 
----
+Support
 
-## Support
+    Issues: Report bugs on GitHub Issues
 
-- **Issues:** Report bugs on GitHub Issues
-- **Discord:** Join the Minecraft Computer Mods Discord Server
-
-**Enjoy creating amazing graphics in ComputerCraft!** 🎨
+    Discord: Join the Minecraft Computer Mods Discord Server
