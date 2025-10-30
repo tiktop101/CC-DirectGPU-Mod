@@ -22,7 +22,7 @@ Features
 
 Installation
 
-    Download the latest DirectGPU JAR from releases
+    Download the latest DirectGPU JAR
 
     Place in your Minecraft mods folder
 
