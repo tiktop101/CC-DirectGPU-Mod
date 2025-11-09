@@ -1,17 +1,29 @@
 # DirectGPU
 
-A high-performance ComputerCraft peripheral for Minecraft that enables hardware-accelerated graphics rendering directly to monitors. Stream images, create interactive UIs, or build pixel art - all at up to 656×324 resolution per block with 4x scaling.
+A high-performance ComputerCraft peripheral for Minecraft that enables hardware-accelerated 2D and 3D graphics rendering directly to monitors. Stream images, create interactive UIs, render 3D models, or build pixel art - all at up to 656×324 resolution per block with 4x scaling.
 
 ## Features
 
+### 2D Graphics
 - **True RGB Graphics** - 24-bit color with 164×81 pixels per monitor block (up to 656×324 with 4x resolution multiplier)
 - **Hardware Accelerated** - OpenGL rendering bypasses CC's text system for maximum performance
-- **Touch Input** - Full mouse click, drag, and keyboard event support with sub-tick latency
-- **Auto-Detection** - Automatically finds and configures nearby monitors in any orientation
-- **Drawing Primitives** - Fast lines, rectangles, and pixel-perfect rendering
+- **Drawing Primitives** - Fast lines, rectangles, circles, and pixel-perfect rendering
+- **Built-in Font Rendering** - Multiple system fonts with anti-aliasing, styles, and sizes
 - **Image Support** - Load JPEG images with hardware decoding (~5ms per frame)
 - **Dictionary Compression** - Intelligent chunk-based caching reduces bandwidth by 90%+ for video
-- **Flexible Sizing** - Works with any monitor array up to 16×16 blocks
+
+### 3D Graphics
+- **3D Camera System** - Full perspective projection with position, rotation, and look-at
+- **3D Primitives** - Cubes, spheres, pyramids with rotation and scaling
+- **OBJ Model Loading** - Load and render .obj 3D models with texture support
+- **Z-Buffer Depth Testing** - Proper depth sorting for complex 3D scenes
+- **Texture Mapping** - UV-mapped textures on 3D models
+- **Dynamic Lighting** - Directional lights with diffuse shading
+
+### Interaction & Data
+- **Touch Input** - Full mouse click, drag, hover, and keyboard event support with sub-tick latency
+- **World Data Access** - Query time, weather, moon phase, biome, and game rules
+- **Auto-Detection** - Automatically finds and configures nearby monitors in any orientation
 - **Multi-Display** - Up to 50 displays with 10 megapixel total limit
 - **Thread-Safe** - Safe concurrent access from multiple computers
 
@@ -19,7 +31,7 @@ A high-performance ComputerCraft peripheral for Minecraft that enables hardware-
 
 1. Download the latest DirectGPU JAR from releases
 2. Place in your Minecraft `mods` folder
-3. Ensure you have **Forge** Or **Fabric** and **CC: Tweaked** installed
+3. Ensure you have **Forge** and **CC: Tweaked** installed
 4. Craft the DirectGPU block (see recipe below)
 5. Launch Minecraft and enjoy!
 
@@ -39,6 +51,7 @@ A high-performance ComputerCraft peripheral for Minecraft that enables hardware-
 
 ## Quick Start
 
+### 2D Graphics
 ```lua
 -- Find the DirectGPU peripheral
 local gpu = peripheral.find("directgpu")
@@ -59,13 +72,57 @@ gpu.updateDisplay(display)
 gpu.clearAllDisplays()
 ```
 
+### 3D Graphics
+```lua
+local gpu = peripheral.find("directgpu")
+local display = gpu.autoDetectAndCreateDisplay()
+
+-- Setup 3D camera
+gpu.setupCamera(display, 60, 0.1, 1000)  -- FOV, near, far
+gpu.setCameraPosition(display, 0, 0, 5)
+gpu.setCameraRotation(display, 0, 0, 0)
+
+-- Clear and draw a rotating cube
+gpu.clear(display, 0, 0, 0)
+gpu.clearZBuffer(display)
+
+local rotation = 0
+while true do
+    gpu.clear(display, 0, 0, 0)
+    gpu.clearZBuffer(display)
+    
+    -- Draw cube at origin with rotation
+    gpu.drawCube(display, 0, 0, 0, 2, rotation, rotation, 0, 255, 100, 100)
+    
+    gpu.updateDisplay(display)
+    rotation = rotation + 2
+    sleep(0.05)
+end
+```
+
 ---
 
 ## API Reference
 
-### Display Management
+## Table of Contents
+- [Display Management](#display-management)
+- [2D Drawing Functions](#2d-drawing-functions)
+- [Font Rendering](#font-rendering)
+- [Image Loading](#image-loading)
+- [Dictionary Compression](#dictionary-compression)
+- [3D Rendering](#3d-rendering)
+- [3D Models (OBJ Files)](#3d-models-obj-files)
+- [Textures](#textures)
+- [Lighting](#lighting)
+- [Touch Input](#touch-input)
+- [World Data](#world-data)
+- [Examples](#examples)
 
-#### `autoDetectMonitor()` → info
+---
+
+## Display Management
+
+### `autoDetectMonitor()` → info
 
 Scans for the nearest monitor within 16 blocks and returns its configuration.
 
@@ -91,21 +148,14 @@ end
 }
 ```
 
-**Notes:**
-- Automatically detects monitor orientation (north, south, east, west, up, down)
-- Finds complete rectangular monitor arrays only
-- Returns `{found = false}` if no monitor found
-- Detection range: 16 blocks in all directions
-
 ---
 
-#### `autoDetectAndCreateDisplay()` → displayId
+### `autoDetectAndCreateDisplay()` → displayId
 
 Automatically detects the nearest monitor and creates a display at 1x resolution.
 
 ```lua
 local display = gpu.autoDetectAndCreateDisplay()
-print("Created display: " .. display)
 ```
 
 **Returns:** Display ID (number)  
@@ -113,33 +163,22 @@ print("Created display: " .. display)
 
 ---
 
-#### `autoDetectAndCreateDisplayWithResolution(resolutionMultiplier)` → displayId
+### `autoDetectAndCreateDisplayWithResolution(resolutionMultiplier)` → displayId
 
 Same as above but with custom resolution scaling.
 
 ```lua
 -- Create a 2x resolution display (328x162 pixels per block)
 local display = gpu.autoDetectAndCreateDisplayWithResolution(2)
-
--- Maximum 4x resolution (656x324 pixels per block)
-local display = gpu.autoDetectAndCreateDisplayWithResolution(4)
 ```
 
 **Parameters:**
-- `resolutionMultiplier` (number): Resolution scale factor (1-4)
-  - `1` = 164×81 per block (default)
-  - `2` = 328×162 per block
-  - `3` = 492×243 per block
-  - `4` = 656×324 per block
-
-**Returns:** Display ID  
-**Throws:** Error if multiplier is out of range or no monitor found
-
-**Performance Note:** Higher resolutions consume more memory and bandwidth. Use 2x for HD content, 4x only for small displays.
+- `resolutionMultiplier` (number): 1-4 (1=164×81, 2=328×162, 3=492×243, 4=656×324 per block)
 
 ---
 
-#### `createDisplay(x, y, z, facing, width, height)` → displayId
+### `createDisplay(x, y, z, facing, width, height)` → displayId
+### `createDisplayAt(x, y, z, facing, width, height)` → displayId
 
 Creates a display at specific world coordinates with 1x resolution.
 
@@ -149,275 +188,287 @@ local display = gpu.createDisplay(100, 64, 200, "south", 4, 3)
 
 **Parameters:**
 - `x, y, z` (number): World coordinates of bottom-left corner
-- `facing` (string): Direction - "north", "south", "east", "west", "up", "down"
-- `width` (number): Monitor width in blocks (1-16)
-- `height` (number): Monitor height in blocks (1-16)
-
-**Returns:** Display ID  
-**Throws:** Error if parameters are invalid
-
-**Important:** The facing direction should be the direction the monitor is facing (where the screen points), NOT the direction you're looking at it from.
+- `facing` (string): "north", "south", "east", "west", "up", "down"
+- `width, height` (number): Monitor size in blocks (1-16)
 
 ---
 
-#### `createDisplayAt(x, y, z, facing, width, height)` → displayId
-
-Alias for `createDisplay()`. Identical functionality.
-
-```lua
-local display = gpu.createDisplayAt(100, 64, 200, "south", 4, 3)
-```
-
----
-
-#### `createDisplayWithResolution(x, y, z, facing, width, height, resolutionMultiplier)` → displayId
+### `createDisplayWithResolution(x, y, z, facing, width, height, resolutionMultiplier)` → displayId
 
 Creates a display with custom resolution scaling.
 
 ```lua
--- 3x2 monitor array at 2x resolution
 local display = gpu.createDisplayWithResolution(100, 64, 200, "south", 3, 2, 2)
 ```
 
-**Parameters:**
-- `x, y, z, facing, width, height`: Same as `createDisplay()`
-- `resolutionMultiplier` (number): Resolution scale (1-4)
+---
 
-**Returns:** Display ID  
-**Throws:** Error if parameters are invalid or resource limits exceeded
+### `removeDisplay(displayId)` → success
+### `clearAllDisplays()`
+### `listDisplays()` → displayIds
+### `getDisplayInfo(displayId)` → info
+### `getResourceStats()` → stats
+
+Standard display management functions. See original README for details.
 
 ---
 
-#### `removeDisplay(displayId)` → success
+## 2D Drawing Functions
 
-Removes a specific display and frees its resources.
+### `setPixel(displayId, x, y, r, g, b)`
 
-```lua
-local success = gpu.removeDisplay(display)
-if success then
-    print("Display removed")
-end
-```
-
-**Returns:** `true` if successful, `false` if display doesn't exist
-
-**Note:** Also cleans up associated OpenGL textures automatically.
-
----
-
-#### `clearAllDisplays()`
-
-Removes all displays created by this DirectGPU block.
-
-```lua
-gpu.clearAllDisplays()
-```
-
-**Note:** Automatically called when the DirectGPU block is broken.
-
----
-
-#### `listDisplays()` → displayIds
-
-Returns a list of all active display IDs.
-
-```lua
-local displays = gpu.listDisplays()
-for _, id in ipairs(displays) do
-    print("Display: " .. id)
-end
-```
-
-**Returns:** Array of display IDs (numbers)
-
----
-
-#### `getDisplayInfo(displayId)` → info
-
-Returns detailed information about a display.
-
-```lua
-local info = gpu.getDisplayInfo(display)
-print(string.format("%dx%d pixels (%dx resolution)", 
-    info.pixelWidth, info.pixelHeight, info.resolutionMultiplier))
-```
-
-**Returns:**
-```lua
-{
-    id = 0,                  -- Display ID
-    x = 100,                 -- World X coordinate
-    y = 64,                  -- World Y coordinate  
-    z = 200,                 -- World Z coordinate
-    facing = "north",        -- Direction
-    width = 3,               -- Width in blocks
-    height = 2,              -- Height in blocks
-    pixelWidth = 492,        -- Width in pixels (width * 164 * multiplier)
-    pixelHeight = 162,       -- Height in pixels (height * 81 * multiplier)
-    resolutionMultiplier = 1 -- Resolution scale factor (1-4)
-}
-```
-
----
-
-#### `getResourceStats()` → stats
-
-Returns system resource usage statistics.
-
-```lua
-local stats = gpu.getResourceStats()
-print(string.format("Displays: %d/%d", stats.displays, stats.maxDisplays))
-print(string.format("Pixels: %.1fM / %.1fM (%.1f%%)", 
-    stats.totalPixels/1e6, stats.maxTotalPixels/1e6, stats.pixelUsagePercent))
-```
-
-**Returns:**
-```lua
-{
-    displays = 3,              -- Current number of displays
-    maxDisplays = 50,          -- Maximum allowed displays
-    totalPixels = 2500000,     -- Total pixels across all displays
-    maxTotalPixels = 10000000, -- Maximum total pixels allowed
-    pixelUsagePercent = 25.0   -- Percentage of pixel budget used
-}
-```
-
----
-
-### Drawing Functions
-
-#### `setPixel(displayId, x, y, r, g, b)`
-
-Sets a single pixel to the specified RGB color.
+Sets a single pixel to RGB color (0-255).
 
 ```lua
 gpu.setPixel(display, 100, 50, 255, 128, 0)
 ```
 
-**Parameters:**
-- `displayId` (number): Target display ID
-- `x, y` (number): Pixel coordinates (0-indexed from top-left)
-- `r, g, b` (number): RGB color values (0-255)
-
-**Note:** Does not automatically update the display. Call `updateDisplay()` to render changes to the screen.
-
-**Coordinate System:** (0, 0) is top-left corner. X increases right, Y increases down.
-
 ---
 
-#### `getPixel(displayId, x, y)` → color
+### `getPixel(displayId, x, y)` → {r, g, b}
 
 Returns the RGB color of a pixel.
 
 ```lua
 local r, g, b = table.unpack(gpu.getPixel(display, 100, 50))
-print(string.format("RGB: %d, %d, %d", r, g, b))
 ```
-
-**Parameters:**
-- `displayId` (number): Target display ID
-- `x, y` (number): Pixel coordinates
-
-**Returns:** Array `{r, g, b}` with values 0-255
-
-**Note:** Returns `{0, 0, 0}` if coordinates are out of bounds.
 
 ---
 
-#### `clear(displayId, r, g, b)`
+### `clear(displayId, r, g, b)`
 
-Fills the entire display with a solid color.
+Fills entire display with solid color.
 
 ```lua
-gpu.clear(display, 0, 0, 0)  -- Clear to black
-gpu.clear(display, 255, 255, 255)  -- Clear to white
-gpu.clear(display, 64, 128, 192)  -- Clear to custom color
+gpu.clear(display, 0, 0, 0)  -- Black
 ```
-
-**Parameters:**
-- `displayId` (number): Target display ID
-- `r, g, b` (number): RGB fill color (0-255)
-
-**Note:** Marks display as dirty but you still need to call `updateDisplay()` to render.
 
 ---
 
-#### `fillRect(displayId, x, y, width, height, r, g, b)`
+### `fillRect(displayId, x, y, width, height, r, g, b)`
 
 Draws a filled rectangle.
 
 ```lua
--- Draw a 100x50 red rectangle at (10, 10)
 gpu.fillRect(display, 10, 10, 100, 50, 255, 0, 0)
-
--- Draw a yellow bar across the top
-gpu.fillRect(display, 0, 0, info.pixelWidth, 20, 255, 255, 0)
 ```
-
-**Parameters:**
-- `displayId` (number): Target display ID
-- `x, y` (number): Top-left corner position
-- `width, height` (number): Rectangle dimensions in pixels
-- `r, g, b` (number): Fill color (0-255)
-
-**Note:** Automatically clips to display bounds.
 
 ---
 
-#### `drawLine(displayId, x1, y1, x2, y2, r, g, b)`
+### `drawLine(displayId, x1, y1, x2, y2, r, g, b)`
 
-Draws a line between two points using Bresenham's algorithm.
+Draws a line using Bresenham's algorithm.
 
 ```lua
--- Draw white diagonal line
 gpu.drawLine(display, 0, 0, 163, 80, 255, 255, 255)
-
--- Draw a cross
-gpu.drawLine(display, 0, 0, 163, 80, 255, 0, 0)
-gpu.drawLine(display, 163, 0, 0, 80, 255, 0, 0)
 ```
-
-**Parameters:**
-- `displayId` (number): Target display ID
-- `x1, y1` (number): Start point coordinates
-- `x2, y2` (number): End point coordinates
-- `r, g, b` (number): Line color (0-255)
-
-**Performance:** Efficient single-pixel-wide line drawing.
 
 ---
 
-#### `updateDisplay(displayId)`
+### `drawCircle(displayId, cx, cy, radius, r, g, b, filled)`
 
-Marks the display as dirty, triggering a render update on the next frame.
+Draws a circle (filled or outline).
+
+```lua
+-- Filled red circle
+gpu.drawCircle(display, 100, 100, 50, 255, 0, 0, true)
+
+-- White circle outline
+gpu.drawCircle(display, 100, 100, 50, 255, 255, 255, false)
+```
+
+**Parameters:**
+- `cx, cy` (number): Center coordinates
+- `radius` (number): Circle radius in pixels
+- `r, g, b` (number): RGB color (0-255)
+- `filled` (boolean): true for filled circle, false for outline
+
+---
+
+### `drawEllipse(displayId, cx, cy, rx, ry, r, g, b, filled)`
+
+Draws an ellipse (filled or outline).
+
+```lua
+-- Filled blue ellipse
+gpu.drawEllipse(display, 100, 100, 80, 40, 0, 0, 255, true)
+```
+
+**Parameters:**
+- `cx, cy` (number): Center coordinates
+- `rx, ry` (number): X and Y radii in pixels
+- `r, g, b` (number): RGB color
+- `filled` (boolean): true for filled, false for outline
+
+---
+
+### `updateDisplay(displayId)`
+
+Marks display as dirty to trigger render update.
 
 ```lua
 gpu.setPixel(display, 10, 10, 255, 0, 0)
-gpu.setPixel(display, 11, 10, 255, 0, 0)
-gpu.setPixel(display, 12, 10, 255, 0, 0)
-gpu.updateDisplay(display)  -- Render all changes at once
+gpu.updateDisplay(display)  -- Render changes
 ```
-
-**Performance Tips:** 
-- Batch multiple drawing operations before calling `updateDisplay()`
-- The renderer automatically limits updates to ~60 FPS for smooth performance
-- No need to call this more than once per frame
 
 ---
 
-### Image Loading
+## Font Rendering
 
-#### `loadImage(displayId, imageData)`
+DirectGPU includes built-in system font rendering with anti-aliasing, multiple fonts, sizes, and styles.
 
-Loads an image from a Lua table in nested or flat pixel format. Automatically scales to fit display with aspect ratio preservation.
+### `drawText(displayId, text, x, y, r, g, b, fontName, fontSize, style)` → result
+
+Renders text to the display with anti-aliasing.
+
+```lua
+local result = gpu.drawText(display, "Hello World!", 10, 10, 
+    255, 255, 255,  -- White text
+    "Arial", 24, "plain")
+
+print(string.format("Text size: %dx%d", result.width, result.height))
+```
+
+**Parameters:**
+- `displayId` (number): Target display
+- `text` (string): Text to render
+- `x, y` (number): Top-left position
+- `r, g, b` (number): Text color (0-255)
+- `fontName` (string): Font name (e.g., "Arial", "Times New Roman", "Courier New")
+- `fontSize` (number): Font size in points
+- `style` (string): "plain", "bold", "italic", or "bold_italic"
+
+**Returns:**
+```lua
+{
+    width = 120,     -- Rendered text width
+    height = 24,     -- Rendered text height
+    success = true
+}
+```
+
+**Note:** Does not call `updateDisplay()`. Call it after rendering text.
+
+---
+
+### `measureText(text, fontName, fontSize, style)` → metrics
+
+Measures text dimensions without rendering.
+
+```lua
+local metrics = gpu.measureText("Hello World!", "Arial", 24, "plain")
+print(string.format("Text will be %dx%d pixels", metrics.width, metrics.height))
+```
+
+**Returns:**
+```lua
+{
+    width = 120,     -- Text width in pixels
+    height = 24,     -- Text height in pixels
+    ascent = 20,     -- Distance from baseline to top
+    descent = 4,     -- Distance from baseline to bottom
+    success = true
+}
+```
+
+**Use Case:** Layout calculation before rendering.
+
+---
+
+### `drawTextWithBg(displayId, text, x, y, fgR, fgG, fgB, bgR, bgG, bgB, padding, fontName, fontSize, style)` → result
+
+Draws text with a background rectangle.
+
+```lua
+-- White text on dark blue background with 5px padding
+gpu.drawTextWithBg(display, "Status: OK", 10, 10,
+    255, 255, 255,  -- White foreground
+    0, 0, 128,      -- Dark blue background
+    5,              -- 5px padding
+    "Arial", 16, "bold")
+```
+
+**Parameters:**
+- First 7 parameters: Same as `drawText`
+- `bgR, bgG, bgB` (number): Background color
+- `padding` (number): Padding around text in pixels
+- Last 3 parameters: Font settings
+
+---
+
+### `drawTextWrapped(displayId, text, x, y, maxWidth, r, g, b, lineSpacing, fontName, fontSize, style)` → result
+
+Draws multi-line text with word wrapping.
+
+```lua
+local longText = "This is a long paragraph that will automatically wrap to fit within the specified width constraint."
+
+local result = gpu.drawTextWrapped(display, longText, 
+    10, 10,         -- Start position
+    300,            -- Max width (will wrap at this width)
+    255, 255, 255,  -- White text
+    5,              -- 5px line spacing
+    "Arial", 14, "plain")
+
+print("Drew " .. result.linesDrawn .. " lines")
+```
+
+**Parameters:**
+- `maxWidth` (number): Maximum width before wrapping
+- `lineSpacing` (number): Vertical spacing between lines
+
+**Returns:**
+```lua
+{
+    linesDrawn = 4,  -- Number of lines rendered
+    success = true
+}
+```
+
+---
+
+### `getAvailableFonts()` → fontNames
+
+Returns list of all available system fonts.
+
+```lua
+local fonts = gpu.getAvailableFonts()
+for i, font in ipairs(fonts) do
+    print(i .. ": " .. font)
+end
+```
+
+**Returns:** Array of font name strings
+
+**Common Fonts:** "Arial", "Courier New", "Times New Roman", "Comic Sans MS", "Verdana", "Georgia", "Trebuchet MS"
+
+---
+
+### `clearFontCache()`
+
+Clears the font rendering cache to free memory.
+
+```lua
+gpu.clearFontCache()
+```
+
+**Use Case:** Call after rendering many different font combinations to free memory.
+
+---
+
+## Image Loading
+
+### `loadImage(displayId, imageData)`
+
+Loads an image from Lua table format.
 
 ```lua
 local imageData = {
     width = 100,
     height = 100,
     pixels = {
-        {{255, 0, 0}, {0, 255, 0}, {0, 0, 255}, ...},  -- Row 1
-        {{0, 255, 0}, {0, 0, 255}, {255, 0, 0}, ...},  -- Row 2
+        {{255, 0, 0}, {0, 255, 0}, ...},  -- Row 1
+        {{0, 0, 255}, {255, 255, 0}, ...},  -- Row 2
         ...
     }
 }
@@ -426,42 +477,11 @@ gpu.loadImage(display, imageData)
 gpu.updateDisplay(display)
 ```
 
-**Supported Formats:**
-
-1. **Nested List Format (recommended):**
-```lua
-pixels = {
-    {{r, g, b}, {r, g, b}, ...},  -- Row 1
-    {{r, g, b}, {r, g, b}, ...},  -- Row 2
-    ...
-}
-```
-
-2. **Flat Array Format:**
-```lua
-pixels = {r, g, b, r, g, b, r, g, b, ...}  -- Single linear array
-```
-
-3. **Lua Table Format (1-indexed):**
-```lua
-pixels = {
-    [1] = {[1] = {r, g, b}, [2] = {r, g, b}, ...},
-    [2] = {[1] = {r, g, b}, [2] = {r, g, b}, ...},
-    ...
-}
-```
-
-**Parameters:**
-- `displayId` (number): Target display ID
-- `imageData` (table): Image data structure with `width`, `height`, and `pixels` fields
-
-**Note:** Does not call `updateDisplay()` automatically. Always call it after loading.
-
 ---
 
-#### `decodeJPEG(jpegData)` → result
+### `decodeJPEG(jpegData)` → result
 
-Decodes a JPEG image from binary data. Returns pixel data for manual processing.
+Decodes JPEG from binary data.
 
 ```lua
 local handle = http.get("http://example.com/image.jpg", {}, true)
@@ -471,582 +491,1013 @@ handle.close()
 local result = gpu.decodeJPEG(jpegData)
 print(string.format("Decoded: %dx%d in %dms", 
     result.width, result.height, result.decodeTime))
-
--- result.pixels is a byte array (flat RGB format)
 ```
-
-**Parameters:**
-- `jpegData` (string): Binary JPEG data (use `http.get(..., {}, true)` for binary mode)
-
-**Returns:**
-```lua
-{
-    width = 640,           -- Image width in pixels
-    height = 480,          -- Image height in pixels
-    pixels = "\xFF\x00...", -- Flat RGB byte array (width * height * 3 bytes)
-    decodeTime = 5         -- Decode time in milliseconds
-}
-```
-
-**Performance:** ~5-15ms for typical webcam images (640×480)
-
-**Important:** The `pixels` field is a binary string in flat RGB format: `RGBRGBRGB...`
 
 ---
 
-#### `decodeAndScaleJPEG(jpegData, targetWidth, targetHeight)` → result
+### `decodeAndScaleJPEG(jpegData, targetWidth, targetHeight)` → result
 
-Decodes and scales a JPEG in one optimized operation. Much faster than decode + scale separately.
+Decodes and scales JPEG in one operation (faster).
 
 ```lua
 local info = gpu.getDisplayInfo(display)
 local result = gpu.decodeAndScaleJPEG(jpegData, info.pixelWidth, info.pixelHeight)
-
-print(string.format("Scaled %dx%d -> %dx%d in %dms",
-    result.originalWidth, result.originalHeight,
-    result.width, result.height,
-    result.decodeTime))
 ```
-
-**Parameters:**
-- `jpegData` (string): Binary JPEG data
-- `targetWidth, targetHeight` (number): Target dimensions
-
-**Returns:**
-```lua
-{
-    width = 164,            -- Scaled width
-    height = 81,            -- Scaled height
-    pixels = "...",         -- Scaled RGB byte array
-    originalWidth = 640,    -- Original image width
-    originalHeight = 480,   -- Original image height
-    decodeTime = 8          -- Total decode+scale time (ms)
-}
-```
-
-**Performance:** Faster than decode + scale separately. Use for real-time video streaming.
 
 ---
 
-#### `getJPEGDimensions(jpegData)` → dimensions
+### `getJPEGDimensions(jpegData)` → dimensions
 
-Gets JPEG dimensions without full decode (very fast, <1ms).
+Gets JPEG dimensions without full decode (<1ms).
 
 ```lua
 local dims = gpu.getJPEGDimensions(jpegData)
 print(string.format("Image: %dx%d", dims.width, dims.height))
-
--- Useful for deciding whether to scale before decoding
-if dims.width > 1000 then
-    print("Image too large, will scale down")
-end
 ```
-
-**Parameters:**
-- `jpegData` (string): Binary JPEG data
-
-**Returns:** `{width = number, height = number}`
-
-**Use Case:** Check image size before expensive decode operations.
 
 ---
 
-#### `loadJPEGRegion(displayId, jpegData, x, y, width, height)`
+### `loadJPEGRegion(displayId, jpegData, x, y, width, height)`
 
-Decodes a JPEG and blits it to a specific region of the display. Does NOT call `updateDisplay()`.
+Decodes JPEG and blits to specific region.
 
 ```lua
--- Load webcam frame into top-left corner
 gpu.loadJPEGRegion(display, jpegData, 0, 0, 320, 240)
-
--- Load thumbnail into bottom-right
-local info = gpu.getDisplayInfo(display)
-gpu.loadJPEGRegion(display, thumbnailData, 
-    info.pixelWidth - 80, info.pixelHeight - 60, 80, 60)
-
-gpu.updateDisplay(display)  -- Must call this to render
+gpu.updateDisplay(display)
 ```
-
-**Parameters:**
-- `displayId` (number): Target display ID
-- `jpegData` (string): Binary JPEG data
-- `x, y` (number): Destination position on display
-- `width, height` (number): Region size (JPEG will be scaled to fit)
-
-**Use Case:** 
-- Compositing multiple images on one display
-- Picture-in-picture video windows
-- Thumbnail grids
-
-**Performance:** Combines decode, scale, and blit in one optimized operation.
 
 ---
 
-### Dictionary Compression
+## Dictionary Compression
 
-DirectGPU includes a high-performance dictionary compression system that caches 8KB chunks by hash. This is **extremely efficient for video streaming** - typically 90%+ cache hit rate after the first frame.
+### `compressWithDict(data)` → stats
+### `decompressFromDict(hashes)` → data
+### `hasChunk(hash)` → boolean
+### `getChunk(hash)` → data
+### `getDictionaryStats()` → stats
+### `clearDictionary()`
 
-#### `compressWithDict(data)` → stats
+See original README for dictionary compression details.
 
-Compresses binary data using dictionary-based chunking.
+---
+
+## 3D Rendering
+
+DirectGPU includes a full 3D rendering engine with camera projection, primitives, and depth testing.
+
+### `setupCamera(displayId, fov, near, far)` → result
+
+Initializes the 3D camera for a display.
 
 ```lua
-local handle = http.get("http://example.com/image.jpg", {}, true)
-local jpegData = handle.readAll()
+local result = gpu.setupCamera(display, 60, 0.1, 1000)
+print("Aspect ratio: " .. result.aspect)
+```
+
+**Parameters:**
+- `displayId` (number): Target display
+- `fov` (number): Field of view in degrees (typically 45-90)
+- `near` (number): Near clipping plane (typically 0.1)
+- `far` (number): Far clipping plane (typically 100-1000)
+
+**Returns:**
+```lua
+{
+    success = true,
+    aspect = 2.024  -- Calculated aspect ratio
+}
+```
+
+**Note:** Must be called before any 3D drawing. Automatically calculates aspect ratio from display dimensions.
+
+---
+
+### `setCameraPosition(displayId, x, y, z)`
+
+Sets the 3D camera position in world space.
+
+```lua
+gpu.setCameraPosition(display, 0, 2, 5)  -- 5 units back, 2 units up
+```
+
+**Parameters:**
+- `x, y, z` (number): Camera position in 3D space
+
+**Coordinate System:**
+- X: Right (+) / Left (-)
+- Y: Up (+) / Down (-)
+- Z: Forward (-) / Back (+)
+
+---
+
+### `setCameraRotation(displayId, pitch, yaw, roll)`
+
+Sets camera rotation angles in degrees.
+
+```lua
+gpu.setCameraRotation(display, -15, 45, 0)  -- Look down 15°, turn right 45°
+```
+
+**Parameters:**
+- `pitch` (number): Rotation around X axis (look up/down)
+- `yaw` (number): Rotation around Y axis (look left/right)
+- `roll` (number): Rotation around Z axis (tilt)
+
+**Angles:**
+- Pitch: -90 (down) to 90 (up)
+- Yaw: 0-360 (0=north, 90=east, 180=south, 270=west)
+- Roll: -180 to 180
+
+---
+
+### `lookAt(displayId, targetX, targetY, targetZ)`
+
+Points camera at a specific 3D point.
+
+```lua
+-- Look at origin from current position
+gpu.lookAt(display, 0, 0, 0)
+
+-- Look at a specific object
+gpu.lookAt(display, objectX, objectY, objectZ)
+```
+
+**Parameters:**
+- `targetX, targetY, targetZ` (number): Point to look at
+
+**Note:** Automatically calculates pitch and yaw. Roll remains unchanged.
+
+---
+
+### `getCameraInfo(displayId)` → info
+
+Returns current camera state.
+
+```lua
+local cam = gpu.getCameraInfo(display)
+print(string.format("Camera at (%.1f, %.1f, %.1f)", cam.posX, cam.posY, cam.posZ))
+print(string.format("Rotation: pitch=%.1f, yaw=%.1f", cam.pitch, cam.yaw))
+```
+
+**Returns:**
+```lua
+{
+    posX = 0, posY = 2, posZ = 5,     -- Camera position
+    pitch = -15, yaw = 45, roll = 0,  -- Camera rotation
+    fov = 60,                          -- Field of view
+    near = 0.1, far = 1000,           -- Clipping planes
+    aspect = 2.024                     -- Aspect ratio
+}
+```
+
+---
+
+### `clearZBuffer(displayId)`
+
+Clears the depth buffer for a new frame.
+
+```lua
+-- Typical 3D rendering loop
+gpu.clear(display, 0, 0, 0)          -- Clear color
+gpu.clearZBuffer(display)             -- Clear depth
+-- ... draw 3D objects ...
+gpu.updateDisplay(display)
+```
+
+**Important:** Call this at the start of each 3D frame to prevent depth artifacts.
+
+---
+
+### `drawCube(displayId, x, y, z, size, rotX, rotY, rotZ, r, g, b)`
+
+Draws a 3D cube with rotation.
+
+```lua
+-- Draw a red cube at origin, rotated 45° on Y axis
+gpu.drawCube(display, 0, 0, 0, 2, 0, 45, 0, 255, 0, 0)
+```
+
+**Parameters:**
+- `x, y, z` (number): Cube center position
+- `size` (number): Cube edge length
+- `rotX, rotY, rotZ` (number): Rotation angles in degrees
+- `r, g, b` (number): Cube color (0-255)
+
+---
+
+### `drawSphere(displayId, x, y, z, radius, segments, r, g, b)`
+
+Draws a 3D sphere.
+
+```lua
+-- Draw a blue sphere with 16 segments (smoother)
+gpu.drawSphere(display, 0, 0, 0, 1.5, 16, 0, 100, 255)
+```
+
+**Parameters:**
+- `x, y, z` (number): Sphere center
+- `radius` (number): Sphere radius
+- `segments` (number): Detail level (8-32, higher = smoother but slower)
+- `r, g, b` (number): Sphere color
+
+**Performance:** 8-12 segments for real-time, 16-24 for quality, 32+ for screenshots.
+
+---
+
+### `drawPyramid(displayId, x, y, z, size, rotX, rotY, rotZ, r, g, b)`
+
+Draws a 3D pyramid.
+
+```lua
+-- Draw a yellow pyramid
+gpu.drawPyramid(display, 0, -1, 0, 2, 0, 0, 0, 255, 255, 0)
+```
+
+**Parameters:**
+- `x, y, z` (number): Pyramid base center
+- `size` (number): Base edge length
+- `rotX, rotY, rotZ` (number): Rotation angles
+- `r, g, b` (number): Pyramid color
+
+---
+
+### `clear3D(displayId)`
+
+Clears all 3D state for a display (camera, z-buffer).
+
+```lua
+gpu.clear3D(display)
+```
+
+---
+
+## 3D Models (OBJ Files)
+
+DirectGPU can load and render industry-standard .obj 3D model files.
+
+### `load3DModel(objData)` → modelId
+
+Loads an OBJ model from string data.
+
+```lua
+local objFile = [[
+v -1 -1 -1
+v 1 -1 -1
+v 1 1 -1
+v -1 1 -1
+v -1 -1 1
+v 1 -1 1
+v 1 1 1
+v -1 1 1
+f 1 2 3 4
+f 5 8 7 6
+...
+]]
+
+local modelId = gpu.load3DModel(objFile)
+print("Loaded model: " .. modelId)
+```
+
+**Parameters:**
+- `objData` (string): OBJ file content as string
+
+**Returns:** Model ID (number)
+
+**Supported OBJ Features:**
+- Vertices (v)
+- Normals (vn)
+- Texture coordinates (vt)
+- Faces (f) - triangles, quads, and polygons
+- Groups (g) and objects (o)
+
+---
+
+### `load3DModelFromBytes(objData)` → modelId
+
+Loads OBJ model from byte array.
+
+```lua
+local handle = http.get("http://example.com/model.obj", {}, true)
+local objBytes = handle.readAll()
 handle.close()
 
-local stats = gpu.compressWithDict(jpegData)
-print(string.format("Chunks: %d total, %d new, %d cached (%.1f%% savings)",
-    stats.totalChunks, stats.newChunks, stats.cachedChunks,
-    (stats.cachedChunks / stats.totalChunks) * 100))
+local modelId = gpu.load3DModelFromBytes(objBytes)
 ```
-
-**Parameters:**
-- `data` (string): Binary data to compress
-
-**Returns:**
-```lua
-{
-    hashes = {12345, 67890, ...},  -- Array of chunk hashes
-    totalChunks = 120,              -- Total 8KB chunks
-    newChunks = 12,                 -- New chunks added to dictionary
-    cachedChunks = 108,             -- Chunks already in dictionary
-    chunkSize = 8192                -- Bytes per chunk
-}
-```
-
-**How It Works:**
-1. Splits data into 8KB chunks
-2. Computes CRC32 hash for each chunk
-3. Checks if chunk exists in dictionary
-4. Only stores new/changed chunks
-5. Returns array of hashes to reconstruct data
-
-**Result:** 90%+ bandwidth reduction for video after first frame!
-
-**Important:** The dictionary is global and shared across all displays. This makes compression even more efficient when streaming similar content to multiple displays.
 
 ---
 
-#### `decompressFromDict(hashes)` → data
+### `draw3DModel(displayId, modelId, x, y, z, rotX, rotY, rotZ, scale, r, g, b)`
 
-Reconstructs data from chunk hashes.
+Renders a loaded 3D model.
 
 ```lua
-local stats = gpu.compressWithDict(jpegData)
--- ... send hashes to another computer or store them ...
-
--- Later, reconstruct the original data
-local originalData = gpu.decompressFromDict(stats.hashes)
+-- Draw model at origin, scaled 0.5x, with rotation
+gpu.draw3DModel(display, modelId, 
+    0, 0, 0,        -- Position
+    0, 45, 0,       -- Rotation
+    0.5,            -- Scale
+    200, 200, 200)  -- Color
 ```
 
 **Parameters:**
-- `hashes` (array): Array of chunk hashes from `compressWithDict()`
-
-**Returns:** Binary string (reconstructed data)  
-**Throws:** Error if any chunk is missing from dictionary
-
-**Note:** All chunks must exist in the dictionary. If a chunk was evicted (dictionary holds max 10,000 chunks), decompression will fail.
+- `displayId` (number): Target display
+- `modelId` (number): Model ID from `load3DModel`
+- `x, y, z` (number): Model position
+- `rotX, rotY, rotZ` (number): Rotation in degrees
+- `scale` (number): Uniform scale factor
+- `r, g, b` (number): Model color (modulates texture if present)
 
 ---
 
-#### `hasChunk(hash)` → boolean
+### `unload3DModel(modelId)` → success
 
-Checks if a chunk exists in the dictionary.
+Removes model from memory.
 
 ```lua
-if gpu.hasChunk(12345) then
-    print("Chunk cached")
-else
-    print("Need to send chunk")
+if gpu.unload3DModel(modelId) then
+    print("Model unloaded")
 end
 ```
 
-**Parameters:**
-- `hash` (number): Chunk hash
-
-**Returns:** `true` if chunk exists, `false` otherwise
-
-**Use Case:** Network optimization - only send chunks that aren't cached.
+**Returns:** true if model existed and was removed
 
 ---
 
-#### `getChunk(hash)` → data
+### `get3DModelInfo(modelId)` → info
 
-Retrieves a chunk by its hash.
-
-```lua
-local chunkData = gpu.getChunk(12345)
-print("Chunk size: " .. #chunkData .. " bytes")
-```
-
-**Parameters:**
-- `hash` (number): Chunk hash
-
-**Returns:** Binary string (up to 8KB)  
-**Throws:** Error if chunk doesn't exist
-
----
-
-#### `getDictionaryStats()` → stats
-
-Returns dictionary statistics.
+Returns model statistics.
 
 ```lua
-local stats = gpu.getDictionaryStats()
-print(string.format("Dictionary: %d/%d chunks (%.1f MB)",
-    stats.dictionarySize, stats.maxDictionarySize, stats.totalMB))
+local info = gpu.get3DModelInfo(modelId)
+print(string.format("Model: %d vertices, %d faces", info.vertexCount, info.faceCount))
+print("Has textures: " .. tostring(info.hasTexCoords))
 ```
 
 **Returns:**
 ```lua
 {
-    dictionarySize = 5000,      -- Current chunks in dictionary
-    maxDictionarySize = 10000,  -- Maximum chunks (then LRU eviction)
-    chunkSize = 8192,           -- Bytes per chunk
-    totalBytes = 40960000,      -- Total bytes cached
-    totalMB = 39.1              -- Total MB cached
+    name = "unnamed",        -- Model name from OBJ
+    vertexCount = 1234,      -- Number of vertices
+    faceCount = 678,         -- Number of faces
+    hasNormals = true,       -- Has normal data
+    hasTexCoords = false     -- Has UV coordinates
 }
 ```
 
-**Note:** When dictionary reaches 10,000 chunks, oldest chunks are automatically evicted.
-
 ---
 
-#### `clearDictionary()`
+### `clearAll3DModels()`
 
-Clears all chunks from the dictionary.
+Unloads all models from memory.
 
 ```lua
-gpu.clearDictionary()
-print("Dictionary cleared")
+gpu.clearAll3DModels()
 ```
 
-**Use Cases:** 
-- Free memory when done streaming
-- Reset compression state between sessions
-- Clear cache when switching content types
-
 ---
 
-### Touch Input
+## Textures
 
-Touch input captures mouse events when you interact with the physical monitor blocks in the world.
+Textures can be applied to 3D models for realistic rendering.
 
-**Important:** Touch input only works when NOT in any GUI. Close the CC terminal and click directly on the monitor blocks.
+### `loadTexture(width, height, pixelData)` → textureId
 
-#### `hasEvents(displayId)` → boolean
-
-Checks if there are pending input events.
+Loads a texture from RGB byte array.
 
 ```lua
-while true do
-    if gpu.hasEvents(display) then
-        local event = gpu.pollEvent(display)
-        -- Process event
-    else
-        sleep(0.05)  -- Don't busy-wait
-    end
-end
+-- Create 2x2 checkerboard texture
+local pixels = string.char(
+    255, 0, 0,    0, 255, 0,   -- Red, Green
+    0, 0, 255,    255, 255, 0  -- Blue, Yellow
+)
+
+local textureId = gpu.loadTexture(2, 2, pixels)
 ```
 
 **Parameters:**
-- `displayId` (number): Target display ID
+- `width, height` (number): Texture dimensions (power of 2 recommended)
+- `pixelData` (string): Flat RGB byte array (width × height × 3 bytes)
 
-**Returns:** `true` if events are queued, `false` otherwise
+**Returns:** Texture ID (number)
 
 ---
 
-#### `pollEvent(displayId)` → event
+### `loadTextureFromImage(imageData)` → textureId
 
-Retrieves and removes the next input event from the queue.
+Loads texture from image data table.
 
 ```lua
-local event = gpu.pollEvent(display)
-if event then
-    print("Event type: " .. event.type)
-    print("Position: (" .. event.x .. ", " .. event.y .. ")")
-    print("Button: " .. event.button)
-end
-```
-
-**Parameters:**
-- `displayId` (number): Target display ID
-
-**Returns:** Event table or `nil` if no events available
-
-**Event Object:**
-```lua
-{
-    type = "mouse_click",  -- Event type (see below)
-    x = 50,                -- Pixel X coordinate (0-indexed)
-    y = 30,                -- Pixel Y coordinate (0-indexed)
-    button = 1,            -- Mouse button (1=left, 2=right, 3=middle)
-    timestamp = 1234567890 -- System time in milliseconds
+local imageData = {
+    width = 64,
+    height = 64,
+    pixels = "\xFF\x00\x00..."  -- RGB byte array
 }
+
+local textureId = gpu.loadTextureFromImage(imageData)
 ```
+
+---
+
+### `unloadTexture(textureId)` → success
+
+Removes texture from memory.
+
+```lua
+gpu.unloadTexture(textureId)
+```
+
+---
+
+### `getTextureInfo(textureId)` → info
+
+Returns texture details.
+
+```lua
+local info = gpu.getTextureInfo(textureId)
+print(string.format("Texture: %dx%d", info.width, info.height))
+```
+
+---
+
+### `draw3DModelTextured(displayId, modelId, x, y, z, rotX, rotY, rotZ, scale, textureId)`
+
+Renders a model with texture mapping.
+
+```lua
+-- Load model and texture
+local modelId = gpu.load3DModel(objData)
+local textureId = gpu.loadTextureFromImage(imageData)
+
+-- Draw textured model
+gpu.draw3DModelTextured(display, modelId,
+    0, 0, 0,        -- Position
+    0, 45, 0,       -- Rotation
+    1.0,            -- Scale
+    textureId)      -- Texture
+```
+
+**Note:** Model must have UV coordinates (vt in OBJ file).
+
+---
+
+## Lighting
+
+Add realistic lighting to 3D scenes with directional lights.
+
+### `addDirectionalLight(displayId, dirX, dirY, dirZ, r, g, b, intensity)`
+
+Adds a directional light source (like the sun).
+
+```lua
+-- Add white light from above
+gpu.addDirectionalLight(display, 
+    0, -1, 0,       -- Direction (down)
+    255, 255, 255,  -- White light
+    0.8)            -- 80% intensity
+```
+
+**Parameters:**
+- `displayId` (number): Target display
+- `dirX, dirY, dirZ` (number): Light direction (automatically normalized)
+- `r, g, b` (number): Light color (0-255)
+- `intensity` (number): Light strength (0.0-1.0)
+
+**Tips:**
+- Direction points WHERE light is going (not where it comes from)
+- Use intensity 0.6-1.0 for main lights
+- Use intensity 0.2-0.4 for ambient/fill lights
+- Multiple lights are additive
+
+---
+
+### `clearLights(displayId)`
+
+Removes all lights from a display.
+
+```lua
+gpu.clearLights(display)
+```
+
+---
+
+## Touch Input
+
+### `hasEvents(displayId)` → boolean
+### `pollEvent(displayId)` → event
+### `clearEvents(displayId)`
+
+Mouse and keyboard event handling. See original README for details.
 
 **Event Types:**
-
-| Type | Description | When Fired | Fields |
-|------|-------------|------------|--------|
-| `mouse_click` | Mouse button pressed | On button down | `x, y, button, timestamp` |
-| `mouse_drag` | Mouse moved while button held | While dragging (throttled to 50ms) | `x, y, button, timestamp` |
-| `mouse_up` | Mouse button released | On button up | `x, y, button, timestamp` |
-
-**Button Values:**
-- `1` = Left mouse button
-- `2` = Right mouse button
-- `3` = Middle mouse button
-
-**Important Notes:**
-- Events are queued (max 100 events)
-- Drag events are throttled to every 50ms for performance
-- Coordinates are in pixel space relative to display
-- Y-axis is flipped: (0, 0) is top-left
-- You must close the CC terminal to receive events
+- `mouse_click` - Button pressed
+- `mouse_drag` - Mouse moved while button held
+- `mouse_up` - Button released
+- `mouse_enter` - Mouse entered display area
+- `mouse_leave` - Mouse left display area
+- `mouse_move` - Mouse moved (no button)
 
 ---
 
-#### `clearEvents(displayId)`
+## World Data
 
-Clears all pending events from the queue.
+Query Minecraft world information directly from Lua.
+
+### `getWorldInfo()` → info
+
+Returns comprehensive world state.
 
 ```lua
--- Switching UI states
-currentScreen = "menu"
-gpu.clearEvents(display)  -- Discard old events
+local world = gpu.getWorldInfo()
+print("Time: " .. world.timeOfDay)
+print("Weather: " .. (world.isRaining and "Rain" or "Clear"))
+print("Moon: " .. world.moonPhaseName)
+print("Dimension: " .. world.dimension)
+```
 
--- New interaction loop
-while currentScreen == "menu" do
-    if gpu.hasEvents(display) then
-        handleMenuClick(gpu.pollEvent(display))
-    end
-    sleep(0.05)
+**Returns:**
+```lua
+{
+    -- Time
+    worldTime = 24000,           -- Total ticks since world creation
+    dayTime = 6000,              -- Time of current day (0-24000)
+    isDay = true,                -- Is it daytime?
+    isNight = false,             -- Is it nighttime?
+    timeOfDay = "12:00",         -- Human-readable time
+    
+    -- Weather
+    isRaining = false,           -- Is it raining?
+    isThundering = false,        -- Is there a thunderstorm?
+    rainLevel = 0.0,             -- Rain intensity (0.0-1.0)
+    thunderLevel = 0.0,          -- Thunder intensity (0.0-1.0)
+    
+    -- Moon
+    moonPhase = 0,               -- Moon phase (0-7)
+    moonPhaseName = "Full Moon", -- Human-readable phase
+    
+    -- Dimension
+    dimension = "minecraft:overworld",
+    isOverworld = true,
+    isNether = false,
+    isEnd = false,
+    
+    -- Game Settings
+    difficulty = "normal",       -- easy/normal/hard/peaceful
+    difficultyLocked = false,
+    doDaylightCycle = true,      -- Game rule
+    doWeatherCycle = true,       -- Game rule
+    doMobSpawning = true         -- Game rule
+}
+```
+
+**Use Cases:**
+- Display current time/date
+- Weather-based effects
+- Moon phase tracker
+- Dimension-aware programs
+
+---
+
+### `getWeather()` → weather
+
+Returns current weather state.
+
+```lua
+local weather = gpu.getWeather()
+if weather.state == "thundering" then
+    print("Take shelter!")
+elseif weather.state == "raining" then
+    print("Bring an umbrella")
 end
 ```
 
-**Parameters:**
-- `displayId` (number): Target display ID
+**Returns:**
+```lua
+{
+    isRaining = true,
+    isThundering = false,
+    rainLevel = 0.8,        -- 0.0-1.0
+    thunderLevel = 0.0,     -- 0.0-1.0
+    state = "raining"       -- "clear", "raining", "thundering"
+}
+```
 
-**Use Case:** Prevent stale events when changing UI states or screens.
+---
+
+### `getTimeInfo()` → timeInfo
+
+Returns detailed time information.
+
+```lua
+local time = gpu.getTimeInfo()
+print(string.format("Day %d, %s", time.dayCount, time.timeString))
+```
+
+**Returns:**
+```lua
+{
+    worldTime = 48000,      -- Total ticks
+    dayTime = 6000,         -- Current day time (0-24000)
+    dayCount = 2,           -- Days elapsed
+    isDay = true,
+    isNight = false,
+    hours = 12,             -- 0-23
+    minutes = 0,            -- 0-59
+    timeString = "12:00"
+}
+```
+
+**Note:** Minecraft day cycle: 0=6am, 6000=noon, 12000=6pm, 18000=midnight
+
+---
+
+### `getMoonInfo()` → moonInfo
+
+Returns moon phase information.
+
+```lua
+local moon = gpu.getMoonInfo()
+print("Tonight's moon: " .. moon.phaseName)
+```
+
+**Returns:**
+```lua
+{
+    phase = 0,                  -- 0-7
+    phaseName = "Full Moon",    -- Name string
+    brightness = 1.0            -- Light level (0.25-1.0)
+}
+```
+
+**Moon Phases:** Full Moon (0), Waning Gibbous (1), Last Quarter (2), Waning Crescent (3), New Moon (4), Waxing Crescent (5), First Quarter (6), Waxing Gibbous (7)
+
+---
+
+### `getDimension()` → dimensionName
+
+Returns current dimension ID.
+
+```lua
+local dim = gpu.getDimension()
+if dim == "minecraft:the_nether" then
+    print("We're in the Nether!")
+end
+```
+
+**Common Values:**
+- `"minecraft:overworld"`
+- `"minecraft:the_nether"`
+- `"minecraft:the_end"`
+
+---
+
+### `getBiomeAt(x, y, z)` → biomeInfo
+
+Returns biome information at specific coordinates.
+
+```lua
+local biome = gpu.getBiomeAt(100, 64, 200)
+print("Biome: " .. biome.name)
+print("Temperature: " .. biome.temperature)
+```
+
+**Parameters:**
+- `x, y, z` (number): World coordinates
+
+**Returns:**
+```lua
+{
+    name = "minecraft:plains",           -- Biome ID
+    temperature = 0.8,                   -- Temperature value
+    hasPrecipitation = true,             -- Can rain/snow here?
+    precipitationType = "rain"           -- "rain", "snow", or "none"
+}
+```
+
+**Use Cases:**
+- Biome-specific displays
+- Weather prediction
+- Environmental monitoring stations
 
 ---
 
 ## Examples
 
-### Example 1: Gradient Background
-
-```lua
-local gpu = peripheral.find("directgpu")
-local display = gpu.autoDetectAndCreateDisplay()
-local info = gpu.getDisplayInfo(display)
-
-print("Drawing gradient...")
-
-for y = 0, info.pixelHeight - 1 do
-    for x = 0, info.pixelWidth - 1 do
-        local r = math.floor((x / info.pixelWidth) * 255)
-        local g = math.floor((y / info.pixelHeight) * 255)
-        local b = 128
-        gpu.setPixel(display, x, y, r, g, b)
-    end
-    
-    -- Update every 20 rows for smooth rendering
-    if y % 20 == 0 then
-        gpu.updateDisplay(display)
-        print(string.format("Progress: %.1f%%", (y / info.pixelHeight) * 100))
-    end
-end
-
-gpu.updateDisplay(display)
-print("Done!")
-sleep(5)
-gpu.clearAllDisplays()
-```
-
----
-
-### Example 2: Interactive Paint Program
+### Example 1: 3D Spinning Cube
 
 ```lua
 local gpu = peripheral.find("directgpu")
 local display = gpu.autoDetectAndCreateDisplay()
 
--- Clear to white canvas
-gpu.clear(display, 255, 255, 255)
-gpu.updateDisplay(display)
+-- Setup 3D
+gpu.setupCamera(display, 60, 0.1, 1000)
+gpu.setCameraPosition(display, 0, 0, 5)
 
-print("Draw on the monitor! Press Ctrl+T to exit")
-print("Close this terminal and click the monitor blocks")
+-- Add lighting
+gpu.addDirectionalLight(display, 0, -1, 0, 255, 255, 255, 0.8)
 
-local lastX, lastY = nil, nil
+local rotation = 0
+print("Press Q to stop")
+
 local running = true
-
 parallel.waitForAny(
-    -- Event loop
     function()
         while running do
-            if gpu.hasEvents(display) then
-                local event = gpu.pollEvent(display)
-                
-                if event.type == "mouse_click" then
-                    -- Draw dot
-                    gpu.fillRect(display, event.x-3, event.y-3, 7, 7, 0, 0, 0)
-                    lastX, lastY = event.x, event.y
-                    gpu.updateDisplay(display)
-                    
-                elseif event.type == "mouse_drag" then
-                    -- Draw line from last position
-                    if lastX and lastY then
-                        gpu.drawLine(display, lastX, lastY, event.x, event.y, 0, 0, 0)
-                        gpu.updateDisplay(display)
-                    end
-                    lastX, lastY = event.x, event.y
-                end
-            else
-                sleep(0.05)
-            end
+            -- Clear frame
+            gpu.clear(display, 20, 20, 40)
+            gpu.clearZBuffer(display)
+            
+            -- Draw spinning cube
+            gpu.drawCube(display, 0, 0, 0, 2, rotation, rotation * 1.5, 0, 
+                255, 100, 100)
+            
+            gpu.updateDisplay(display)
+            rotation = rotation + 2
+            sleep(0.05)
         end
     end,
-    
-    -- Exit handler
     function()
-        os.pullEvent("terminate")
-        running = false
+        while running do
+            local event, key = os.pullEvent("key")
+            if key == keys.q then running = false end
+        end
     end
 )
 
 gpu.clearAllDisplays()
-print("Goodbye!")
 ```
 
 ---
 
-### Example 3: Button UI
+### Example 2: Text Display with Fonts
 
 ```lua
 local gpu = peripheral.find("directgpu")
 local display = gpu.autoDetectAndCreateDisplay()
 
--- Define button
-local button = {
-    x = 50, y = 50,
-    width = 120, height = 50,
-    color = {100, 150, 255},
-    hoverColor = {120, 170, 255},
-    clickColor = {255, 200, 100}
-}
+-- Clear to dark background
+gpu.clear(display, 30, 30, 30)
 
--- Helper: Check if point is inside button
-local function isInside(x, y)
-    return x >= button.x and x < button.x + button.width and
-           y >= button.y and y < button.y + button.height
-end
+-- Title
+gpu.drawText(display, "DirectGPU Demo", 10, 10, 
+    255, 200, 100, "Arial", 32, "bold")
 
--- Draw function
-local function drawButton(color)
-    gpu.clear(display, 220, 220, 220)
-    gpu.fillRect(display, button.x, button.y, button.width, button.height, 
-                 color[1], color[2], color[3])
+-- Body text with wrapping
+local text = "DirectGPU brings hardware-accelerated graphics to ComputerCraft. "..
+    "Render 2D graphics, 3D models, and interactive UIs at high resolution."
+
+gpu.drawTextWrapped(display, text, 10, 60, 450,
+    200, 200, 200, 8, "Arial", 16, "plain")
+
+-- Status box
+gpu.drawTextWithBg(display, "Status: Ready", 10, 150,
+    0, 255, 0,      -- Green text
+    0, 50, 0,       -- Dark green background
+    8,              -- Padding
+    "Courier New", 14, "bold")
+
+gpu.updateDisplay(display)
+
+print("Press any key to continue...")
+os.pullEvent("key")
+gpu.clearAllDisplays()
+```
+
+---
+
+### Example 3: 3D Model Viewer
+
+```lua
+local gpu = peripheral.find("directgpu")
+local display = gpu.autoDetectAndCreateDisplay()
+
+-- Load your OBJ model
+local modelData = [[
+v -1 -1 -1
+v 1 -1 -1
+v 1 1 -1
+v -1 1 -1
+v -1 -1 1
+v 1 -1 1
+v 1 1 1
+v -1 1 1
+f 1 2 3 4
+f 5 8 7 6
+f 1 5 6 2
+f 2 6 7 3
+f 3 7 8 4
+f 4 8 5 1
+]]
+
+local modelId = gpu.load3DModel(modelData)
+local info = gpu.get3DModelInfo(modelId)
+print(string.format("Loaded: %d vertices, %d faces", info.vertexCount, info.faceCount))
+
+-- Setup 3D
+gpu.setupCamera(display, 60, 0.1, 1000)
+gpu.setCameraPosition(display, 0, 0, 5)
+
+-- Add two lights
+gpu.addDirectionalLight(display, 0, -1, -0.5, 255, 255, 255, 0.8)  -- Main
+gpu.addDirectionalLight(display, 1, 0, 0, 100, 100, 150, 0.3)      -- Fill
+
+local rotation = 0
+print("Model viewer - Press Q to quit")
+
+local running = true
+parallel.waitForAny(
+    function()
+        while running do
+            gpu.clear(display, 0, 0, 0)
+            gpu.clearZBuffer(display)
+            
+            gpu.draw3DModel(display, modelId,
+                0, 0, 0,            -- Position
+                20, rotation, 0,    -- Rotation
+                1.0,                -- Scale
+                200, 200, 255)      -- Color
+            
+            gpu.updateDisplay(display)
+            rotation = rotation + 1
+            sleep(0.05)
+        end
+    end,
+    function()
+        while running do
+            local event, key = os.pullEvent("key")
+            if key == keys.q then running = false end
+        end
+    end
+)
+
+gpu.unload3DModel(modelId)
+gpu.clearAllDisplays()
+```
+
+---
+
+### Example 4: Weather Display
+
+```lua
+local gpu = peripheral.find("directgpu")
+local display = gpu.autoDetectAndCreateDisplay()
+local info = gpu.getDisplayInfo(display)
+
+local function drawWeatherDisplay()
+    local world = gpu.getWorldInfo()
+    local time = gpu.getTimeInfo()
+    local weather = gpu.getWeather()
     
-    -- Draw border
-    gpu.drawLine(display, button.x, button.y, button.x + button.width, button.y, 0, 0, 0)
-    gpu.drawLine(display, button.x, button.y + button.height, button.x + button.width, button.y + button.height, 0, 0, 0)
-    gpu.drawLine(display, button.x, button.y, button.x, button.y + button.height, 0, 0, 0)
-    gpu.drawLine(display, button.x + button.width, button.y, button.x + button.width, button.y + button.height, 0, 0, 0)
+    -- Background based on time
+    local bgColor
+    if time.isDay then
+        bgColor = weather.isRaining and {100, 100, 120} or {135, 206, 235}
+    else
+        bgColor = {20, 20, 40}
+    end
+    
+    gpu.clear(display, table.unpack(bgColor))
+    
+    -- Time
+    gpu.drawTextWithBg(display, "Time: " .. time.timeString, 10, 10,
+        255, 255, 255, 0, 0, 0, 8, "Arial", 24, "bold")
+    
+    -- Date
+    gpu.drawText(display, "Day " .. time.dayCount, 10, 50,
+        220, 220, 220, "Arial", 18, "plain")
+    
+    -- Weather
+    local weatherText = "Weather: " .. weather.state:gsub("^%l", string.upper)
+    local weatherColor = weather.isThundering and {255, 255, 0} or 
+                        weather.isRaining and {100, 150, 255} or {255, 255, 255}
+    
+    gpu.drawText(display, weatherText, 10, 90,
+        weatherColor[1], weatherColor[2], weatherColor[3],
+        "Arial", 20, "bold")
+    
+    -- Moon phase
+    gpu.drawText(display, "Moon: " .. world.moonPhaseName, 10, 130,
+        200, 200, 200, "Arial", 16, "plain")
+    
+    -- Biome at GPU block
+    local biome = gpu.getBiomeAt(info.x, info.y, info.z)
+    local biomeName = biome.name:match("minecraft:(.+)") or biome.name
+    gpu.drawText(display, "Biome: " .. biomeName:gsub("_", " "), 10, 160,
+        180, 255, 180, "Arial", 16, "plain")
     
     gpu.updateDisplay(display)
 end
 
--- Initial draw
-drawButton(button.color)
-print("Click the blue button!")
-print("Close terminal and click the monitor")
+print("Weather Display - Press Ctrl+T to exit")
 
--- Event loop
 while true do
-    if gpu.hasEvents(display) then
-        local event = gpu.pollEvent(display)
-        
-        if event.type == "mouse_click" and isInside(event.x, event.y) then
-            print("Button clicked at (" .. event.x .. ", " .. event.y .. ")")
-            
-            -- Flash animation
-            drawButton(button.clickColor)
-            sleep(0.15)
-            drawButton(button.color)
-        end
-    end
-    sleep(0.05)
+    drawWeatherDisplay()
+    sleep(1)  -- Update every second
 end
 ```
 
 ---
 
-### Example 4: Webcam Streamer
-
-**Simple Version (HTTP + JPEG):**
+### Example 5: Interactive 3D Scene with Mouse
 
 ```lua
 local gpu = peripheral.find("directgpu")
-local display = gpu.autoDetectAndCreateDisplayWithResolution(2)  -- 2x for better quality
-local info = gpu.getDisplayInfo(display)
+local display = gpu.autoDetectAndCreateDisplay()
 
-print("Webcam Viewer - " .. info.pixelWidth .. "x" .. info.pixelHeight)
+-- Setup 3D
+gpu.setupCamera(display, 60, 0.1, 1000)
+gpu.setCameraPosition(display, 0, 2, 8)
+gpu.addDirectionalLight(display, 0, -1, 0, 255, 255, 255, 0.8)
 
-local CAMERA_URL = "http://192.168.1.100:8080/shot.jpg"
-local TARGET_FPS = 10
+-- Scene objects
+local objects = {
+    {type="cube", x=-2, y=0, z=0, size=1.5, color={255,100,100}},
+    {type="sphere", x=0, y=0, z=0, size=1, color={100,255,100}},
+    {type="pyramid", x=2, y=0, z=0, size=1.5, color={100,100,255}}
+}
 
-local function fetchFrame()
-    -- Add timestamp to prevent caching
-    local url = CAMERA_URL .. "?t=" .. os.epoch("utc")
-    local handle = http.get(url, {}, true)  -- Binary mode
+local selectedIndex = nil
+local rotation = 0
+
+local function drawScene()
+    gpu.clear(display, 20, 20, 30)
+    gpu.clearZBuffer(display)
     
-    if not handle then 
-        print("Failed to fetch frame")
-        return false 
+    for i, obj in ipairs(objects) do
+        local rot = (selectedIndex == i) and rotation or 0
+        local col = obj.color
+        
+        -- Highlight selected object
+        if selectedIndex == i then
+            col = {math.min(255, col[1] + 50), 
+                   math.min(255, col[2] + 50), 
+                   math.min(255, col[3] + 50)}
+        end
+        
+        if obj.type == "cube" then
+            gpu.drawCube(display, obj.x, obj.y, obj.z, obj.size, 
+                rot, rot, 0, col[1], col[2], col[3])
+        elseif obj.type == "sphere" then
+            gpu.drawSphere(display, obj.x, obj.y, obj.z, obj.size, 
+                12, col[1], col[2], col[3])
+        elseif obj.type == "pyramid" then
+            gpu.drawPyramid(display, obj.x, obj.y, obj.z, obj.size, 
+                rot, rot, 0, col[1], col[2], col[3])
+        end
     end
     
-    local jpegData = handle.readAll()
-    handle.close()
+    -- Instructions
+    gpu.drawTextWithBg(display, "Click objects to select", 10, 10,
+        255, 255, 255, 0, 0, 0, 5, "Arial", 14, "plain")
     
-    if #jpegData < 100 then 
-        print("Invalid frame data")
-        return false 
+    if selectedIndex then
+        gpu.drawTextWithBg(display, "Selected: " .. objects[selectedIndex].type, 
+            10, 40, 255, 255, 100, 50, 50, 0, 5, "Arial", 14, "bold")
     end
     
-    -- Load directly to display (auto-scales)
-    gpu.loadJPEGRegion(display, jpegData, 0, 0, info.pixelWidth, info.pixelHeight)
     gpu.updateDisplay(display)
-    
-    return true
 end
 
-print("Streaming... Press Q to quit")
+print("Interactive 3D Scene")
+print("Close terminal and click objects")
+print("Press Q to quit")
 
 local running = true
-local frameCount = 0
-local startTime = os.epoch("utc")
 
 parallel.waitForAny(
-    -- Stream loop
+    -- Render loop
     function()
         while running do
-            local frameStart = os.epoch("utc")
-            
-            if fetchFrame() then
-                frameCount = frameCount + 1
-                
-                -- Show FPS every second
-                if frameCount % 30 == 0 then
-                    local elapsed = (os.epoch("utc") - startTime) / 1000
-                    print(string.format("FPS: %.1f", frameCount / elapsed))
+            drawScene()
+            if selectedIndex then
+                rotation = rotation + 2
+            end
+            sleep(0.05)
+        end
+    end,
+    
+    -- Input loop
+    function()
+        while running do
+            if gpu.hasEvents(display) then
+                local event = gpu.pollEvent(display)
+                if event.type == "mouse_click" then
+                    -- Simple object selection (normally you'd do ray-object intersection)
+                    local info = gpu.getDisplayInfo(display)
+                    local clickX = event.x / info.pixelWidth
+                    
+                    if clickX < 0.33 then
+                        selectedIndex = 1
+                        print("Selected: Cube")
+                    elseif clickX < 0.66 then
+                        selectedIndex = 2
+                        print("Selected: Sphere")
+                    else
+                        selectedIndex = 3
+                        print("Selected: Pyramid")
+                    end
                 end
             end
-            
-            local frameTime = (os.epoch("utc") - frameStart) / 1000
-            sleep(math.max(0, (1/TARGET_FPS) - frameTime))
+            sleep(0.05)
         end
     end,
     
@@ -1054,614 +1505,244 @@ parallel.waitForAny(
     function()
         while running do
             local event, key = os.pullEvent("key")
-            if key == keys.q then 
-                running = false 
-            end
+            if key == keys.q then running = false end
         end
     end
 )
-
-gpu.clearAllDisplays()
-print("Stream stopped. Total frames: " .. frameCount)
-```
-
-**Advanced Version (Dictionary Compression):**
-
-```lua
-local gpu = peripheral.find("directgpu")
-local display = gpu.autoDetectAndCreateDisplay()
-local info = gpu.getDisplayInfo(display)
-
-local CAMERA_URL = "http://192.168.1.100:8080/shot.jpg"
-local frameCount = 0
-local totalCacheHits = 0
-
-print("Webcam with Dictionary Compression")
-
-local function fetchFrame()
-    local handle = http.get(CAMERA_URL .. "?t=" .. os.epoch("utc"), {}, true)
-    if not handle then return false end
-    
-    local jpegData = handle.readAll()
-    handle.close()
-    
-    -- Compress with dictionary
-    local stats = gpu.compressWithDict(jpegData)
-    local cacheHitRate = (stats.cachedChunks / stats.totalChunks) * 100
-    
-    -- Decompress and load
-    local decompressed = gpu.decompressFromDict(stats.hashes)
-    gpu.loadJPEGRegion(display, decompressed, 0, 0, info.pixelWidth, info.pixelHeight)
-    gpu.updateDisplay(display)
-    
-    frameCount = frameCount + 1
-    totalCacheHits = totalCacheHits + cacheHitRate
-    
-    if frameCount % 30 == 0 then
-        print(string.format("Frame %d | Cache hit: %.1f%% | New chunks: %d", 
-            frameCount, totalCacheHits / frameCount, stats.newChunks))
-    end
-    
-    return true
-end
-
--- Stream loop
-local running = true
-parallel.waitForAny(
-    function()
-        while running do
-            fetchFrame()
-            sleep(0.1)  -- 10 FPS
-        end
-    end,
-    function()
-        os.pullEvent("terminate")
-        running = false
-    end
-)
-
-local dictStats = gpu.getDictionaryStats()
-print(string.format("Dictionary: %d chunks (%.1f MB)", 
-    dictStats.dictionarySize, dictStats.totalMB))
 
 gpu.clearAllDisplays()
 ```
 
 ---
 
-### Example 5: Image Slideshow
+### Example 6: Real-Time Clock with Graphics
 
 ```lua
 local gpu = peripheral.find("directgpu")
 local display = gpu.autoDetectAndCreateDisplayWithResolution(2)
 local info = gpu.getDisplayInfo(display)
 
-local images = {
-    "http://example.com/photo1.jpg",
-    "http://example.com/photo2.jpg",
-    "http://example.com/photo3.jpg"
-}
+local centerX = info.pixelWidth / 2
+local centerY = info.pixelHeight / 2
+local clockRadius = math.min(centerX, centerY) - 20
 
-print("Slideshow starting...")
-print("Display: " .. info.pixelWidth .. "x" .. info.pixelHeight)
-
-for i, url in ipairs(images) do
-    print("Loading image " .. i .. " of " .. #images .. "...")
+local function drawClock()
+    local time = gpu.getTimeInfo()
+    local world = gpu.getWorldInfo()
     
-    local handle = http.get(url, {}, true)
-    if handle then
-        local jpegData = handle.readAll()
-        handle.close()
-        
-        -- Load and scale to display
-        gpu.loadJPEGRegion(display, jpegData, 0, 0, info.pixelWidth, info.pixelHeight)
-        gpu.updateDisplay(display)
-        
-        print("Showing for 5 seconds...")
-        sleep(5)
+    -- Background (sky color based on time)
+    local bgR, bgG, bgB
+    if time.isDay then
+        bgR, bgG, bgB = 135, 206, 235  -- Day sky
     else
-        print("Failed to load: " .. url)
+        bgR, bgG, bgB = 20, 20, 40     -- Night sky
     end
-end
-
-print("Slideshow complete!")
-gpu.clearAllDisplays()
-```
-
----
-
-### Example 6: Multi-Display Dashboard
-
-```lua
-local gpu = peripheral.find("directgpu")
-
--- Create 2x2 grid of displays
-local displays = {}
-print("Creating 2x2 display grid...")
-
-for row = 0, 1 do
-    for col = 0, 1 do
-        local x = 100 + col * 3  -- 3 blocks apart
-        local y = 64 + row * 2   -- 2 blocks apart
-        local z = 200
-        
-        local id = gpu.createDisplay(x, y, z, "south", 3, 2)
-        table.insert(displays, id)
-        print("Created display " .. id .. " at (" .. x .. ", " .. y .. ", " .. z .. ")")
-    end
-end
-
--- Draw different content on each
-local colors = {
-    {255, 0, 0},    -- Red
-    {0, 255, 0},    -- Green
-    {0, 0, 255},    -- Blue
-    {255, 255, 0}   -- Yellow
-}
-
-for i, display in ipairs(displays) do
-    local color = colors[i]
-    gpu.clear(display, color[1], color[2], color[3])
+    gpu.clear(display, bgR, bgG, bgB)
     
-    -- Draw a pattern
-    local info = gpu.getDisplayInfo(display)
-    gpu.fillRect(display, 10, 10, info.pixelWidth - 20, info.pixelHeight - 20, 
-        255 - color[1], 255 - color[2], 255 - color[3])
+    -- Clock face
+    gpu.drawCircle(display, centerX, centerY, clockRadius, 255, 255, 255, true)
+    gpu.drawCircle(display, centerX, centerY, clockRadius, 0, 0, 0, false)
+    
+    -- Hour marks
+    for i = 0, 11 do
+        local angle = math.rad(i * 30 - 90)
+        local x1 = centerX + math.cos(angle) * (clockRadius - 15)
+        local y1 = centerY + math.sin(angle) * (clockRadius - 15)
+        local x2 = centerX + math.cos(angle) * (clockRadius - 5)
+        local y2 = centerY + math.sin(angle) * (clockRadius - 5)
+        gpu.drawLine(display, x1, y1, x2, y2, 0, 0, 0)
+    end
+    
+    -- Hour hand
+    local hourAngle = math.rad((time.hours % 12) * 30 + time.minutes * 0.5 - 90)
+    local hourX = centerX + math.cos(hourAngle) * (clockRadius * 0.5)
+    local hourY = centerY + math.sin(hourAngle) * (clockRadius * 0.5)
+    gpu.drawLine(display, centerX, centerY, hourX, hourY, 0, 0, 0)
+    
+    -- Minute hand
+    local minAngle = math.rad(time.minutes * 6 - 90)
+    local minX = centerX + math.cos(minAngle) * (clockRadius * 0.7)
+    local minY = centerY + math.sin(minAngle) * (clockRadius * 0.7)
+    gpu.drawLine(display, centerX, centerY, minX, minY, 255, 0, 0)
+    
+    -- Center dot
+    gpu.drawCircle(display, centerX, centerY, 5, 0, 0, 0, true)
+    
+    -- Digital time display
+    gpu.drawTextWithBg(display, time.timeString, centerX - 40, 
+        info.pixelHeight - 50, 255, 255, 255, 0, 0, 0, 8, 
+        "Arial", 24, "bold")
+    
+    -- Date and weather
+    local dateStr = string.format("Day %d - %s", time.dayCount, world.moonPhaseName)
+    gpu.drawText(display, dateStr, centerX - 80, info.pixelHeight - 20,
+        200, 200, 200, "Arial", 14, "plain")
     
     gpu.updateDisplay(display)
 end
 
-print("Multi-display dashboard running!")
-print("Press any key to exit...")
-os.pullEvent("key")
+print("Minecraft Clock - Press Ctrl+T to exit")
 
--- Clean up all displays
-gpu.clearAllDisplays()
-print("Displays cleared")
-```
-
----
-
-### Example 7: Real-Time Drawing Board
-
-```lua
-local gpu = peripheral.find("directgpu")
-local display = gpu.autoDetectAndCreateDisplayWithResolution(2)
-local info = gpu.getDisplayInfo(display)
-
--- Canvas state
-local canvas = {
-    brushSize = 5,
-    brushColor = {0, 0, 0},
-    backgroundColor = {255, 255, 255},
-    drawing = false,
-    lastX = nil,
-    lastY = nil
-}
-
--- Color palette (bottom of screen)
-local palette = {
-    {255, 0, 0},     -- Red
-    {0, 255, 0},     -- Green
-    {0, 0, 255},     -- Blue
-    {255, 255, 0},   -- Yellow
-    {255, 0, 255},   -- Magenta
-    {0, 255, 255},   -- Cyan
-    {0, 0, 0},       -- Black
-    {255, 255, 255}  -- White (eraser)
-}
-
-local paletteY = info.pixelHeight - 30
-local paletteItemWidth = info.pixelWidth / #palette
-
--- Draw UI
-local function drawUI()
-    -- Clear canvas
-    gpu.clear(display, canvas.backgroundColor[1], canvas.backgroundColor[2], canvas.backgroundColor[3])
-    
-    -- Draw palette at bottom
-    for i, color in ipairs(palette) do
-        local x = math.floor((i - 1) * paletteItemWidth)
-        gpu.fillRect(display, x, paletteY, math.floor(paletteItemWidth), 30, color[1], color[2], color[3])
-        
-        -- Draw border
-        gpu.drawLine(display, x, paletteY, x, info.pixelHeight, 128, 128, 128)
-    end
-    
-    gpu.updateDisplay(display)
+while true do
+    drawClock()
+    sleep(0.5)  -- Update twice per second
 end
-
--- Draw brush stroke
-local function drawBrush(x, y)
-    local halfSize = math.floor(canvas.brushSize / 2)
-    gpu.fillRect(display, x - halfSize, y - halfSize, canvas.brushSize, canvas.brushSize,
-        canvas.brushColor[1], canvas.brushColor[2], canvas.brushColor[3])
-end
-
-drawUI()
-
-print("Drawing Board Ready!")
-print("Close terminal and draw on the monitor")
-print("Click palette at bottom to change colors")
-print("Press Ctrl+T to exit")
-
-local running = true
-
-parallel.waitForAny(
-    function()
-        while running do
-            if gpu.hasEvents(display) then
-                local event = gpu.pollEvent(display)
-                
-                if event.type == "mouse_click" then
-                    -- Check if clicking palette
-                    if event.y >= paletteY then
-                        local colorIndex = math.floor(event.x / paletteItemWidth) + 1
-                        if colorIndex >= 1 and colorIndex <= #palette then
-                            canvas.brushColor = palette[colorIndex]
-                            print("Color changed to: " .. colorIndex)
-                        end
-                    else
-                        -- Start drawing
-                        canvas.drawing = true
-                        drawBrush(event.x, event.y)
-                        canvas.lastX, canvas.lastY = event.x, event.y
-                        gpu.updateDisplay(display)
-                    end
-                    
-                elseif event.type == "mouse_drag" and canvas.drawing then
-                    if event.y < paletteY then  -- Don't draw on palette
-                        -- Draw line from last position for smooth strokes
-                        if canvas.lastX and canvas.lastY then
-                            gpu.drawLine(display, canvas.lastX, canvas.lastY, event.x, event.y,
-                                canvas.brushColor[1], canvas.brushColor[2], canvas.brushColor[3])
-                        end
-                        drawBrush(event.x, event.y)
-                        canvas.lastX, canvas.lastY = event.x, event.y
-                        gpu.updateDisplay(display)
-                    end
-                end
-            else
-                sleep(0.02)
-            end
-        end
-    end,
-    
-    function()
-        os.pullEvent("terminate")
-        running = false
-    end
-)
-
-gpu.clearAllDisplays()
-print("Drawing board closed")
 ```
 
 ---
 
 ## Performance Tips
 
-### Drawing Optimization
+### 2D Graphics Optimization
 
-1. **Batch operations** - Call `updateDisplay()` once after multiple drawing calls:
+1. **Batch drawing operations:**
 ```lua
--- Bad: 1000 updates
-for i = 1, 1000 do
-    gpu.setPixel(display, i, 10, 255, 0, 0)
-    gpu.updateDisplay(display)  -- Too many!
-end
-
 -- Good: 1 update
 for i = 1, 1000 do
-    gpu.setPixel(display, i, 10, 255, 0, 0)
+    gpu.setPixel(display, x, y, r, g, b)
 end
-gpu.updateDisplay(display)  -- Once at the end
+gpu.updateDisplay(display)
+
+-- Bad: 1000 updates
+for i = 1, 1000 do
+    gpu.setPixel(display, x, y, r, g, b)
+    gpu.updateDisplay(display)  -- Too many!
+end
 ```
 
-2. **Use primitives** - `fillRect()` and `drawLine()` are faster than individual `setPixel()` calls:
+2. **Use primitives over pixels:**
 ```lua
+-- Faster
+gpu.fillRect(display, x, y, 100, 50, r, g, b)
+
 -- Slower
-for x = 0, 100 do
-    for y = 0, 50 do
-        gpu.setPixel(display, x, y, 255, 0, 0)
+for py = y, y + 50 do
+    for px = x, x + 100 do
+        gpu.setPixel(display, px, py, r, g, b)
     end
 end
-
--- Much faster
-gpu.fillRect(display, 0, 0, 100, 50, 255, 0, 0)
 ```
 
-3. **Limit update rate** - Don't call `updateDisplay()` more than 60 times per second:
+3. **Limit frame rate:**
 ```lua
 local lastUpdate = 0
-local UPDATE_INTERVAL = 1/60  -- 60 FPS max
-
 while running do
-    -- Draw stuff...
+    -- ... drawing code ...
     
     local now = os.clock()
-    if now - lastUpdate >= UPDATE_INTERVAL then
+    if now - lastUpdate >= 1/60 then  -- Max 60 FPS
         gpu.updateDisplay(display)
         lastUpdate = now
     end
 end
 ```
 
-4. **Progressive rendering** - Update display periodically during long operations:
+### 3D Graphics Optimization
+
+1. **Use appropriate detail levels:**
 ```lua
-for y = 0, info.pixelHeight - 1 do
-    for x = 0, info.pixelWidth - 1 do
-        gpu.setPixel(display, x, y, r, g, b)
-    end
-    
-    -- Update every 20 rows
-    if y % 20 == 0 then
-        gpu.updateDisplay(display)
-    end
+-- Close objects: high detail
+gpu.drawSphere(display, x, y, z, radius, 24, r, g, b)
+
+-- Far objects: low detail
+gpu.drawSphere(display, x, y, z, radius, 8, r, g, b)
+```
+
+2. **Minimize state changes:**
+```lua
+-- Good: Group by type
+for _, cube in ipairs(cubes) do
+    gpu.drawCube(display, ...)
 end
-gpu.updateDisplay(display)  -- Final update
-```
+for _, sphere in ipairs(spheres) do
+    gpu.drawSphere(display, ...)
+end
 
-### Memory Management
-
-1. **Clean up displays** - Always call `clearAllDisplays()` when done:
-```lua
-local display = gpu.autoDetectAndCreateDisplay()
-
--- Your code here...
-
-gpu.clearAllDisplays()  -- Important!
-```
-
-2. **Monitor pixel budget** - Use `getResourceStats()` to track usage:
-```lua
-local stats = gpu.getResourceStats()
-if stats.pixelUsagePercent > 80 then
-    print("Warning: High pixel usage!")
+-- Less efficient: Mixed types
+for _, obj in ipairs(objects) do
+    if obj.type == "cube" then gpu.drawCube(...)
+    elseif obj.type == "sphere" then gpu.drawSphere(...) end
 end
 ```
 
-3. **Use appropriate resolution** - Higher multipliers consume more memory:
+3. **Always clear Z-buffer:**
 ```lua
--- Memory per monitor block:
--- 1x: ~40 KB   (164x81 pixels)
--- 2x: ~160 KB  (328x162 pixels)
--- 4x: ~640 KB  (656x324 pixels)
+-- Required at start of each 3D frame
+gpu.clear(display, 0, 0, 0)
+gpu.clearZBuffer(display)
+```
 
--- For general use, 1x or 2x is recommended
+### Resolution and Memory
+
+```lua
+-- Memory usage per block:
+-- 1x: ~40 KB   (164×81)
+-- 2x: ~160 KB  (328×162) - Recommended for HD
+-- 4x: ~640 KB  (656×324) - Only for small displays
+
+-- Use appropriate resolution
 local display = gpu.autoDetectAndCreateDisplayWithResolution(2)
 ```
 
-### Image/Video Streaming
+### Video Streaming
 
-1. **Use JPEG for photos** - Smaller file size, hardware-accelerated decode
-2. **Use dictionary compression for video** - 90%+ bandwidth reduction after first frame:
 ```lua
--- First frame: ~100KB
--- Subsequent frames: ~10KB (90% cache hit)
+-- Use dictionary compression for >90% bandwidth reduction
 local stats = gpu.compressWithDict(jpegData)
-```
+-- First frame: ~100 KB
+-- Subsequent: ~10 KB (90% cache hit)
 
-3. **Binary HTTP mode** - Always use for images:
-```lua
--- Correct
-local handle = http.get(url, {}, true)  -- Binary mode
-
--- Wrong
-local handle = http.get(url)  -- Text mode corrupts binary data
-```
-
-4. **Cache-busting** - Add random query params to prevent caching:
-```lua
-local url = CAMERA_URL .. "?t=" .. os.epoch("utc")
-```
-
-5. **Target 10-15 FPS** - Good balance between smooth video and performance:
-```lua
-local TARGET_FPS = 10
-sleep(1 / TARGET_FPS)
-```
-
-6. **Scale on decode** - Use `decodeAndScaleJPEG()` instead of separate operations:
-```lua
--- Faster
-local result = gpu.decodeAndScaleJPEG(jpegData, targetW, targetH)
-
--- Slower
-local decoded = gpu.decodeJPEG(jpegData)
--- ... then manually scale ...
-```
-
-### Input Handling
-
-1. **Add sleep() in event loops** - Prevent CPU overload:
-```lua
-while running do
-    if gpu.hasEvents(display) then
-        local event = gpu.pollEvent(display)
-        -- Handle event
-    end
-    sleep(0.05)  -- Important!
-end
-```
-
-2. **Use hasEvents()** - Check before calling `pollEvent()`:
-```lua
--- Good
-if gpu.hasEvents(display) then
-    local event = gpu.pollEvent(display)
-end
-
--- Bad
-local event = gpu.pollEvent(display)  -- Returns nil often
-```
-
-3. **Clear old events** - When switching UI states:
-```lua
-currentScreen = "menu"
-gpu.clearEvents(display)  -- Prevent stale events
+-- Target 10-15 FPS for smooth video
+sleep(1 / 10)
 ```
 
 ---
 
 ## Troubleshooting
 
-### "Display not found" or "No monitor found"
+### Common Issues
 
-**Causes:**
-- Monitors not forming a complete rectangle
-- Monitors too far away (>16 blocks)
-- Wrong monitor type (must be CC monitors)
+**"Display not found" or "No monitor found"**
+- Monitors must form complete rectangle
+- Maximum 16 blocks away
+- Must be CC monitors
 
-**Solutions:**
 ```lua
--- Test auto-detection
 local info = gpu.autoDetectMonitor()
-if not info.found then
-    print("No monitor detected within 16 blocks")
-else
-    print("Found: " .. info.width .. "x" .. info.height)
-    print("At: " .. info.x .. ", " .. info.y .. ", " .. info.z)
-    print("Facing: " .. info.facing)
-end
+print("Found: " .. tostring(info.found))
 ```
 
-### "Failed to create display - check resource limits"
+**"Resource limits exceeded"**
+- Max 50 displays
+- Max 10 megapixels total
 
-**Causes:**
-- Hit 50 display limit
-- Hit 10 megapixel total limit
-
-**Solutions:**
 ```lua
--- Check current usage
 local stats = gpu.getResourceStats()
-print("Displays: " .. stats.displays .. "/" .. stats.maxDisplays)
-print("Pixels: " .. stats.totalPixels .. "/" .. stats.maxTotalPixels)
-
--- Clean up unused displays
-gpu.clearAllDisplays()
-
--- Use lower resolution
-local display = gpu.autoDetectAndCreateDisplayWithResolution(1)  -- Instead of 4
+print(string.format("Usage: %.1f%%", stats.pixelUsagePercent))
+gpu.clearAllDisplays()  -- Free resources
 ```
 
-### Touch input not working
+**Touch input not working**
+- Close CC terminal (press E)
+- Click physical monitor blocks
+- Verify display exists
 
-**Solutions:**
-1. Close the CC computer terminal (press E or Esc)
-2. Click directly on the physical monitor blocks in the world
-3. Verify display exists:
-```lua
-local displays = gpu.listDisplays()
-print("Active displays: " .. #displays)
-```
+**Low FPS / Stuttering**
+- Reduce resolution multiplier
+- Use smaller monitors
+- Limit update rate
+- Reduce 3D detail level
 
-4. Check event queue:
-```lua
-if gpu.hasEvents(display) then
-    print("Events available!")
-else
-    print("No events - try clicking the monitor blocks")
-end
-```
+**3D objects not rendering**
+- Call `setupCamera()` first
+- Call `clearZBuffer()` each frame
+- Check camera position (not inside objects)
+- Verify objects are in view frustum
 
-### Peripheral not detected
-
-**Solutions:**
-1. Connect a wired modem to the DirectGPU block
-2. Right-click the modem to activate it (should turn red)
-3. Check peripheral list:
-```lua
-local peripherals = peripheral.getNames()
-for _, name in ipairs(peripherals) do
-    print(name .. ": " .. peripheral.getType(name))
-end
-```
-
-4. Try wrapping directly:
-```lua
-local gpu = peripheral.wrap("right")  -- or whichever side
-if gpu then
-    print("Type: " .. peripheral.getType("right"))
-end
-```
-
-### Low FPS or stuttering
-
-**Solutions:**
-1. Reduce resolution multiplier:
-```lua
-local display = gpu.autoDetectAndCreateDisplayWithResolution(1)  -- Lower res
-```
-
-2. Use smaller monitor arrays (3x2 instead of 8x6)
-
-3. Limit update calls:
-```lua
-local lastUpdate = os.clock()
-if os.clock() - lastUpdate > 0.016 then  -- Max 60 FPS
-    gpu.updateDisplay(display)
-    lastUpdate = os.clock()
-end
-```
-
-4. Check server TPS:
-```
-/forge tps
-```
-
-### JPEG decode errors
-
-**Solutions:**
-```lua
--- Verify binary mode
-local handle = http.get(url, {}, true)  -- Third parameter must be true
-if not handle then
-    print("HTTP request failed")
-    return
-end
-
-local data = handle.readAll()
-handle.close()
-
--- Check data size
-if #data < 100 then
-    print("Data too small: " .. #data .. " bytes")
-    return
-end
-
--- Try decode with error handling
-local success, result = pcall(function()
-    return gpu.decodeJPEG(data)
-end)
-
-if not success then
-    print("Decode failed: " .. result)
-else
-    print("Decoded: " .. result.width .. "x" .. result.height)
-end
-```
-
-### Images not loading / blank display
-
-**Checklist:**
-```lua
--- 1. Verify display exists
-local displays = gpu.listDisplays()
-print("Displays: " .. #displays)
-
--- 2. Check display info
-local info = gpu.getDisplayInfo(display)
-print("Size: " .. info.pixelWidth .. "x" .. info.pixelHeight)
-
--- 3. Try simple draw test
-gpu.clear(display, 255, 0, 0)  -- Red
-gpu.updateDisplay(display)
-sleep(1)
-
--- 4. If that works, problem is with image loading
-```
+**Textures not loading**
+- Model must have UV coordinates (vt in OBJ)
+- Texture dimensions should be power of 2
+- Use `getTextureInfo()` to verify load
 
 ---
 
@@ -1669,99 +1750,19 @@ sleep(1)
 
 | Specification | Value |
 |---------------|-------|
-| **Resolution (1x)** | 164×81 pixels per block |
-| **Resolution (2x)** | 328×162 pixels per block |
-| **Resolution (3x)** | 492×243 pixels per block |
-| **Resolution (4x)** | 656×324 pixels per block |
-| **Color depth** | 24-bit RGB (8 bits/channel) |
-| **Maximum monitor size** | 16×16 blocks |
-| **Maximum displays** | 50 per world |
-| **Maximum total pixels** | 10 megapixels across all displays |
+| **Resolution (1x-4x)** | 164×81 to 656×324 pixels/block |
+| **Color depth** | 24-bit RGB (16.7M colors) |
+| **Max monitor size** | 16×16 blocks |
+| **Max displays** | 50 per world |
+| **Max total pixels** | 10 megapixels |
 | **Render distance** | 64 blocks |
-| **Texture update rate** | 60 FPS (hardware limited) |
-| **Input latency** | <50ms (sub-tick) |
-| **JPEG decode time** | 5-15ms (hardware accelerated) |
-| **Dictionary chunk size** | 8 KB |
-| **Dictionary capacity** | 10,000 chunks (~80 MB) |
-| **Memory per 1×1 block (1x)** | ~40 KB |
-| **Memory per 1×1 block (2x)** | ~160 KB |
-| **Memory per 1×1 block (4x)** | ~640 KB |
-| **Mouse event queue** | 100 events max |
-| **Drag event throttle** | 50ms (20 events/sec) |
-
----
-
-## Coordinate System
-
-DirectGPU uses a standard 2D pixel coordinate system:
-
-- **Origin (0, 0)** is at the **top-left corner**
-- **X axis** increases to the **right**
-- **Y axis** increases **downward**
-- All coordinates are in **pixels**, not blocks
-- Coordinates are **0-indexed**
-
-**Example:** For a 164×81 display:
-- Top-left corner: (0, 0)
-- Top-right corner: (163, 0)
-- Bottom-left corner: (0, 80)
-- Bottom-right corner: (163, 80)
-- Center: (82, 40)
-
----
-
-## Best Practices
-
-### Display Lifecycle
-
-```lua
--- Always use error handling and cleanup
-local gpu = peripheral.find("directgpu")
-if not gpu then
-    error("DirectGPU peripheral not found")
-end
-
-local success, display = pcall(function()
-    return gpu.autoDetectAndCreateDisplay()
-end)
-
-if not success then
-    print("Error: " .. display)
-    return
-end
-
--- Your code here...
-
--- Always clean up
-gpu.clearAllDisplays()
-```
-
-### Event Loop Structure
-
-```lua
-local running = true
-
-parallel.waitForAny(
-    -- Main loop
-    function()
-        while running do
-            if gpu.hasEvents(display) then
-                local event = gpu.pollEvent(display)
-                -- Handle event
-            end
-            sleep(0.05)  -- Prevent CPU overload
-        end
-    end,
-    
-    -- Exit handler
-    function()
-        os.pullEvent("terminate")
-        running = false
-    end
-)
-
-gpu.clearAllDisplays()
-```
+| **Update rate** | 60 FPS (hardware limited) |
+| **Input latency** | <50ms |
+| **JPEG decode** | 5-15ms (hardware accelerated) |
+| **3D primitives** | Cube, Sphere, Pyramid |
+| **3D file format** | OBJ (with textures) |
+| **Lighting** | Directional lights, diffuse shading |
+| **Font rendering** | System fonts with anti-aliasing |
 
 ---
 
@@ -1771,6 +1772,13 @@ gpu.clearAllDisplays()
 **Minecraft Version:** 1.20.1  
 **Forge Version:** 47.3.0+  
 **CC: Tweaked Version:** 1.20.1  
+
+**Special Thanks:**
+- Minecraft Forge team
+- CC: Tweaked developers
+- DirectGPU community testers
+
+---
 
 ## License
 
@@ -1788,8 +1796,10 @@ This project is licensed under **All Rights Reserved (ARR)**.
 
 ---
 
-## Support
+## Support & Community
 
 - **Issues:** Report bugs on GitHub
-- **Documentation:** This README
-- **Community:** https://discord.gg/DHbQ7Xurpv
+- **Discord:** https://discord.gg/DHbQ7Xurpv
+- **Documentation:** This README + in-game examples
+
+---
