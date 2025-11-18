@@ -105,7 +105,7 @@ end
 ## API Reference
 
 ## Table of Contents
-- [Controller Support](# Controller Input)
+- [Controller Support](#Controller-Input)
 - [Display Management](#display-management)
 - [2D Drawing Functions](#2d-drawing-functions)
 - [Font Rendering](#font-rendering)
