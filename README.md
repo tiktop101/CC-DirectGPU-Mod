@@ -105,6 +105,7 @@ end
 ## API Reference
 
 ## Table of Contents
+- [Controller Support](# Controller Input)
 - [Display Management](#display-management)
 - [2D Drawing Functions](#2d-drawing-functions)
 - [Font Rendering](#font-rendering)
@@ -1765,6 +1766,750 @@ gpu.clearAllDisplays()  -- Free resources
 | **Font rendering** | System fonts with anti-aliasing |
 
 ---
+
+## Controller Input
+
+DirectGPU provides comprehensive game controller support with automatic device detection, button/axis mapping, and multi-controller support. Works with Xbox, PlayStation, Nintendo, racing wheels, flight sticks, and generic gamepads.
+
+**Features:**
+- Auto-detection of controller types (Xbox, PlayStation, Switch, etc.)
+- Raw button and axis access
+- Named input mapping (e.g., "A" button, "LEFT_STICK_X")
+- Configurable deadzones and calibration
+- Event system for input changes
+- Multiplayer support (server-side state access)
+- Hot-plug support
+
+### Controller Support Overview
+
+DirectGPU automatically profiles controllers to provide consistent, named access to buttons and axes across different devices:
+
+| Controller Type | Detection | Named Buttons | Named Axes |
+|----------------|-----------|---------------|------------|
+| Xbox (360, One, Series) | Auto | A, B, X, Y, LB, RB, START, BACK, LS, RS | LEFT_STICK_X/Y, RIGHT_STICK_X/Y, LEFT_TRIGGER, RIGHT_TRIGGER |
+| PlayStation (DS4, DS5) | Auto | CROSS, CIRCLE, SQUARE, TRIANGLE, L1, R1, L2, R2, PS | LEFT_STICK_X/Y, RIGHT_STICK_X/Y, L2_TRIGGER, R2_TRIGGER |
+| Nintendo Switch Pro | Auto | A, B, X, Y, L, R, ZL, ZR, PLUS, MINUS | LEFT_STICK_X/Y, RIGHT_STICK_X/Y |
+| Nintendo 64 | Auto | A, B, Z, START, L, R, C buttons, D-pad | STICK_X, STICK_Y |
+| GameCube | Auto | A, B, X, Y, Z, START, L, R | MAIN_STICK_X/Y, C_STICK_X/Y, L_TRIGGER, R_TRIGGER |
+| Racing Wheels | Auto | Shifter paddles, buttons | STEERING, THROTTLE, BRAKE, CLUTCH |
+| Flight Sticks | Auto | TRIGGER, THUMB, numbered buttons | STICK_X/Y, THROTTLE, RUDDER |
+| Generic Gamepad | Auto | A, B, X, Y, LB, RB, START, BACK | LEFT_STICK_X/Y, RIGHT_STICK_X/Y |
+
+### Basic Controller Functions
+
+#### `getControllerCount()`
+
+Get number of connected controllers
+
+```lua
+local count = gpu.getControllerCount()
+print("Controllers: " .. count)
+```
+
+---
+
+#### `scanForControllers()`
+
+Rescan for new/removed controllers
+
+```lua
+gpu.scanForControllers()  -- Refresh controller list
+```
+
+---
+
+#### `getControllerInfo()`
+
+Get controller details
+
+```lua
+local info = gpu.getControllerInfo(0)
+print(info.name)      -- "Xbox Controller"
+print(info.guid)      -- Controller GUID
+print(info.buttonCount)  -- 15
+print(info.axisCount)    -- 6
+```
+
+---
+
+#### `listControllers()`
+
+List all connected controllers
+
+```lua
+local controllers = gpu.listControllers()
+for i, ctrl in ipairs(controllers) do
+    print(i .. ": " .. ctrl.name)
+end
+```
+
+---
+
+#### `getButton()`
+
+Get raw button state (by index)
+
+```lua
+local pressed = gpu.getButton(0, 0)  -- Controller 0, button 0
+if pressed then
+    print("Button 0 pressed!")
+end
+```
+
+---
+
+#### `getButtons()`
+
+Get all button states
+
+```lua
+local buttons = gpu.getButtons(0)
+for i, pressed in ipairs(buttons) do
+    if pressed then
+        print("Button " .. (i-1) .. " pressed")
+    end
+end
+```
+
+---
+
+#### `getAxis()`
+
+Get raw axis value (by index)
+
+```lua
+local value = gpu.getAxis(0, 0)  -- Controller 0, axis 0
+print("Axis 0: " .. value)  -- -1.0 to 1.0
+```
+
+---
+
+#### `getAxes()`
+
+Get all axis values
+
+```lua
+local axes = gpu.getAxes(0)
+for i, value in ipairs(axes) do
+    print("Axis " .. (i-1) .. ": " .. value)
+end
+```
+
+### State Tracking and Events
+
+#### `setControllerDeadzone(deadzone)`
+
+Set the deadzone threshold for axis values (0.0-1.0).
+
+```lua
+gpu.setControllerDeadzone(0.15)  -- Ignore axis values < 0.15
+```
+
+#### `getControllerDeadzone()` → deadzone
+
+Get current deadzone setting.
+
+```lua
+local dz = gpu.getControllerDeadzone()
+print("Deadzone: " .. dz)
+```
+
+#### `updateControllerState(controllerId)`
+
+Update state tracker and generate events for changes.
+
+```lua
+gpu.updateControllerState(0)  -- Track changes for controller 0
+```
+
+#### `pollControllerEvent(controllerId)` → event
+
+Get next input event from queue.
+
+```lua
+local event = gpu.pollControllerEvent(0)
+if event then
+    print("Type: " .. event.type)        -- "button_down", "button_up", "axis"
+    print("Index: " .. event.index)      -- Button/axis index
+    print("Value: " .. event.value)      -- New value
+    print("Time: " .. event.timestamp)
+end
+```
+
+**Event Types:**
+- `button_down` - Button was pressed
+- `button_up` - Button was released
+- `axis` - Axis value changed (beyond deadzone)
+
+#### `hasControllerEvents(controllerId)` → boolean
+
+Check if controller has pending events.
+
+```lua
+if gpu.hasControllerEvents(0) then
+    local event = gpu.pollControllerEvent(0)
+    -- Process event
+end
+```
+
+#### `clearControllerEvents(controllerId)`
+
+Clear all pending events for a controller.
+
+```lua
+gpu.clearControllerEvents(0)
+```
+
+### Named Input Functions (Auto-Profiling)
+
+DirectGPU automatically detects controller types and provides named access to buttons and axes.
+
+#### `getControllerProfile(controllerId)` → profile
+
+Get auto-detected controller profile.
+
+```lua
+local profile = gpu.getControllerProfile(0)
+print("Controller: " .. profile.name)
+print("Type: " .. profile.type)          -- "Xbox Controller"
+print("Description: " .. profile.description)
+print("Buttons: " .. profile.mappedButtons)
+print("Axes: " .. profile.mappedAxes)
+```
+
+#### `getControllerType(controllerId)` → type
+
+Get controller type string.
+
+```lua
+local type = gpu.getControllerType(0)
+-- "Xbox Controller", "PlayStation Controller", "Nintendo Switch Pro", etc.
+```
+
+#### `getNamedButton(controllerId, buttonName)` → boolean
+
+Get button state by name (cross-platform).
+
+```lua
+-- Works on any controller type!
+if gpu.getNamedButton(0, "A") then          -- Xbox A / PS Cross
+    print("Primary action button pressed")
+end
+
+if gpu.getNamedButton(0, "START") then      -- Any controller
+    print("Start button pressed")
+end
+
+-- PlayStation-specific
+if gpu.getNamedButton(0, "CROSS") then
+    print("Cross button")
+end
+
+-- N64-specific
+if gpu.getNamedButton(0, "Z") then
+    print("Z trigger")
+end
+```
+
+#### `getNamedAxis(controllerId, axisName)` → value
+
+Get axis value by name.
+
+```lua
+-- Left stick
+local lx = gpu.getNamedAxis(0, "LEFT_STICK_X")   -- -1.0 to 1.0
+local ly = gpu.getNamedAxis(0, "LEFT_STICK_Y")
+
+-- Right stick
+local rx = gpu.getNamedAxis(0, "RIGHT_STICK_X")
+local ry = gpu.getNamedAxis(0, "RIGHT_STICK_Y")
+
+-- Triggers (normalized to 0.0 to 1.0)
+local lt = gpu.getNamedAxis(0, "LEFT_TRIGGER")   -- 0.0 = not pressed
+local rt = gpu.getNamedAxis(0, "RIGHT_TRIGGER")  -- 1.0 = fully pressed
+
+-- Racing wheel
+local steering = gpu.getNamedAxis(0, "STEERING")
+local throttle = gpu.getNamedAxis(0, "THROTTLE")
+```
+
+#### `getControllerButtonNames(controllerId)` → names
+
+Get list of all available button names.
+
+```lua
+local buttons = gpu.getControllerButtonNames(0)
+for _, name in ipairs(buttons) do
+    print("Button: " .. name)
+end
+-- Output (Xbox): A, B, X, Y, LB, RB, START, BACK, LS, RS
+```
+
+#### `getControllerAxisNames(controllerId)` → names
+
+Get list of all available axis names.
+
+```lua
+local axes = gpu.getControllerAxisNames(0)
+for _, name in ipairs(axes) do
+    print("Axis: " .. name)
+end
+-- Output: LEFT_STICK_X, LEFT_STICK_Y, RIGHT_STICK_X, RIGHT_STICK_Y, LEFT_TRIGGER, RIGHT_TRIGGER
+```
+
+#### `getNamedButtonsPressed(controllerId)` → buttonNames
+
+Get all currently pressed buttons by name.
+
+```lua
+local pressed = gpu.getNamedButtonsPressed(0)
+for _, name in ipairs(pressed) do
+    print("Pressed: " .. name)
+end
+```
+
+#### `getNamedAxesActive(controllerId, threshold)` → axes
+
+Get all active axes (above threshold) with values.
+
+```lua
+local active = gpu.getNamedAxesActive(0, 0.2)
+for name, value in pairs(active) do
+    print(name .. " = " .. value)
+end
+```
+
+#### `hasInput(controllerId, inputName)` → boolean
+
+Check if controller has a specific button/axis.
+
+```lua
+if gpu.hasInput(0, "Z") then
+    print("N64 controller detected!")
+end
+
+if gpu.hasInput(0, "STEERING") then
+    print("Racing wheel detected!")
+end
+```
+
+#### `getControllerInputs(controllerId)` → inputs
+
+Get all input definitions for advanced mapping.
+
+```lua
+local inputs = gpu.getControllerInputs(0)
+for name, def in pairs(inputs) do
+    print(name .. ": " .. def.description)
+    print("  Type: " .. def.type)
+    print("  Raw Index: " .. def.rawIndex)
+end
+```
+
+#### `refreshControllerProfile(controllerId)`
+
+Refresh controller profile (useful after hot-plugging).
+
+```lua
+gpu.refreshControllerProfile(0)
+```
+
+### Multiplayer Support (Server-Side Access)
+
+Access controller state on the server for multiplayer games.
+
+#### `getPlayerUUID()` → uuid
+
+Get current player's UUID.
+
+```lua
+local uuid = gpu.getPlayerUUID()
+print("Player UUID: " .. uuid)
+```
+
+#### `getServerControllerCount(playerUUID)` → count
+
+Get number of controllers for a player (server-side).
+
+```lua
+local count = gpu.getServerControllerCount(uuid)
+print("Player has " .. count .. " controllers")
+```
+
+#### `listServerControllers(playerUUID)` → controllers
+
+List controllers for a player (server-side).
+
+```lua
+local controllers = gpu.listServerControllers(uuid)
+for _, ctrl in ipairs(controllers) do
+    print(ctrl.name .. " (ID: " .. ctrl.id .. ")")
+end
+```
+
+#### `getServerControllerButton(playerUUID, controllerId, buttonIndex)` → boolean
+
+Get button state on server.
+
+```lua
+if gpu.getServerControllerButton(uuid, 0, 0) then
+    print("Player pressed button 0")
+end
+```
+
+#### `getServerControllerAxis(playerUUID, controllerId, axisIndex)` → value
+
+Get axis value on server.
+
+```lua
+local value = gpu.getServerControllerAxis(uuid, 0, 0)
+print("Axis 0: " .. value)
+```
+
+#### `getServerControllerState(playerUUID, controllerId)` → state
+
+Get complete controller state on server.
+
+```lua
+local state = gpu.getServerControllerState(uuid, 0)
+print("Buttons:", state.buttons)
+print("Axes:", state.axes)
+print("Timestamp:", state.timestamp)
+```
+
+---
+
+## Controller Examples
+
+### Example 1: Basic Controller Input
+
+```lua
+local gpu = peripheral.find("directgpu")
+
+-- Scan for controllers
+gpu.scanForControllers()
+local count = gpu.getControllerCount()
+print("Found " .. count .. " controllers")
+
+if count == 0 then
+    print("No controllers connected!")
+    return
+end
+
+-- Get info
+local info = gpu.getControllerInfo(0)
+print("Using: " .. info.name)
+print("Type: " .. gpu.getControllerType(0))
+
+-- Main loop
+while true do
+    -- Check primary action button
+    if gpu.getNamedButton(0, "A") then
+        print("A button pressed!")
+    end
+
+    -- Read analog stick
+    local lx = gpu.getNamedAxis(0, "LEFT_STICK_X")
+    local ly = gpu.getNamedAxis(0, "LEFT_STICK_Y")
+
+    if math.abs(lx) > 0.2 or math.abs(ly) > 0.2 then
+        print(string.format("Left stick: %.2f, %.2f", lx, ly))
+    end
+
+    sleep(0.05)
+end
+```
+
+---
+
+### Example 2: Display Controller Inputs on Screen
+
+```lua
+local gpu = peripheral.find("directgpu")
+local display = gpu.autoDetectAndCreateDisplay()
+
+gpu.scanForControllers()
+if gpu.getControllerCount() == 0 then
+    print("No controllers!")
+    return
+end
+
+local info = gpu.getControllerInfo(0)
+print("Controller: " .. info.name)
+
+while true do
+    gpu.clear(display, 20, 20, 30)
+
+    -- Title
+    gpu.drawText(display, "Controller: " .. info.name, 10, 10,
+        255, 255, 255, "Arial", 20, "bold")
+
+    -- Show pressed buttons
+    local pressed = gpu.getNamedButtonsPressed(0)
+    local y = 50
+    for _, name in ipairs(pressed) do
+        gpu.drawTextWithBg(display, name, 10, y,
+            255, 255, 0,  -- Yellow text
+            50, 50, 0,    -- Dark yellow bg
+            5, "Arial", 16, "bold")
+        y = y + 30
+    end
+
+    -- Show active axes
+    local axes = gpu.getNamedAxesActive(0, 0.15)
+    y = 250
+    for name, value in pairs(axes) do
+        local text = string.format("%s: %.2f", name, value)
+        gpu.drawText(display, text, 10, y,
+            100, 255, 100, "Arial", 14, "plain")
+
+        -- Draw bar graph
+        local barW = math.abs(value) * 200
+        local barX = value > 0 and 250 or (250 - barW)
+        gpu.fillRect(display, barX, y, barW, 15, 0, 255, 0)
+
+        y = y + 25
+    end
+
+    gpu.updateDisplay(display)
+    sleep(0.05)
+end
+```
+
+---
+
+### Example 3: Racing Game with Steering Wheel
+
+```lua
+local gpu = peripheral.find("directgpu")
+local display = gpu.autoDetectAndCreateDisplay()
+
+gpu.scanForControllers()
+local controllerId = 0
+
+-- Check if it's a wheel
+local type = gpu.getControllerType(controllerId)
+print("Controller type: " .. type)
+
+local carX = 320
+local carY = 400
+local speed = 0
+
+while true do
+    gpu.clear(display, 50, 100, 50)  -- Grass
+
+    -- Get steering input (works for both wheel and gamepad)
+    local steering = 0
+    if gpu.hasInput(controllerId, "STEERING") then
+        steering = gpu.getNamedAxis(controllerId, "STEERING")
+    else
+        steering = gpu.getNamedAxis(controllerId, "LEFT_STICK_X")
+    end
+
+    -- Get throttle/brake
+    local throttle = 0
+    local brake = 0
+
+    if gpu.hasInput(controllerId, "THROTTLE") then
+        -- Racing wheel
+        throttle = gpu.getNamedAxis(controllerId, "THROTTLE")
+        brake = gpu.getNamedAxis(controllerId, "BRAKE")
+    else
+        -- Gamepad
+        throttle = gpu.getNamedAxis(controllerId, "RIGHT_TRIGGER")
+        brake = gpu.getNamedAxis(controllerId, "LEFT_TRIGGER")
+    end
+
+    -- Update car position
+    speed = speed + (throttle * 0.5) - (brake * 0.8)
+    speed = math.max(0, math.min(10, speed))
+
+    carX = carX + (steering * speed)
+    carX = math.max(50, math.min(600, carX))
+
+    -- Draw road
+    gpu.fillRect(display, 200, 0, 250, 600, 80, 80, 80)
+
+    -- Draw car
+    gpu.fillRect(display, carX - 20, carY - 40, 40, 80, 255, 0, 0)
+
+    -- HUD
+    gpu.drawTextWithBg(display, string.format("Speed: %.1f", speed),
+        10, 10, 255, 255, 255, 0, 0, 0, 5, "Arial", 18, "bold")
+
+    gpu.drawTextWithBg(display, string.format("Steering: %.2f", steering),
+        10, 45, 255, 255, 255, 0, 0, 0, 5, "Arial", 14, "plain")
+
+    gpu.updateDisplay(display)
+    sleep(0.05)
+end
+```
+
+---
+
+### Example 4: Event-Based Input (Efficient)
+
+```lua
+local gpu = peripheral.find("directgpu")
+
+gpu.scanForControllers()
+if gpu.getControllerCount() == 0 then
+    print("No controllers!")
+    return
+end
+
+-- Set up event tracking
+gpu.setControllerDeadzone(0.15)
+
+print("Press buttons or move sticks. Press START to exit.")
+
+local running = true
+while running do
+    -- Update state tracker
+    gpu.updateControllerState(0)
+
+    -- Process events
+    while gpu.hasControllerEvents(0) do
+        local event = gpu.pollControllerEvent(0)
+
+        if event.type == "button_down" then
+            print("Button " .. event.index .. " pressed")
+
+            -- Check if it's START button
+            if gpu.getNamedButton(0, "START") then
+                print("Exiting...")
+                running = false
+            end
+
+        elseif event.type == "button_up" then
+            print("Button " .. event.index .. " released")
+
+        elseif event.type == "axis" then
+            print(string.format("Axis %d: %.2f", event.index, event.value))
+        end
+    end
+
+    sleep(0.05)
+end
+```
+
+---
+
+### Example 5: Cross-Platform Button Prompts
+
+```lua
+local gpu = peripheral.find("directgpu")
+local display = gpu.autoDetectAndCreateDisplay()
+
+gpu.scanForControllers()
+local controllerId = 0
+
+-- Get controller type to show correct prompts
+local controllerType = gpu.getControllerType(controllerId)
+
+local function getButtonName(action)
+    if controllerType:find("Xbox") then
+        if action == "primary" then return "A" end
+        if action == "secondary" then return "B" end
+        if action == "jump" then return "A" end
+        if action == "attack" then return "X" end
+    elseif controllerType:find("PlayStation") then
+        if action == "primary" then return "CROSS" end
+        if action == "secondary" then return "CIRCLE" end
+        if action == "jump" then return "CROSS" end
+        if action == "attack" then return "SQUARE" end
+    else
+        if action == "primary" then return "A" end
+        if action == "secondary" then return "B" end
+    end
+end
+
+while true do
+    gpu.clear(display, 30, 30, 50)
+
+    -- Show controller-specific prompts
+    local y = 50
+
+    gpu.drawText(display, "Controller: " .. controllerType, 10, y,
+        255, 200, 100, "Arial", 20, "bold")
+    y = y + 40
+
+    local actions = {
+        {"Jump", "primary"},
+        {"Attack", "attack"},
+        {"Cancel", "secondary"}
+    }
+
+    for _, action in ipairs(actions) do
+        local label = action[1]
+        local button = getButtonName(action[2])
+
+        local text = string.format("Press [%s] to %s", button, label)
+
+        -- Highlight if pressed
+        if gpu.getNamedButton(controllerId, button) then
+            gpu.drawTextWithBg(display, text, 10, y,
+                255, 255, 0, 50, 50, 0, 5, "Arial", 16, "bold")
+        else
+            gpu.drawText(display, text, 10, y,
+                200, 200, 200, "Arial", 16, "plain")
+        end
+
+        y = y + 35
+    end
+
+    gpu.updateDisplay(display)
+    sleep(0.05)
+end
+```
+
+---
+
+### Example 6: Multiplayer Server-Side Controller
+
+```lua
+-- SERVER-SIDE SCRIPT
+local gpu = peripheral.find("directgpu")
+
+-- Track players and their controller states
+local players = {}
+
+while true do
+    -- Update player controller states
+    -- (In real scenario, you'd get UUIDs from player join events)
+
+    for uuid, playerData in pairs(players) do
+        local controllers = gpu.listServerControllers(uuid)
+
+        if #controllers > 0 then
+            local state = gpu.getServerControllerState(uuid, 0)
+
+            -- Process player input server-side
+            -- This prevents cheating and reduces network traffic
+
+            -- Example: Check if player pressed attack button
+            if state.buttons[1] then  -- Button 0 (A/Cross)
+                print("Player " .. uuid .. " attacked!")
+                -- Handle attack logic server-side
+            end
+
+            -- Get movement from analog stick
+            if #state.axes >= 2 then
+                local moveX = state.axes[1]
+                local moveY = state.axes[2]
+
+                if math.abs(moveX) > 0.2 or math.abs(moveY) > 0.2 then
+                    print(string.format("Player %s moving: %.2f, %.2f",
+                        uuid, moveX, moveY))
+                    -- Update player position server-side
+                end
+            end
+        end
+    end
+
+    sleep(0.05)
+end
+```
 
 ## Credits
 
