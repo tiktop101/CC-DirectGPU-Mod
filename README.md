@@ -108,6 +108,7 @@ end
 - [Controller Input](#Controller-Input)
 - [Display Management](#display-management)
 - [2D Drawing Functions](#2d-drawing-functions)
+- [Polylines & Polygons](#polylines--polygons)
 - [Font Rendering](#font-rendering)
 - [Image Loading](#image-loading)
 - [Dictionary Compression](#dictionary-compression)
