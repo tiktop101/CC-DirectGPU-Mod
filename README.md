@@ -108,7 +108,6 @@ end
 - [Controller Input](#Controller-Input)
 - [Display Management](#display-management)
 - [2D Drawing Functions](#2d-drawing-functions)
-- [Polylines & Polygons](#polylines--polygons)
 - [Font Rendering](#font-rendering)
 - [Image Loading](#image-loading)
 - [Dictionary Compression](#dictionary-compression)
@@ -301,6 +300,301 @@ gpu.drawEllipse(display, 100, 100, 80, 40, 0, 0, 255, true)
 - `rx, ry` (number): X and Y radii in pixels
 - `r, g, b` (number): RGB color
 - `filled` (boolean): true for filled, false for outline
+
+---
+
+## Polylines & Polygons
+
+DirectGPU provides functions to draw connected line segments (polylines) and closed shapes (polygons).
+
+### `drawPolylines(displayId, points, r, g, b)`
+
+Draws connected line segments between a series of points.
+
+```lua
+-- Draw a zigzag line
+local points = {
+    {10, 10},
+    {50, 50},
+    {90, 10},
+    {130, 50},
+    {170, 10}
+}
+
+gpu.drawPolylines(display, points, 255, 255, 255)
+gpu.updateDisplay(display)
+```
+
+**Parameters:**
+- `displayId` (number): Target display
+- `points` (table): Array of {x, y} coordinate pairs
+- `r, g, b` (number): Line color (0-255)
+
+**Format:** Points must be a Lua table of tables: `{{x1, y1}, {x2, y2}, {x3, y3}, ...}`
+
+**Use Cases:**
+- Draw paths and trajectories
+- Create custom line shapes
+- Plot data graphs
+- Render vector graphics
+
+**Notes:**
+- Requires at least 2 points
+- Lines are drawn between consecutive points
+- Shape is NOT automatically closed (use `drawPolygon` for closed shapes)
+
+---
+
+### `drawPolygon(displayId, points, r, g, b)`
+
+Draws a closed polygon by connecting points and closing back to the first point.
+
+```lua
+-- Draw a pentagon
+local pentagon = {
+    {100, 50},   -- Top
+    {150, 80},   -- Top right
+    {135, 140},  -- Bottom right
+    {65, 140},   -- Bottom left
+    {50, 80}     -- Top left
+}
+
+gpu.drawPolygon(display, pentagon, 0, 255, 0)
+gpu.updateDisplay(display)
+```
+
+**Parameters:**
+- `displayId` (number): Target display
+- `points` (table): Array of {x, y} coordinate pairs
+- `r, g, b` (number): Line color (0-255)
+
+**Format:** Same as `drawPolylines`: `{{x1, y1}, {x2, y2}, {x3, y3}, ...}`
+
+**Use Cases:**
+- Draw custom polygonal shapes
+- Create hexagons, pentagons, stars
+- Render building outlines
+- UI shapes and borders
+
+**Notes:**
+- Requires at least 3 points
+- Automatically connects last point back to first point
+- This is an OUTLINE only (not filled)
+
+**Difference from drawPolylines:**
+- `drawPolylines`: Open shape (does NOT connect last point to first)
+- `drawPolygon`: Closed shape (connects last point to first)
+
+---
+
+### Examples
+
+#### Example 1: Draw a Star
+
+```lua
+local gpu = peripheral.find("directgpu")
+local display = gpu.autoDetectAndCreateDisplay()
+
+-- Clear to black
+gpu.clear(display, 0, 0, 0)
+
+-- Create a 5-pointed star
+local cx, cy = 250, 250
+local outerRadius = 100
+local innerRadius = 40
+
+local star = {}
+for i = 0, 9 do
+    local angle = math.rad(i * 36 - 90)  -- Start at top
+    local radius = (i % 2 == 0) and outerRadius or innerRadius
+    local x = cx + math.cos(angle) * radius
+    local y = cy + math.sin(angle) * radius
+    table.insert(star, {x, y})
+end
+
+-- Draw yellow star
+gpu.drawPolygon(display, star, 255, 255, 0)
+gpu.updateDisplay(display)
+```
+
+---
+
+#### Example 2: Animated Path Drawing
+
+```lua
+local gpu = peripheral.find("directgpu")
+local display = gpu.autoDetectAndCreateDisplay()
+
+local points = {}
+local maxPoints = 50
+
+print("Move your mouse to draw! Press Q to quit")
+
+local running = true
+parallel.waitForAny(
+    function()
+        while running do
+            gpu.clear(display, 20, 20, 30)
+
+            -- Draw accumulated points as polyline
+            if #points >= 2 then
+                gpu.drawPolylines(display, points, 0, 255, 255)
+            end
+
+            -- Draw points as dots
+            for _, p in ipairs(points) do
+                gpu.drawCircle(display, p[1], p[2], 3, 255, 255, 255, true)
+            end
+
+            gpu.updateDisplay(display)
+            sleep(0.05)
+        end
+    end,
+
+    function()
+        while running do
+            if gpu.hasEvents(display) then
+                local event = gpu.pollEvent(display)
+                if event.type == "mouse_drag" or event.type == "mouse_click" then
+                    -- Add point to path
+                    table.insert(points, {event.x, event.y})
+
+                    -- Limit point count
+                    if #points > maxPoints then
+                        table.remove(points, 1)
+                    end
+                end
+            end
+            sleep(0.05)
+        end
+    end,
+
+    function()
+        while running do
+            local event, key = os.pullEvent("key")
+            if key == keys.q then running = false end
+        end
+    end
+)
+
+gpu.clearAllDisplays()
+```
+
+---
+
+#### Example 3: Draw Multiple Polygons
+
+```lua
+local gpu = peripheral.find("directgpu")
+local display = gpu.autoDetectAndCreateDisplay()
+
+gpu.clear(display, 30, 30, 50)
+
+-- Triangle
+local triangle = {
+    {50, 100},
+    {100, 50},
+    {150, 100}
+}
+gpu.drawPolygon(display, triangle, 255, 0, 0)
+
+-- Hexagon
+local hexagon = {}
+for i = 0, 5 do
+    local angle = math.rad(i * 60)
+    local x = 250 + math.cos(angle) * 50
+    local y = 100 + math.sin(angle) * 50
+    table.insert(hexagon, {x, y})
+end
+gpu.drawPolygon(display, hexagon, 0, 255, 0)
+
+-- Arrow (using polylines)
+local arrow = {
+    {400, 100},  -- Tip
+    {350, 80},   -- Top wing
+    {350, 90},   -- Wing join
+    {320, 90},   -- Shaft top
+    {320, 110},  -- Shaft bottom
+    {350, 110},  -- Wing join
+    {350, 120}   -- Bottom wing
+}
+gpu.drawPolylines(display, arrow, 255, 255, 0)
+
+gpu.updateDisplay(display)
+
+print("Press any key to exit")
+os.pullEvent("key")
+gpu.clearAllDisplays()
+```
+
+---
+
+#### Example 4: Data Plotting
+
+```lua
+local gpu = peripheral.find("directgpu")
+local display = gpu.autoDetectAndCreateDisplay()
+local info = gpu.getDisplayInfo(display)
+
+-- Generate sine wave data
+local points = {}
+local width = info.pixelWidth
+local height = info.pixelHeight
+local centerY = height / 2
+
+for x = 0, width, 5 do
+    local y = centerY + math.sin(x * 0.02) * 100
+    table.insert(points, {x, y})
+end
+
+-- Clear and draw
+gpu.clear(display, 0, 0, 40)
+
+-- Draw axes
+gpu.drawLine(display, 0, centerY, width, centerY, 100, 100, 100)  -- X axis
+gpu.drawLine(display, 50, 0, 50, height, 100, 100, 100)          -- Y axis
+
+-- Draw sine wave
+gpu.drawPolylines(display, points, 0, 255, 255)
+
+-- Labels
+gpu.drawText(display, "Sine Wave", 10, 10,
+    255, 255, 255, "Arial", 20, "bold")
+
+gpu.updateDisplay(display)
+
+print("Press any key to exit")
+os.pullEvent("key")
+gpu.clearAllDisplays()
+```
+
+---
+
+### Performance Tips
+
+**Polylines and Polygons:**
+- Limit points to < 100 for real-time animation
+- Pre-calculate complex shapes instead of generating each frame
+- Use lower resolution for smoother drawing
+- Combine with `fillRect` for filled polygon effects
+
+**Memory Usage:**
+```lua
+-- Efficient: Reuse point table
+local points = {}
+while true do
+    -- Update existing points
+    points[1] = {newX1, newY1}
+    points[2] = {newX2, newY2}
+    gpu.drawPolylines(display, points, r, g, b)
+end
+
+-- Less efficient: Create new table each frame
+while true do
+    local points = {{x1, y1}, {x2, y2}}  -- Allocates memory
+    gpu.drawPolylines(display, points, r, g, b)
+end
+```
 
 ---
 
