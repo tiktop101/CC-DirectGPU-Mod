@@ -387,7 +387,1019 @@ gpu.updateDisplay(display)
 
 ---
 
-### Examples
+#
+## Newly Extracted Functions
+
+Found **75** total functions
+
+### 2D Graphics
+
+18 functions
+
+### `addDirectionalLight(displayId, dirX, dirY, dirZ, r, g, b, intensity)`
+
+**Parameters:**
+- `displayId` (int)
+- `dirX` (double)
+- `dirY` (double)
+- `dirZ` (double)
+- `r` (int)
+- `g` (int)
+- `b` (int)
+- `intensity` (double)
+
+**Example:**
+```lua
+gpu.addDirectionalLight(displayId, dirX, dirY, dirZ, r, g, b, intensity)
+```
+
+### `clearFontCache()`
+
+**Example:**
+```lua
+gpu.clearFontCache()
+```
+
+### `draw3DModel(displayId, modelId, x, y, z, rotX, rotY, rotZ, scale, r, g, b)`
+
+**Parameters:**
+- `displayId` (int)
+- `modelId` (int)
+- `x` (double)
+- `y` (double)
+- `z` (double)
+- `rotX` (double)
+- `rotY` (double)
+- `rotZ` (double)
+- `scale` (double)
+- `r` (int)
+- `g` (int)
+- `b` (int)
+
+**Example:**
+```lua
+gpu.draw3DModel(displayId, modelId, x, y, z, rotX, rotY, rotZ, scale, r, g, b)
+```
+
+### `draw3DModelTextured(displayId, modelId, x, y, z, rotX, rotY, rotZ, scale, textureId)`
+
+**Parameters:**
+- `displayId` (int)
+- `modelId` (int)
+- `x` (double)
+- `y` (double)
+- `z` (double)
+- `rotX` (double)
+- `rotY` (double)
+- `rotZ` (double)
+- `scale` (double)
+- `textureId` (int)
+
+**Example:**
+```lua
+gpu.draw3DModelTextured(displayId, modelId, x, y, z, rotX, rotY, rotZ, scale, textureId)
+```
+
+### `drawCircle(displayId, cx, cy, radius, r, g, b, filled)`
+
+**Parameters:**
+- `displayId` (int)
+- `cx` (int)
+- `cy` (int)
+- `radius` (int)
+- `r` (int)
+- `g` (int)
+- `b` (int)
+- `filled` (boolean)
+
+**Example:**
+```lua
+gpu.drawCircle(displayId, cx, cy, radius, r, g, b, filled)
+```
+
+### `drawCube(displayId, x, y, z, size, rotX, rotY, rotZ, r, g, b)`
+
+**Parameters:**
+- `displayId` (int)
+- `x` (double)
+- `y` (double)
+- `z` (double)
+- `size` (double)
+- `rotX` (double)
+- `rotY` (double)
+- `rotZ` (double)
+- `r` (int)
+- `g` (int)
+- `b` (int)
+
+**Example:**
+```lua
+gpu.drawCube(displayId, x, y, z, size, rotX, rotY, rotZ, r, g, b)
+```
+
+### `drawEllipse(displayId, cx, cy, rx, ry, r, g, b, filled)`
+
+**Parameters:**
+- `displayId` (int)
+- `cx` (int)
+- `cy` (int)
+- `rx` (int)
+- `ry` (int)
+- `r` (int)
+- `g` (int)
+- `b` (int)
+- `filled` (boolean)
+
+**Example:**
+```lua
+gpu.drawEllipse(displayId, cx, cy, rx, ry, r, g, b, filled)
+```
+
+### `drawLine(displayId, x1, y1, x2, y2, r, g, b)`
+
+**Parameters:**
+- `displayId` (int)
+- `x1` (int)
+- `y1` (int)
+- `x2` (int)
+- `y2` (int)
+- `r` (int)
+- `g` (int)
+- `b` (int)
+
+**Example:**
+```lua
+gpu.drawLine(displayId, x1, y1, x2, y2, r, g, b)
+```
+
+### `drawPolygon(displayId, pointsObj, r, g, b)`
+
+**Parameters:**
+- `displayId` (int)
+- `pointsObj` (Object)
+- `r` (int)
+- `g` (int)
+- `b` (int)
+
+**Example:**
+```lua
+gpu.drawPolygon(displayId, pointsObj, r, g, b)
+```
+
+### `drawPolylines(displayId, pointsObj, r, g, b)`
+
+**Parameters:**
+- `displayId` (int)
+- `pointsObj` (Object)
+- `r` (int)
+- `g` (int)
+- `b` (int)
+
+**Example:**
+```lua
+gpu.drawPolylines(displayId, pointsObj, r, g, b)
+```
+
+### `drawPyramid(displayId, x, y, z, size, rotX, rotY, rotZ, r, g, b)`
+
+**Parameters:**
+- `displayId` (int)
+- `x` (double)
+- `y` (double)
+- `z` (double)
+- `size` (double)
+- `rotX` (double)
+- `rotY` (double)
+- `rotZ` (double)
+- `r` (int)
+- `g` (int)
+- `b` (int)
+
+**Example:**
+```lua
+gpu.drawPyramid(displayId, x, y, z, size, rotX, rotY, rotZ, r, g, b)
+```
+
+### `drawSphere(displayId, x, y, z, radius, segments, r, g, b)`
+
+**Parameters:**
+- `displayId` (int)
+- `x` (double)
+- `y` (double)
+- `z` (double)
+- `radius` (double)
+- `segments` (int)
+- `r` (int)
+- `g` (int)
+- `b` (int)
+
+**Example:**
+```lua
+gpu.drawSphere(displayId, x, y, z, radius, segments, r, g, b)
+```
+
+### `fillEllipse(displayId, cx, cy, rx, ry, r, g, b)`
+
+**Parameters:**
+- `displayId` (int)
+- `cx` (int)
+- `cy` (int)
+- `rx` (int)
+- `ry` (int)
+- `r` (int)
+- `g` (int)
+- `b` (int)
+
+**Example:**
+```lua
+gpu.fillEllipse(displayId, cx, cy, rx, ry, r, g, b)
+```
+
+### `fillRect(displayId, x, y, w, h, r, g, b)`
+
+**Parameters:**
+- `displayId` (int)
+- `x` (int)
+- `y` (int)
+- `w` (int)
+- `h` (int)
+- `r` (int)
+- `g` (int)
+- `b` (int)
+
+**Example:**
+```lua
+gpu.fillRect(displayId, x, y, w, h, r, g, b)
+```
+
+### `loadTexture(width, height, pixelData)` → int
+
+**Parameters:**
+- `width` (int)
+- `height` (int)
+- `pixelData` (byte[])
+
+**Returns:** `int`
+
+**Example:**
+```lua
+gpu.loadTexture(width, height, pixelData)
+```
+
+### `loadTextureFromImage()` → int
+
+**Returns:** `int`
+
+**Example:**
+```lua
+gpu.loadTextureFromImage()
+```
+
+### `setPixel(displayId, x, y, r, g, b)`
+
+**Parameters:**
+- `displayId` (int)
+- `x` (int)
+- `y` (int)
+- `r` (int)
+- `g` (int)
+- `b` (int)
+
+**Example:**
+```lua
+gpu.setPixel(displayId, x, y, r, g, b)
+```
+
+### `unloadTexture(textureId)` → boolean
+
+**Parameters:**
+- `textureId` (int)
+
+**Returns:** `boolean`
+
+**Example:**
+```lua
+gpu.unloadTexture(textureId)
+```
+
+### 3D Graphics
+
+8 functions
+
+### `clear3D(displayId)`
+
+**Parameters:**
+- `displayId` (int)
+
+**Example:**
+```lua
+gpu.clear3D(displayId)
+```
+
+### `clearAll3DModels()`
+
+**Example:**
+```lua
+gpu.clearAll3DModels()
+```
+
+### `clearLights(displayId)`
+
+**Parameters:**
+- `displayId` (int)
+
+**Example:**
+```lua
+gpu.clearLights(displayId)
+```
+
+### `load3DModel(objData)` → int
+
+**Parameters:**
+- `objData` (String)
+
+**Returns:** `int`
+
+**Example:**
+```lua
+gpu.load3DModel(objData)
+```
+
+### `load3DModelFromBytes(objData)` → int
+
+**Parameters:**
+- `objData` (byte[])
+
+**Returns:** `int`
+
+**Example:**
+```lua
+gpu.load3DModelFromBytes(objData)
+```
+
+### `setCameraPosition(displayId, x, y, z)`
+
+**Parameters:**
+- `displayId` (int)
+- `x` (double)
+- `y` (double)
+- `z` (double)
+
+**Example:**
+```lua
+gpu.setCameraPosition(displayId, x, y, z)
+```
+
+### `setCameraRotation(displayId, pitch, yaw, roll)`
+
+**Parameters:**
+- `displayId` (int)
+- `pitch` (double)
+- `yaw` (double)
+- `roll` (double)
+
+**Example:**
+```lua
+gpu.setCameraRotation(displayId, pitch, yaw, roll)
+```
+
+### `unload3DModel(modelId)` → boolean
+
+**Parameters:**
+- `modelId` (int)
+
+**Returns:** `boolean`
+
+**Example:**
+```lua
+gpu.unload3DModel(modelId)
+```
+
+### Image & Media
+
+3 functions
+
+### `clearDictionary()`
+
+**Example:**
+```lua
+gpu.clearDictionary()
+```
+
+### `loadImage(displayId)`
+
+**Parameters:**
+- `displayId` (int)
+
+**Example:**
+```lua
+gpu.loadImage(displayId)
+```
+
+### `loadJPEGRegion(displayId, jpegBinaryData, x, y, w, h)`
+
+**Parameters:**
+- `displayId` (int)
+- `jpegBinaryData` (String)
+- `x` (int)
+- `y` (int)
+- `w` (int)
+- `h` (int)
+
+**Example:**
+```lua
+gpu.loadJPEGRegion(displayId, jpegBinaryData, x, y, w, h)
+```
+
+### Input & Events
+
+8 functions
+
+### `clearEvents(displayId)`
+
+**Parameters:**
+- `displayId` (int)
+
+**Example:**
+```lua
+gpu.clearEvents(displayId)
+```
+
+### `getAxis(playerUUID, localControllerId, axisIndex)` → float
+
+**Parameters:**
+- `playerUUID` (String)
+- `localControllerId` (int)
+- `axisIndex` (int)
+
+**Returns:** `float`
+
+**Example:**
+```lua
+gpu.getAxis(playerUUID, localControllerId, axisIndex)
+```
+
+### `getAxisLocal(controllerId, axisIndex)` → float
+
+**Parameters:**
+- `controllerId` (int)
+- `axisIndex` (int)
+
+**Returns:** `float`
+
+**Example:**
+```lua
+gpu.getAxisLocal(controllerId, axisIndex)
+```
+
+### `getMappedAxis(controllerId, axisName)` → float
+
+**Parameters:**
+- `controllerId` (int)
+- `axisName` (String)
+
+**Returns:** `float`
+
+**Example:**
+```lua
+gpu.getMappedAxis(controllerId, axisName)
+```
+
+### `getNamedAxis(controllerId, axisName)` → float
+
+Get mapped axis value by name (e.g., "LEFT_STICK_X", "STEERING", "LEFT_TRIGGER")
+
+**Parameters:**
+- `controllerId` (int)
+- `axisName` (String)
+
+**Returns:** `float`
+
+**Example:**
+```lua
+gpu.getNamedAxis(controllerId, axisName)
+```
+
+### `hasEvents(displayId)` → boolean
+
+**Parameters:**
+- `displayId` (int)
+
+**Returns:** `boolean`
+
+**Example:**
+```lua
+gpu.hasEvents(displayId)
+```
+
+### `hasInput(controllerId, inputName)` → boolean
+
+Check if a button/axis exists on this controller
+
+**Parameters:**
+- `controllerId` (int)
+- `inputName` (String)
+
+**Returns:** `boolean`
+
+**Example:**
+```lua
+gpu.hasInput(controllerId, inputName)
+```
+
+### `setAxisMapping(controllerId, axisName, rawAxis, inverted)`
+
+**Parameters:**
+- `controllerId` (int)
+- `axisName` (String)
+- `rawAxis` (int)
+- `inverted` (boolean)
+
+**Example:**
+```lua
+gpu.setAxisMapping(controllerId, axisName, rawAxis, inverted)
+```
+
+### World Data
+
+1 functions
+
+### `getDimension()` → string
+
+**Returns:** `String`
+
+**Example:**
+```lua
+gpu.getDimension()
+```
+
+### Utilities
+
+15 functions
+
+### `autoDetectAndCreateDisplay()` → int
+
+**Returns:** `int`
+
+**Example:**
+```lua
+gpu.autoDetectAndCreateDisplay()
+```
+
+### `autoDetectAndCreateDisplayWithResolution(resolutionMultiplier)` → int
+
+**Parameters:**
+- `resolutionMultiplier` (int)
+
+**Returns:** `int`
+
+**Example:**
+```lua
+gpu.autoDetectAndCreateDisplayWithResolution(resolutionMultiplier)
+```
+
+### `clear(displayId, r, g, b)`
+
+**Parameters:**
+- `displayId` (int)
+- `r` (int)
+- `g` (int)
+- `b` (int)
+
+**Example:**
+```lua
+gpu.clear(displayId, r, g, b)
+```
+
+### `clearAllDisplays()`
+
+**Example:**
+```lua
+gpu.clearAllDisplays()
+```
+
+### `clearZBuffer(displayId)`
+
+**Parameters:**
+- `displayId` (int)
+
+**Example:**
+```lua
+gpu.clearZBuffer(displayId)
+```
+
+### `createDisplay(x, y, z, facing, width, height)` → int
+
+Create display as a virtual ENTITY at specific coordinates (old behavior)
+This creates a floating display NOT tied to monitor blocks
+
+**Parameters:**
+- `x` (int)
+- `y` (int)
+- `z` (int)
+- `facing` (String)
+- `width` (int)
+- `height` (int)
+
+**Returns:** `int`
+
+**Example:**
+```lua
+gpu.createDisplay(x, y, z, facing, width, height)
+```
+
+### `createDisplayWithResolution(x, y, z, facing, width, height, resolutionMultiplier)` → int
+
+Create display as a virtual ENTITY at specific coordinates (old behavior)
+This creates a floating display NOT tied to monitor blocks
+
+**Parameters:**
+- `x` (int)
+- `y` (int)
+- `z` (int)
+- `facing` (String)
+- `width` (int)
+- `height` (int)
+- `resolutionMultiplier` (int)
+
+**Returns:** `int`
+
+**Example:**
+```lua
+gpu.createDisplayWithResolution(x, y, z, facing, width, height, resolutionMultiplier)
+```
+
+### `createMonitorDisplay()` → int
+
+Create display ON TOP OF monitor blocks (no entity, merged with monitors)
+
+**Returns:** `int`
+
+**Example:**
+```lua
+gpu.createMonitorDisplay()
+```
+
+### `createMonitorDisplayWithResolution(resolutionMultiplier)` → int
+
+Create display ON TOP OF monitor blocks (no entity, merged with monitors)
+
+**Parameters:**
+- `resolutionMultiplier` (int)
+
+**Returns:** `int`
+
+**Example:**
+```lua
+gpu.createMonitorDisplayWithResolution(resolutionMultiplier)
+```
+
+### `getPlayerUUID()` → string
+
+**Returns:** `String`
+
+**Example:**
+```lua
+gpu.getPlayerUUID()
+```
+
+### `hasChunk(hash)` → boolean
+
+**Parameters:**
+- `hash` (long)
+
+**Returns:** `boolean`
+
+**Example:**
+```lua
+gpu.hasChunk(hash)
+```
+
+### `lookAt(displayId, targetX, targetY, targetZ)`
+
+**Parameters:**
+- `displayId` (int)
+- `targetX` (double)
+- `targetY` (double)
+- `targetZ` (double)
+
+**Example:**
+```lua
+gpu.lookAt(displayId, targetX, targetY, targetZ)
+```
+
+### `removeDisplay(displayId)` → boolean
+
+**Parameters:**
+- `displayId` (int)
+
+**Returns:** `boolean`
+
+**Example:**
+```lua
+gpu.removeDisplay(displayId)
+```
+
+### `setCalibrationMode(enabled, divisor, subtract)`
+
+**Parameters:**
+- `enabled` (boolean)
+- `divisor` (double)
+- `subtract` (double)
+
+**Example:**
+```lua
+gpu.setCalibrationMode(enabled, divisor, subtract)
+```
+
+### `updateDisplay(displayId)`
+
+**Parameters:**
+- `displayId` (int)
+
+**Example:**
+```lua
+gpu.updateDisplay(displayId)
+```
+
+### Controller Input
+
+22 functions
+
+### `clearControllerEvents(controllerId)`
+
+**Parameters:**
+- `controllerId` (int)
+
+**Example:**
+```lua
+gpu.clearControllerEvents(controllerId)
+```
+
+### `getButton(playerUUID, localControllerId, buttonIndex)` → boolean
+
+**Parameters:**
+- `playerUUID` (String)
+- `localControllerId` (int)
+- `buttonIndex` (int)
+
+**Returns:** `boolean`
+
+**Example:**
+```lua
+gpu.getButton(playerUUID, localControllerId, buttonIndex)
+```
+
+### `getButtonLocal(controllerId, buttonIndex)` → boolean
+
+**Parameters:**
+- `controllerId` (int)
+- `buttonIndex` (int)
+
+**Returns:** `boolean`
+
+**Example:**
+```lua
+gpu.getButtonLocal(controllerId, buttonIndex)
+```
+
+### `getControllerCount(playerUUID)` → int
+
+**Parameters:**
+- `playerUUID` (String)
+
+**Returns:** `int`
+
+**Example:**
+```lua
+gpu.getControllerCount(playerUUID)
+```
+
+### `getControllerCountLocal()` → int
+
+**Returns:** `int`
+
+**Example:**
+```lua
+gpu.getControllerCountLocal()
+```
+
+### `getControllerDeadzone()` → float
+
+**Returns:** `float`
+
+**Example:**
+```lua
+gpu.getControllerDeadzone()
+```
+
+### `getControllerType(controllerId)` → string
+
+Get controller type as string
+
+**Parameters:**
+- `controllerId` (int)
+
+**Returns:** `String`
+
+**Example:**
+```lua
+gpu.getControllerType(controllerId)
+```
+
+### `getMappedButton(controllerId, buttonName)` → boolean
+
+**Parameters:**
+- `controllerId` (int)
+- `buttonName` (String)
+
+**Returns:** `boolean`
+
+**Example:**
+```lua
+gpu.getMappedButton(controllerId, buttonName)
+```
+
+### `getNamedButton(controllerId, buttonName)` → boolean
+
+Get mapped button state by name (e.g., "A", "CROSS", "TRIGGER")
+
+**Parameters:**
+- `controllerId` (int)
+- `buttonName` (String)
+
+**Returns:** `boolean`
+
+**Example:**
+```lua
+gpu.getNamedButton(controllerId, buttonName)
+```
+
+### `getServerControllerAxis(playerUUID, localControllerId, axisIndex)` → float
+
+Get axis state from server-side controller storage using LOCAL controller ID
+@param playerUUID The player's UUID
+@param localControllerId The player's local controller ID (0, 1, 2, ...)
+@param axisIndex The axis index
+
+**Parameters:**
+- `playerUUID` (String)
+- `localControllerId` (int)
+- `axisIndex` (int)
+
+**Returns:** `float`
+
+**Example:**
+```lua
+gpu.getServerControllerAxis(playerUUID, localControllerId, axisIndex)
+```
+
+### `getServerControllerButton(playerUUID, localControllerId, buttonIndex)` → boolean
+
+Get button state from server-side controller storage using LOCAL controller ID
+@param playerUUID The player's UUID
+@param localControllerId The player's local controller ID (0, 1, 2, ...)
+@param buttonIndex The button index
+
+**Parameters:**
+- `playerUUID` (String)
+- `localControllerId` (int)
+- `buttonIndex` (int)
+
+**Returns:** `boolean`
+
+**Example:**
+```lua
+gpu.getServerControllerButton(playerUUID, localControllerId, buttonIndex)
+```
+
+### `getServerControllerCount(playerUUID)` → int
+
+Get number of controllers for a specific player
+Returns how many controllers the player has (0, 1, 2, ...)
+
+**Parameters:**
+- `playerUUID` (String)
+
+**Returns:** `int`
+
+**Example:**
+```lua
+gpu.getServerControllerCount(playerUUID)
+```
+
+### `hasController(playerUUID, localControllerId)` → boolean
+
+**Parameters:**
+- `playerUUID` (String)
+- `localControllerId` (int)
+
+**Returns:** `boolean`
+
+**Example:**
+```lua
+gpu.hasController(playerUUID, localControllerId)
+```
+
+### `hasControllerEvents(controllerId)` → boolean
+
+**Parameters:**
+- `controllerId` (int)
+
+**Returns:** `boolean`
+
+**Example:**
+```lua
+gpu.hasControllerEvents(controllerId)
+```
+
+### `hasServerController(playerUUID, localControllerId)` → boolean
+
+Check if a player has a controller at the given local ID
+@param playerUUID The player's UUID
+@param localControllerId The local controller ID to check (0, 1, 2, ...)
+
+**Parameters:**
+- `playerUUID` (String)
+- `localControllerId` (int)
+
+**Returns:** `boolean`
+
+**Example:**
+```lua
+gpu.hasServerController(playerUUID, localControllerId)
+```
+
+### `refreshControllerProfile(controllerId)`
+
+Refresh controller profile (useful after hot-plugging)
+
+**Parameters:**
+- `controllerId` (int)
+
+**Example:**
+```lua
+gpu.refreshControllerProfile(controllerId)
+```
+
+### `resetControllerMapping(controllerId)`
+
+**Parameters:**
+- `controllerId` (int)
+
+**Example:**
+```lua
+gpu.resetControllerMapping(controllerId)
+```
+
+### `saveControllerMappings()`
+
+**Example:**
+```lua
+gpu.saveControllerMappings()
+```
+
+### `scanForControllers()`
+
+**Example:**
+```lua
+gpu.scanForControllers()
+```
+
+### `setButtonMapping(controllerId, buttonName, rawButton)`
+
+**Parameters:**
+- `controllerId` (int)
+- `buttonName` (String)
+- `rawButton` (int)
+
+**Example:**
+```lua
+gpu.setButtonMapping(controllerId, buttonName, rawButton)
+```
+
+### `setControllerDeadzone(deadzone)`
+
+**Parameters:**
+- `deadzone` (float)
+
+**Example:**
+```lua
+gpu.setControllerDeadzone(deadzone)
+```
+
+### `updateControllerState(controllerId)`
+
+**Parameters:**
+- `controllerId` (int)
+
+**Example:**
+```lua
+gpu.updateControllerState(controllerId)
+```
+
+
+## Examples
 
 #### Example 1: Draw a Star
 
