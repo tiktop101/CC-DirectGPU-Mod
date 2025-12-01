@@ -214,6 +214,23 @@ Standard display management functions. See original README for details.
 
 ---
 
+
+
+### `setDisplayPersistent(displayId, persistent)`
+
+[Auto-generated documentation]
+
+**Parameters:**
+- `displayId` (number)
+- `persistent` (boolean)
+
+**Example:**
+```lua
+gpu.setDisplayPersistent(displayId, 255)
+```
+
+---
+
 ## 2D Drawing Functions
 
 ### `setPixel(displayId, x, y, r, g, b)`
@@ -300,6 +317,19 @@ gpu.drawEllipse(display, 100, 100, 80, 40, 0, 0, 255, true)
 - `rx, ry` (number): X and Y radii in pixels
 - `r, g, b` (number): RGB color
 - `filled` (boolean): true for filled, false for outline
+
+---
+
+
+
+### `clearJPEGCache()`
+
+[Auto-generated documentation]
+
+**Example:**
+```lua
+gpu.clearJPEGCache()
+```
 
 ---
 
@@ -1832,6 +1862,57 @@ Decodes JPEG and blits to specific region.
 ```lua
 gpu.loadJPEGRegion(display, jpegData, 0, 0, 320, 240)
 gpu.updateDisplay(display)
+```
+
+---
+
+
+
+### `loadJPEGFullscreen(displayId, jpegData)`
+
+[Auto-generated documentation]
+
+**Parameters:**
+- `displayId` (number)
+- `jpegData` (string (binary))
+
+**Example:**
+```lua
+gpu.loadJPEGFullscreen(displayId, 255)
+```
+
+---
+
+### `loadJPEGRegionBytes(displayId, jpegData, x, y, w, h)`
+
+[Auto-generated documentation]
+
+**Parameters:**
+- `displayId` (number)
+- `jpegData` (string (binary))
+- `x` (number)
+- `y` (number)
+- `w` (number)
+- `h` (number)
+
+**Example:**
+```lua
+gpu.loadJPEGRegionBytes(displayId, 255, 0, 0, 0, 0)
+```
+
+---
+
+### `preloadJPEGSequence(displayId, jpegSequence)`
+
+[Auto-generated documentation]
+
+**Parameters:**
+- `displayId` (number)
+- `jpegSequence` (any)
+
+**Example:**
+```lua
+gpu.preloadJPEGSequence(displayId, 255)
 ```
 
 ---
@@ -3482,6 +3563,42 @@ local state = gpu.getServerControllerState(uuid, 0)
 print("Buttons:", state.buttons)
 print("Axes:", state.axes)
 print("Timestamp:", state.timestamp)
+```
+
+---
+
+
+
+### `getServerControllerAxes(playerUUID, localControllerId)` → table
+
+[Auto-generated documentation]
+
+**Parameters:**
+- `playerUUID` (string)
+- `localControllerId` (number)
+
+**Returns:** table
+
+**Example:**
+```lua
+local result = gpu.getServerControllerAxes(255, 255)
+```
+
+---
+
+### `getServerControllerButtons(playerUUID, localControllerId)` → table
+
+[Auto-generated documentation]
+
+**Parameters:**
+- `playerUUID` (string)
+- `localControllerId` (number)
+
+**Returns:** table
+
+**Example:**
+```lua
+local result = gpu.getServerControllerButtons(255, 255)
 ```
 
 ---
