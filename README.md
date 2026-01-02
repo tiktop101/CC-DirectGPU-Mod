@@ -3970,7 +3970,7 @@ This project is licensed under **All Rights Reserved (ARR)**.
 ## Support & Community
 
 - **Issues:** Report bugs on GitHub
-- **Discord:** https://discord.gg/DHbQ7Xurpv
+- **Discord:** [https://discord.gg/zr2CScq7Gf]
 - **Documentation:** This README + in-game examples
 
 ---
