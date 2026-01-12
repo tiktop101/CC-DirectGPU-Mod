@@ -1,5 +1,7 @@
 # DirectGPU
 
+[https://github.com/tiktop101/CCDirectGPU-Projects/tree/main] Download Programs People have already made for this mod :3
+
 Recommended Version of CC:T for this mod is: 1.116.1
 
 A high-performance ComputerCraft peripheral for Minecraft that enables hardware-accelerated 2D and 3D graphics rendering directly to monitors. Stream images, create interactive UIs, render 3D models, or build pixel art - all at up to 656×324 resolution per block with 4x scaling.
