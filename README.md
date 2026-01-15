@@ -10,7 +10,7 @@
 
 Transform ComputerCraft monitors into powerful graphics displays with hardware-accelerated 2D/3D rendering, image decoding, and real-time input support.
 
-[Download](https://github.com/tiktop101/CCDirectGPU-Projects/releases) • [Examples](https://github.com/tiktop101/CCDirectGPU-Projects/tree/main) • [Discord](https://discord.gg/zr2CScq7Gf)
+[Download](https://github.com/tiktop101/CC-DirectGPU-Mod/releases/) • [Examples](https://github.com/tiktop101/CC-DirectGPU-Mod/tree/main/Examples) • [Discord](https://discord.gg/zr2CScq7Gf)
 
 </div>
 
@@ -45,7 +45,7 @@ Transform ComputerCraft monitors into powerful graphics displays with hardware-a
 
 ## 📦 Installation
 
-1. **Download** the latest DirectGPU JAR from [releases](https://github.com/tiktop101/CCDirectGPU-Projects/releases)
+1. **Download** the latest DirectGPU JAR from [releases](https://github.com/tiktop101/CC-DirectGPU-Mod/releases/)
 2. **Place** in your Minecraft `mods` folder
 3. **Ensure** you have **Forge** and **CC: Tweaked** installed
 4. **Craft** the DirectGPU block:
