@@ -1,69 +1,84 @@
 # DirectGPU
 
-[https://github.com/tiktop101/CCDirectGPU-Projects/tree/main] Download Programs People have already made for this mod :3
+<div align="center">
 
-Recommended Version of CC:T for this mod is: 1.116.1
+**High-Performance Graphics for ComputerCraft**
 
-A high-performance ComputerCraft peripheral for Minecraft that enables hardware-accelerated 2D and 3D graphics rendering directly to monitors. Stream images, create interactive UIs, render 3D models, or build pixel art - all at up to 656×324 resolution per block with 4x scaling.
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1-green.svg)](https://www.minecraft.net/)
+[![CC: Tweaked](https://img.shields.io/badge/CC%3A%20Tweaked-1.20.1-blue.svg)](https://tweaked.cc/)
+[![License](https://img.shields.io/badge/License-ARR-red.svg)](LICENSE)
 
-## Features
+Transform ComputerCraft monitors into powerful graphics displays with hardware-accelerated 2D/3D rendering, image decoding, and real-time input support.
 
-### 2D Graphics
-- **True RGB Graphics** - 24-bit color with 164×81 pixels per monitor block (up to 656×324 with 4x resolution multiplier)
-- **Hardware Accelerated** - OpenGL rendering bypasses CC's text system for maximum performance
-- **Drawing Primitives** - Fast lines, rectangles, circles, and pixel-perfect rendering
-- **Built-in Font Rendering** - Multiple system fonts with anti-aliasing, styles, and sizes
-- **Image Support** - Load JPEG images with hardware decoding (~5ms per frame)
-- **Dictionary Compression** - Intelligent chunk-based caching reduces bandwidth by 90%+ for video
+[Download](https://github.com/tiktop101/CCDirectGPU-Projects/releases) • [Examples](https://github.com/tiktop101/CCDirectGPU-Projects/tree/main) • [Discord](https://discord.gg/zr2CScq7Gf)
 
-### 3D Graphics
-- **3D Camera System** - Full perspective projection with position, rotation, and look-at
-- **3D Primitives** - Cubes, spheres, pyramids with rotation and scaling
-- **OBJ Model Loading** - Load and render .obj 3D models with texture support
-- **Z-Buffer Depth Testing** - Proper depth sorting for complex 3D scenes
-- **Texture Mapping** - UV-mapped textures on 3D models
-- **Dynamic Lighting** - Directional lights with diffuse shading
+</div>
 
-### Interaction & Data
-- **Touch Input** - Full mouse click, drag, hover, and keyboard event support with sub-tick latency
-- **World Data Access** - Query time, weather, moon phase, biome, and game rules
-- **Auto-Detection** - Automatically finds and configures nearby monitors in any orientation
-- **Multi-Display** - Up to 50 displays with 10 megapixel total limit
-- **Thread-Safe** - Safe concurrent access from multiple computers
+---
 
-## Installation
+## ✨ Features
 
-1. Download the latest DirectGPU JAR from releases
-2. Place in your Minecraft `mods` folder
-3. Ensure you have **Forge** and **CC: Tweaked** installed
-4. Craft the DirectGPU block (see recipe below)
-5. Launch Minecraft and enjoy!
+### 🎨 2D Graphics
+- **True RGB Color** - 24-bit color depth (16.7M colors)
+- **High Resolution** - Up to 656×324 pixels per block (4x scaling)
+- **Drawing Primitives** - Lines, rectangles, circles, ellipses, polygons, bezier curves
+- **Text Rendering** - System fonts with anti-aliasing and multiple styles
+- **Hardware JPEG Decoding** - ~5ms per frame with compression support
 
-### Crafting Recipe
+### 🎮 3D Graphics
+- **Full 3D Pipeline** - Camera, projection, depth testing
+- **OBJ Model Loading** - Import industry-standard 3D models
+- **Texture Mapping** - UV-mapped textures with hardware acceleration
+- **Dynamic Lighting** - Directional and ambient lights with diffuse/phong shading
+- **Primitives** - Cubes, spheres, pyramids with rotation and scaling
+
+### 🕹️ Input & Interaction
+- **Touch Input** - Mouse clicks, drags, and hover events
+- **Controller Support** - Xbox, PlayStation, Switch, racing wheels, flight sticks
+- **Auto-Profiling** - Named button/axis mapping across controller types
+- **Multiplayer** - Server-side controller state access
+
+### 🌍 World Integration
+- **World Data** - Time, weather, moon phase, biome information
+- **Auto-Detection** - Automatically find and configure nearby monitors
+- **Multi-Display** - Up to 50 displays with 10MP total limit
+
+## 📦 Installation
+
+1. **Download** the latest DirectGPU JAR from [releases](https://github.com/tiktop101/CCDirectGPU-Projects/releases)
+2. **Place** in your Minecraft `mods` folder
+3. **Ensure** you have **Forge** and **CC: Tweaked** installed
+4. **Craft** the DirectGPU block:
 
 ```
-[Iron] [Gold] [Iron]
-[Redstone] [Computer] [Redstone]
-[Iron] [Redstone] [Iron]
+[Iron]     [Gold]      [Iron]
+[Redstone] [Computer]  [Redstone]
+[Iron]     [Redstone]  [Iron]
 ```
 
-**Materials:**
+**Required:**
 - 4× Iron Ingots
 - 1× Gold Ingot
 - 3× Redstone Dust
 - 1× ComputerCraft Computer (normal)
 
-## Quick Start
+**Versions:**
+- Minecraft: 1.20.1
+- Forge: 47.3.0+
+- CC: Tweaked: 1.20.1 (1.116.1 recommended)
 
-### 2D Graphics
+## 🚀 Quick Start
+
+### 2D Graphics Example
+
 ```lua
 -- Find the DirectGPU peripheral
 local gpu = peripheral.find("directgpu")
 
--- Auto-detect and create a display on the nearest monitor
+-- Auto-create display on nearest monitor
 local display = gpu.autoDetectAndCreateDisplay()
 
--- Get display dimensions
+-- Get display info
 local info = gpu.getDisplayInfo(display)
 print(string.format("Display: %dx%d pixels", info.pixelWidth, info.pixelHeight))
 
@@ -72,157 +87,180 @@ gpu.clear(display, 0, 100, 200)
 gpu.fillRect(display, 10, 10, 50, 50, 255, 0, 0)
 gpu.updateDisplay(display)
 
--- Clean up when done
-gpu.clearAllDisplays()
+-- Draw text
+gpu.drawText(display, "Hello DirectGPU!", 10, 70,
+    255, 255, 255, "Arial", 20, "bold")
+gpu.updateDisplay(display)
 ```
 
-### 3D Graphics
+### 3D Graphics Example
+
 ```lua
 local gpu = peripheral.find("directgpu")
 local display = gpu.autoDetectAndCreateDisplay()
 
 -- Setup 3D camera
-gpu.setupCamera(display, 60, 0.1, 1000)  -- FOV, near, far
-gpu.setCameraPosition(display, 0, 0, 5)
-gpu.setCameraRotation(display, 0, 0, 0)
+gpu.setupCamera(display, 60, 0.1, 1000)
+gpu.setCameraPosition(display, 0, 2, 5)
+gpu.addDirectionalLight(display, 0, -1, 0, 255, 255, 255, 0.8)
 
--- Clear and draw a rotating cube
-gpu.clear(display, 0, 0, 0)
-gpu.clearZBuffer(display)
-
+-- Render loop
 local rotation = 0
 while true do
     gpu.clear(display, 0, 0, 0)
     gpu.clearZBuffer(display)
-    
-    -- Draw cube at origin with rotation
+
+    -- Draw rotating cube
     gpu.drawCube(display, 0, 0, 0, 2, rotation, rotation, 0, 255, 100, 100)
-    
+
     gpu.updateDisplay(display)
     rotation = rotation + 2
     sleep(0.05)
 end
 ```
 
----
+## 📚 API Reference
 
-## API Reference
+### Table of Contents
 
-## Table of Contents
-- [Controller Input](#Controller-Input)
-- [Display Management](#display-management)
-- [2D Drawing Functions](#2d-drawing-functions)
-- [Font Rendering](#font-rendering)
-- [Image Loading](#image-loading)
-- [Dictionary Compression](#dictionary-compression)
-- [3D Rendering](#3d-rendering)
-- [3D Models (OBJ Files)](#3d-models-obj-files)
-- [Textures](#textures)
-- [Lighting](#lighting)
-- [Touch Input](#touch-input)
-- [World Data](#world-data)
-- [Examples](#examples)
-
----
-
-## Display Management
-
-### `autoDetectMonitor()` → info
-
-Scans for the nearest monitor within 16 blocks and returns its configuration.
-
-```lua
-local monitor = gpu.autoDetectMonitor()
-if monitor.found then
-    print(string.format("Found %dx%d monitor at (%d, %d, %d)", 
-        monitor.width, monitor.height, monitor.x, monitor.y, monitor.z))
-    print("Facing: " .. monitor.facing)
-end
-```
-
-**Returns:**
-```lua
-{
-    found = true,      -- Boolean: whether a monitor was found
-    x = 100,          -- World X coordinate of bottom-left corner
-    y = 64,           -- World Y coordinate of bottom-left corner
-    z = 200,          -- World Z coordinate of bottom-left corner
-    width = 3,        -- Width in blocks
-    height = 2,       -- Height in blocks
-    facing = "north"  -- Direction the monitor is facing
-}
-```
+- [Display Management](#display-management) (13 functions)
+- [2D Drawing](#2d-drawing) (10 functions)
+- [Text Rendering](#text-rendering) (5 functions)
+- [Image & JPEG](#image-and-jpeg) (10 functions)
+- [Dictionary Compression](#dictionary-compression) (6 functions)
+- [3D Camera](#3d-camera) (7 functions)
+- [3D Primitives](#3d-primitives) (4 functions)
+- [3D Models](#3d-models) (7 functions)
+- [3D Lighting](#3d-lighting) (5 functions)
+- [Textures](#textures) (4 functions)
+- [Input Events](#input-events) (3 functions)
+- [World Data](#world-data) (6 functions)
+- [Controller Input](#controller-input) (13 functions)
+- [Controller Mapping](#controller-mapping) (8 functions)
+- [Controller Profiles](#controller-profiles) (11 functions)
+- [Server-Side Controllers](#server-side-controllers) (9 functions)
+- [Vector Graphics](#vector-graphics) (4 functions)
+- [Metaballs](#metaballs) (11 functions)
+- [Calibration](#calibration) (2 functions)
 
 ---
 
-### `autoDetectAndCreateDisplay()` → displayId
+## API Documentation
 
-Automatically detects the nearest monitor and creates a display at 1x resolution.
+### Display Management
 
+#### `autoDetectAndCreateDisplay()` → number
+
+**Example:**
 ```lua
-local display = gpu.autoDetectAndCreateDisplay()
+local result = gpu.autoDetectAndCreateDisplay()
 ```
 
-**Returns:** Display ID (number)  
-**Throws:** Error if no monitor is found within 16 blocks
-
----
-
-### `autoDetectAndCreateDisplayWithResolution(resolutionMultiplier)` → displayId
-
-Same as above but with custom resolution scaling.
-
-```lua
--- Create a 2x resolution display (328x162 pixels per block)
-local display = gpu.autoDetectAndCreateDisplayWithResolution(2)
-```
+#### `autoDetectAndCreateDisplayWithResolution(resolutionMultiplier)` → number
 
 **Parameters:**
-- `resolutionMultiplier` (number): 1-4 (1=164×81, 2=328×162, 3=492×243, 4=656×324 per block)
+- `resolutionMultiplier` (number)
 
----
-
-### `createDisplay(x, y, z, facing, width, height)` → displayId
-### `createDisplayAt(x, y, z, facing, width, height)` → displayId
-
-Creates a display at specific world coordinates with 1x resolution.
-
+**Example:**
 ```lua
-local display = gpu.createDisplay(100, 64, 200, "south", 4, 3)
+local result = gpu.autoDetectAndCreateDisplayWithResolution(0)
 ```
+
+#### `autoDetectMonitor()` → string
+
+**Example:**
+```lua
+local result = gpu.autoDetectMonitor()
+```
+
+#### `clearAllDisplays()`
+
+**Example:**
+```lua
+gpu.clearAllDisplays()
+```
+
+#### `createDisplay(x, y, z, facing, width, height)` → number
 
 **Parameters:**
-- `x, y, z` (number): World coordinates of bottom-left corner
-- `facing` (string): "north", "south", "east", "west", "up", "down"
-- `width, height` (number): Monitor size in blocks (1-16)
+- `x` (number)
+- `y` (number)
+- `z` (number)
+- `facing` (string)
+- `width` (number)
+- `height` (number)
 
----
-
-### `createDisplayWithResolution(x, y, z, facing, width, height, resolutionMultiplier)` → displayId
-
-Creates a display with custom resolution scaling.
-
+**Example:**
 ```lua
-local display = gpu.createDisplayWithResolution(100, 64, 200, "south", 3, 2, 2)
+local result = gpu.createDisplay(0, 0, 0, "", 0, 0)
 ```
 
----
+#### `createDisplayAt(x, y, z, facing, width, height)` → number
 
-### `removeDisplay(displayId)` → success
-### `clearAllDisplays()`
-### `listDisplays()` → displayIds
-### `getDisplayInfo(displayId)` → info
-### `getResourceStats()` → stats
+**Parameters:**
+- `x` (number)
+- `y` (number)
+- `z` (number)
+- `facing` (string)
+- `width` (number)
+- `height` (number)
 
-Standard display management functions. See original README for details.
+**Example:**
+```lua
+local result = gpu.createDisplayAt(0, 0, 0, "", 0, 0)
+```
 
----
+#### `createDisplayWithResolution(x, y, z, facing, width, height, resolutionMultiplier)` → number
 
+**Parameters:**
+- `x` (number)
+- `y` (number)
+- `z` (number)
+- `facing` (string)
+- `width` (number)
+- `height` (number)
+- `resolutionMultiplier` (number)
 
+**Example:**
+```lua
+local result = gpu.createDisplayWithResolution(0, 0, 0, "", 0, 0, 0)
+```
 
-### `setDisplayPersistent(displayId, persistent)`
+#### `getDisplayInfo(displayId)` → string
 
-[Auto-generated documentation]
+**Parameters:**
+- `displayId` (number)
+
+**Example:**
+```lua
+local result = gpu.getDisplayInfo(0)
+```
+
+#### `getResourceStats()` → string
+
+**Example:**
+```lua
+local result = gpu.getResourceStats()
+```
+
+#### `listDisplays()` → table
+
+**Example:**
+```lua
+local result = gpu.listDisplays()
+```
+
+#### `removeDisplay(displayId)` → boolean
+
+**Parameters:**
+- `displayId` (number)
+
+**Example:**
+```lua
+local result = gpu.removeDisplay(0)
+```
+
+#### `setDisplayPersistent(displayId, persistent)`
 
 **Parameters:**
 - `displayId` (number)
@@ -230,1670 +268,338 @@ Standard display management functions. See original README for details.
 
 **Example:**
 ```lua
-gpu.setDisplayPersistent(displayId, 255)
+gpu.setDisplayPersistent(0, true)
 ```
 
----
-
-## 2D Drawing Functions
-
-### `setPixel(displayId, x, y, r, g, b)`
-
-Sets a single pixel to RGB color (0-255).
-
-```lua
-gpu.setPixel(display, 100, 50, 255, 128, 0)
-```
-
----
-
-### `getPixel(displayId, x, y)` → {r, g, b}
-
-Returns the RGB color of a pixel.
-
-```lua
-local r, g, b = table.unpack(gpu.getPixel(display, 100, 50))
-```
-
----
-
-### `clear(displayId, r, g, b)`
-
-Fills entire display with solid color.
-
-```lua
-gpu.clear(display, 0, 0, 0)  -- Black
-```
-
----
-
-### `fillRect(displayId, x, y, width, height, r, g, b)`
-
-Draws a filled rectangle.
-
-```lua
-gpu.fillRect(display, 10, 10, 100, 50, 255, 0, 0)
-```
-
----
-
-### `drawLine(displayId, x1, y1, x2, y2, r, g, b)`
-
-Draws a line using Bresenham's algorithm.
-
-```lua
-gpu.drawLine(display, 0, 0, 163, 80, 255, 255, 255)
-```
-
----
-
-### `drawCircle(displayId, cx, cy, radius, r, g, b, filled)`
-
-Draws a circle (filled or outline).
-
-```lua
--- Filled red circle
-gpu.drawCircle(display, 100, 100, 50, 255, 0, 0, true)
-
--- White circle outline
-gpu.drawCircle(display, 100, 100, 50, 255, 255, 255, false)
-```
+#### `updateDisplay(displayId)`
 
 **Parameters:**
-- `cx, cy` (number): Center coordinates
-- `radius` (number): Circle radius in pixels
-- `r, g, b` (number): RGB color (0-255)
-- `filled` (boolean): true for filled circle, false for outline
+- `displayId` (number)
 
----
-
-### `drawEllipse(displayId, cx, cy, rx, ry, r, g, b, filled)`
-
-Draws an ellipse (filled or outline).
-
+**Example:**
 ```lua
--- Filled blue ellipse
-gpu.drawEllipse(display, 100, 100, 80, 40, 0, 0, 255, true)
+gpu.updateDisplay(0)
 ```
 
+
+### 2D Drawing
+
+#### `clear(displayId, r, g, b)`
+
 **Parameters:**
-- `cx, cy` (number): Center coordinates
-- `rx, ry` (number): X and Y radii in pixels
-- `r, g, b` (number): RGB color
-- `filled` (boolean): true for filled, false for outline
+- `displayId` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
 
----
+**Example:**
+```lua
+gpu.clear(0, 0, 0, 0)
+```
+
+#### `drawCircle(displayId, cx, cy, radius, r, g, b, filled)`
+
+**Parameters:**
+- `displayId` (number)
+- `cx` (number)
+- `cy` (number)
+- `radius` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+- `filled` (boolean)
+
+**Example:**
+```lua
+gpu.drawCircle(0, 0, 0, 0, 0, 0, 0, true)
+```
+
+#### `drawEllipse(displayId, cx, cy, rx, ry, r, g, b, filled)`
+
+**Parameters:**
+- `displayId` (number)
+- `cx` (number)
+- `cy` (number)
+- `rx` (number)
+- `ry` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+- `filled` (boolean)
+
+**Example:**
+```lua
+gpu.drawEllipse(0, 0, 0, 0, 0, 0, 0, 0, true)
+```
+
+#### `drawLine(displayId, x1, y1, x2, y2, r, g, b)`
+
+**Parameters:**
+- `displayId` (number)
+- `x1` (number)
+- `y1` (number)
+- `x2` (number)
+- `y2` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+
+**Example:**
+```lua
+gpu.drawLine(0, 0, 0, 0, 0, 0, 0, 0)
+```
+
+#### `drawPolygon(displayId, pointsObj, r, g, b)`
+
+**Parameters:**
+- `displayId` (number)
+- `pointsObj` (any)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+
+**Example:**
+```lua
+gpu.drawPolygon(0, value, 0, 0, 0)
+```
+
+#### `drawPolylines(displayId, pointsObj, r, g, b)`
+
+**Parameters:**
+- `displayId` (number)
+- `pointsObj` (any)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+
+**Example:**
+```lua
+gpu.drawPolylines(0, value, 0, 0, 0)
+```
+
+#### `fillEllipse(displayId, cx, cy, rx, ry, r, g, b)`
+
+**Parameters:**
+- `displayId` (number)
+- `cx` (number)
+- `cy` (number)
+- `rx` (number)
+- `ry` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+
+**Example:**
+```lua
+gpu.fillEllipse(0, 0, 0, 0, 0, 0, 0, 0)
+```
+
+#### `fillRect(displayId, x, y, w, h, r, g, b)`
+
+**Parameters:**
+- `displayId` (number)
+- `x` (number)
+- `y` (number)
+- `w` (number)
+- `h` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+
+**Example:**
+```lua
+gpu.fillRect(0, 0, 0, 0, 0, 0, 0, 0)
+```
+
+#### `getPixel(displayId, x, y)` → table
+
+**Parameters:**
+- `displayId` (number)
+- `x` (number)
+- `y` (number)
+
+**Example:**
+```lua
+local result = gpu.getPixel(0, 0, 0)
+```
+
+#### `setPixel(displayId, x, y, r, g, b)`
+
+**Parameters:**
+- `displayId` (number)
+- `x` (number)
+- `y` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+
+**Example:**
+```lua
+gpu.setPixel(0, 0, 0, 0, 0, 0)
+```
 
 
+### Text Rendering
 
-### `clearJPEGCache()`
+#### `clearFontCache()`
 
-[Auto-generated documentation]
+**Example:**
+```lua
+gpu.clearFontCache()
+```
+
+#### `drawText(displayId, text, x, y, r, g, b, fontName, fontSize, style)` → string
+
+**Parameters:**
+- `displayId` (number)
+- `text` (string)
+- `x` (number)
+- `y` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+- `fontName` (string)
+- `fontSize` (number)
+- `style` (string)
+
+**Example:**
+```lua
+local result = gpu.drawText(0, "", 0, 0, 0, 0, 0, "", 0, "")
+```
+
+#### `drawTextWithBg(displayId, text, x, y, fgR, fgG, fgB, bgR, bgG, bgB, padding, fontName, fontSize, style)` → string
+
+**Parameters:**
+- `displayId` (number)
+- `text` (string)
+- `x` (number)
+- `y` (number)
+- `fgR` (number)
+- `fgG` (number)
+- `fgB` (number)
+- `bgR` (number)
+- `bgG` (number)
+- `bgB` (number)
+- `padding` (number)
+- `fontName` (string)
+- `fontSize` (number)
+- `style` (string)
+
+**Example:**
+```lua
+local result = gpu.drawTextWithBg(0, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, "", 0, "")
+```
+
+#### `drawTextWrapped(displayId, text, x, y, maxWidth, r, g, b, lineSpacing, fontName, fontSize, style)` → string
+
+**Parameters:**
+- `displayId` (number)
+- `text` (string)
+- `x` (number)
+- `y` (number)
+- `maxWidth` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+- `lineSpacing` (number)
+- `fontName` (string)
+- `fontSize` (number)
+- `style` (string)
+
+**Example:**
+```lua
+local result = gpu.drawTextWrapped(0, "", 0, 0, 0, 0, 0, 0, 0, "", 0, "")
+```
+
+#### `measureText(text, fontName, fontSize, style)` → string
+
+**Parameters:**
+- `text` (string)
+- `fontName` (string)
+- `fontSize` (number)
+- `style` (string)
+
+**Example:**
+```lua
+local result = gpu.measureText("", "", 0, "")
+```
+
+
+### Image & JPEG
+
+#### `clearJPEGCache()`
 
 **Example:**
 ```lua
 gpu.clearJPEGCache()
 ```
 
----
+#### `decodeAndScaleJPEG(base64JpegData, targetWidth, targetHeight)` → string
 
-## Polylines & Polygons
-
-DirectGPU provides functions to draw connected line segments (polylines) and closed shapes (polygons).
-
-### `drawPolylines(displayId, points, r, g, b)`
-
-Draws connected line segments between a series of points.
-
-```lua
--- Draw a zigzag line
-local points = {
-    {10, 10},
-    {50, 50},
-    {90, 10},
-    {130, 50},
-    {170, 10}
-}
-
-gpu.drawPolylines(display, points, 255, 255, 255)
-gpu.updateDisplay(display)
-```
-
-**Parameters:**
-- `displayId` (number): Target display
-- `points` (table): Array of {x, y} coordinate pairs
-- `r, g, b` (number): Line color (0-255)
-
-**Format:** Points must be a Lua table of tables: `{{x1, y1}, {x2, y2}, {x3, y3}, ...}`
-
-**Use Cases:**
-- Draw paths and trajectories
-- Create custom line shapes
-- Plot data graphs
-- Render vector graphics
-
-**Notes:**
-- Requires at least 2 points
-- Lines are drawn between consecutive points
-- Shape is NOT automatically closed (use `drawPolygon` for closed shapes)
-
----
-
-### `drawPolygon(displayId, points, r, g, b)`
-
-Draws a closed polygon by connecting points and closing back to the first point.
-
-```lua
--- Draw a pentagon
-local pentagon = {
-    {100, 50},   -- Top
-    {150, 80},   -- Top right
-    {135, 140},  -- Bottom right
-    {65, 140},   -- Bottom left
-    {50, 80}     -- Top left
-}
-
-gpu.drawPolygon(display, pentagon, 0, 255, 0)
-gpu.updateDisplay(display)
-```
-
-**Parameters:**
-- `displayId` (number): Target display
-- `points` (table): Array of {x, y} coordinate pairs
-- `r, g, b` (number): Line color (0-255)
-
-**Format:** Same as `drawPolylines`: `{{x1, y1}, {x2, y2}, {x3, y3}, ...}`
-
-**Use Cases:**
-- Draw custom polygonal shapes
-- Create hexagons, pentagons, stars
-- Render building outlines
-- UI shapes and borders
-
-**Notes:**
-- Requires at least 3 points
-- Automatically connects last point back to first point
-- This is an OUTLINE only (not filled)
-
-**Difference from drawPolylines:**
-- `drawPolylines`: Open shape (does NOT connect last point to first)
-- `drawPolygon`: Closed shape (connects last point to first)
-
----
-
-#
-## Newly Extracted Functions
-
-Found **75** total functions
-
-### 2D Graphics
-
-18 functions
-
-### `addDirectionalLight(displayId, dirX, dirY, dirZ, r, g, b, intensity)`
-
-**Parameters:**
-- `displayId` (int)
-- `dirX` (double)
-- `dirY` (double)
-- `dirZ` (double)
-- `r` (int)
-- `g` (int)
-- `b` (int)
-- `intensity` (double)
-
-**Example:**
-```lua
-gpu.addDirectionalLight(displayId, dirX, dirY, dirZ, r, g, b, intensity)
-```
-
-### `clearFontCache()`
-
-**Example:**
-```lua
-gpu.clearFontCache()
-```
-
-### `draw3DModel(displayId, modelId, x, y, z, rotX, rotY, rotZ, scale, r, g, b)`
-
-**Parameters:**
-- `displayId` (int)
-- `modelId` (int)
-- `x` (double)
-- `y` (double)
-- `z` (double)
-- `rotX` (double)
-- `rotY` (double)
-- `rotZ` (double)
-- `scale` (double)
-- `r` (int)
-- `g` (int)
-- `b` (int)
-
-**Example:**
-```lua
-gpu.draw3DModel(displayId, modelId, x, y, z, rotX, rotY, rotZ, scale, r, g, b)
-```
-
-### `draw3DModelTextured(displayId, modelId, x, y, z, rotX, rotY, rotZ, scale, textureId)`
-
-**Parameters:**
-- `displayId` (int)
-- `modelId` (int)
-- `x` (double)
-- `y` (double)
-- `z` (double)
-- `rotX` (double)
-- `rotY` (double)
-- `rotZ` (double)
-- `scale` (double)
-- `textureId` (int)
-
-**Example:**
-```lua
-gpu.draw3DModelTextured(displayId, modelId, x, y, z, rotX, rotY, rotZ, scale, textureId)
-```
-
-### `drawCircle(displayId, cx, cy, radius, r, g, b, filled)`
-
-**Parameters:**
-- `displayId` (int)
-- `cx` (int)
-- `cy` (int)
-- `radius` (int)
-- `r` (int)
-- `g` (int)
-- `b` (int)
-- `filled` (boolean)
-
-**Example:**
-```lua
-gpu.drawCircle(displayId, cx, cy, radius, r, g, b, filled)
-```
-
-### `drawCube(displayId, x, y, z, size, rotX, rotY, rotZ, r, g, b)`
-
-**Parameters:**
-- `displayId` (int)
-- `x` (double)
-- `y` (double)
-- `z` (double)
-- `size` (double)
-- `rotX` (double)
-- `rotY` (double)
-- `rotZ` (double)
-- `r` (int)
-- `g` (int)
-- `b` (int)
-
-**Example:**
-```lua
-gpu.drawCube(displayId, x, y, z, size, rotX, rotY, rotZ, r, g, b)
-```
-
-### `drawEllipse(displayId, cx, cy, rx, ry, r, g, b, filled)`
-
-**Parameters:**
-- `displayId` (int)
-- `cx` (int)
-- `cy` (int)
-- `rx` (int)
-- `ry` (int)
-- `r` (int)
-- `g` (int)
-- `b` (int)
-- `filled` (boolean)
-
-**Example:**
-```lua
-gpu.drawEllipse(displayId, cx, cy, rx, ry, r, g, b, filled)
-```
-
-### `drawLine(displayId, x1, y1, x2, y2, r, g, b)`
-
-**Parameters:**
-- `displayId` (int)
-- `x1` (int)
-- `y1` (int)
-- `x2` (int)
-- `y2` (int)
-- `r` (int)
-- `g` (int)
-- `b` (int)
-
-**Example:**
-```lua
-gpu.drawLine(displayId, x1, y1, x2, y2, r, g, b)
-```
-
-### `drawPolygon(displayId, pointsObj, r, g, b)`
-
-**Parameters:**
-- `displayId` (int)
-- `pointsObj` (Object)
-- `r` (int)
-- `g` (int)
-- `b` (int)
-
-**Example:**
-```lua
-gpu.drawPolygon(displayId, pointsObj, r, g, b)
-```
-
-### `drawPolylines(displayId, pointsObj, r, g, b)`
-
-**Parameters:**
-- `displayId` (int)
-- `pointsObj` (Object)
-- `r` (int)
-- `g` (int)
-- `b` (int)
-
-**Example:**
-```lua
-gpu.drawPolylines(displayId, pointsObj, r, g, b)
-```
-
-### `drawPyramid(displayId, x, y, z, size, rotX, rotY, rotZ, r, g, b)`
-
-**Parameters:**
-- `displayId` (int)
-- `x` (double)
-- `y` (double)
-- `z` (double)
-- `size` (double)
-- `rotX` (double)
-- `rotY` (double)
-- `rotZ` (double)
-- `r` (int)
-- `g` (int)
-- `b` (int)
-
-**Example:**
-```lua
-gpu.drawPyramid(displayId, x, y, z, size, rotX, rotY, rotZ, r, g, b)
-```
-
-### `drawSphere(displayId, x, y, z, radius, segments, r, g, b)`
-
-**Parameters:**
-- `displayId` (int)
-- `x` (double)
-- `y` (double)
-- `z` (double)
-- `radius` (double)
-- `segments` (int)
-- `r` (int)
-- `g` (int)
-- `b` (int)
-
-**Example:**
-```lua
-gpu.drawSphere(displayId, x, y, z, radius, segments, r, g, b)
-```
-
-### `fillEllipse(displayId, cx, cy, rx, ry, r, g, b)`
-
-**Parameters:**
-- `displayId` (int)
-- `cx` (int)
-- `cy` (int)
-- `rx` (int)
-- `ry` (int)
-- `r` (int)
-- `g` (int)
-- `b` (int)
-
-**Example:**
-```lua
-gpu.fillEllipse(displayId, cx, cy, rx, ry, r, g, b)
-```
-
-### `fillRect(displayId, x, y, w, h, r, g, b)`
-
-**Parameters:**
-- `displayId` (int)
-- `x` (int)
-- `y` (int)
-- `w` (int)
-- `h` (int)
-- `r` (int)
-- `g` (int)
-- `b` (int)
-
-**Example:**
-```lua
-gpu.fillRect(displayId, x, y, w, h, r, g, b)
-```
-
-### `loadTexture(width, height, pixelData)` → int
-
-**Parameters:**
-- `width` (int)
-- `height` (int)
-- `pixelData` (byte[])
-
-**Returns:** `int`
-
-**Example:**
-```lua
-gpu.loadTexture(width, height, pixelData)
-```
-
-### `loadTextureFromImage()` → int
-
-**Returns:** `int`
-
-**Example:**
-```lua
-gpu.loadTextureFromImage()
-```
-
-### `setPixel(displayId, x, y, r, g, b)`
-
-**Parameters:**
-- `displayId` (int)
-- `x` (int)
-- `y` (int)
-- `r` (int)
-- `g` (int)
-- `b` (int)
-
-**Example:**
-```lua
-gpu.setPixel(displayId, x, y, r, g, b)
-```
-
-### `unloadTexture(textureId)` → boolean
-
-**Parameters:**
-- `textureId` (int)
-
-**Returns:** `boolean`
-
-**Example:**
-```lua
-gpu.unloadTexture(textureId)
-```
-
-### 3D Graphics
-
-8 functions
-
-### `clear3D(displayId)`
-
-**Parameters:**
-- `displayId` (int)
-
-**Example:**
-```lua
-gpu.clear3D(displayId)
-```
-
-### `clearAll3DModels()`
-
-**Example:**
-```lua
-gpu.clearAll3DModels()
-```
-
-### `clearLights(displayId)`
-
-**Parameters:**
-- `displayId` (int)
-
-**Example:**
-```lua
-gpu.clearLights(displayId)
-```
-
-### `load3DModel(objData)` → int
-
-**Parameters:**
-- `objData` (String)
-
-**Returns:** `int`
-
-**Example:**
-```lua
-gpu.load3DModel(objData)
-```
-
-### `load3DModelFromBytes(objData)` → int
-
-**Parameters:**
-- `objData` (byte[])
-
-**Returns:** `int`
-
-**Example:**
-```lua
-gpu.load3DModelFromBytes(objData)
-```
-
-### `setCameraPosition(displayId, x, y, z)`
-
-**Parameters:**
-- `displayId` (int)
-- `x` (double)
-- `y` (double)
-- `z` (double)
-
-**Example:**
-```lua
-gpu.setCameraPosition(displayId, x, y, z)
-```
-
-### `setCameraRotation(displayId, pitch, yaw, roll)`
-
-**Parameters:**
-- `displayId` (int)
-- `pitch` (double)
-- `yaw` (double)
-- `roll` (double)
-
-**Example:**
-```lua
-gpu.setCameraRotation(displayId, pitch, yaw, roll)
-```
-
-### `unload3DModel(modelId)` → boolean
-
-**Parameters:**
-- `modelId` (int)
-
-**Returns:** `boolean`
-
-**Example:**
-```lua
-gpu.unload3DModel(modelId)
-```
-
-### Image & Media
-
-3 functions
-
-### `clearDictionary()`
-
-**Example:**
-```lua
-gpu.clearDictionary()
-```
-
-### `loadImage(displayId)`
-
-**Parameters:**
-- `displayId` (int)
-
-**Example:**
-```lua
-gpu.loadImage(displayId)
-```
-
-### `loadJPEGRegion(displayId, jpegBinaryData, x, y, w, h)`
-
-**Parameters:**
-- `displayId` (int)
-- `jpegBinaryData` (String)
-- `x` (int)
-- `y` (int)
-- `w` (int)
-- `h` (int)
-
-**Example:**
-```lua
-gpu.loadJPEGRegion(displayId, jpegBinaryData, x, y, w, h)
-```
-
-### Input & Events
-
-8 functions
-
-### `clearEvents(displayId)`
-
-**Parameters:**
-- `displayId` (int)
-
-**Example:**
-```lua
-gpu.clearEvents(displayId)
-```
-
-### `getAxis(playerUUID, localControllerId, axisIndex)` → float
-
-**Parameters:**
-- `playerUUID` (String)
-- `localControllerId` (int)
-- `axisIndex` (int)
-
-**Returns:** `float`
-
-**Example:**
-```lua
-gpu.getAxis(playerUUID, localControllerId, axisIndex)
-```
-
-### `getAxisLocal(controllerId, axisIndex)` → float
-
-**Parameters:**
-- `controllerId` (int)
-- `axisIndex` (int)
-
-**Returns:** `float`
-
-**Example:**
-```lua
-gpu.getAxisLocal(controllerId, axisIndex)
-```
-
-### `getMappedAxis(controllerId, axisName)` → float
-
-**Parameters:**
-- `controllerId` (int)
-- `axisName` (String)
-
-**Returns:** `float`
-
-**Example:**
-```lua
-gpu.getMappedAxis(controllerId, axisName)
-```
-
-### `getNamedAxis(controllerId, axisName)` → float
-
-Get mapped axis value by name (e.g., "LEFT_STICK_X", "STEERING", "LEFT_TRIGGER")
-
-**Parameters:**
-- `controllerId` (int)
-- `axisName` (String)
-
-**Returns:** `float`
-
-**Example:**
-```lua
-gpu.getNamedAxis(controllerId, axisName)
-```
-
-### `hasEvents(displayId)` → boolean
-
-**Parameters:**
-- `displayId` (int)
-
-**Returns:** `boolean`
-
-**Example:**
-```lua
-gpu.hasEvents(displayId)
-```
-
-### `hasInput(controllerId, inputName)` → boolean
-
-Check if a button/axis exists on this controller
-
-**Parameters:**
-- `controllerId` (int)
-- `inputName` (String)
-
-**Returns:** `boolean`
-
-**Example:**
-```lua
-gpu.hasInput(controllerId, inputName)
-```
-
-### `setAxisMapping(controllerId, axisName, rawAxis, inverted)`
-
-**Parameters:**
-- `controllerId` (int)
-- `axisName` (String)
-- `rawAxis` (int)
-- `inverted` (boolean)
-
-**Example:**
-```lua
-gpu.setAxisMapping(controllerId, axisName, rawAxis, inverted)
-```
-
-### World Data
-
-1 functions
-
-### `getDimension()` → string
-
-**Returns:** `String`
-
-**Example:**
-```lua
-gpu.getDimension()
-```
-
-### Utilities
-
-15 functions
-
-### `autoDetectAndCreateDisplay()` → int
-
-**Returns:** `int`
-
-**Example:**
-```lua
-gpu.autoDetectAndCreateDisplay()
-```
-
-### `autoDetectAndCreateDisplayWithResolution(resolutionMultiplier)` → int
-
-**Parameters:**
-- `resolutionMultiplier` (int)
-
-**Returns:** `int`
-
-**Example:**
-```lua
-gpu.autoDetectAndCreateDisplayWithResolution(resolutionMultiplier)
-```
-
-### `clear(displayId, r, g, b)`
-
-**Parameters:**
-- `displayId` (int)
-- `r` (int)
-- `g` (int)
-- `b` (int)
-
-**Example:**
-```lua
-gpu.clear(displayId, r, g, b)
-```
-
-### `clearAllDisplays()`
-
-**Example:**
-```lua
-gpu.clearAllDisplays()
-```
-
-### `clearZBuffer(displayId)`
-
-**Parameters:**
-- `displayId` (int)
-
-**Example:**
-```lua
-gpu.clearZBuffer(displayId)
-```
-
-### `createDisplay(x, y, z, facing, width, height)` → int
-
-Create display as a virtual ENTITY at specific coordinates (old behavior)
-This creates a floating display NOT tied to monitor blocks
-
-**Parameters:**
-- `x` (int)
-- `y` (int)
-- `z` (int)
-- `facing` (String)
-- `width` (int)
-- `height` (int)
-
-**Returns:** `int`
-
-**Example:**
-```lua
-gpu.createDisplay(x, y, z, facing, width, height)
-```
-
-### `createDisplayWithResolution(x, y, z, facing, width, height, resolutionMultiplier)` → int
-
-Create display as a virtual ENTITY at specific coordinates (old behavior)
-This creates a floating display NOT tied to monitor blocks
-
-**Parameters:**
-- `x` (int)
-- `y` (int)
-- `z` (int)
-- `facing` (String)
-- `width` (int)
-- `height` (int)
-- `resolutionMultiplier` (int)
-
-**Returns:** `int`
-
-**Example:**
-```lua
-gpu.createDisplayWithResolution(x, y, z, facing, width, height, resolutionMultiplier)
-```
-
-### `createMonitorDisplay()` → int
-
-Create display ON TOP OF monitor blocks (no entity, merged with monitors)
-
-**Returns:** `int`
-
-**Example:**
-```lua
-gpu.createMonitorDisplay()
-```
-
-### `createMonitorDisplayWithResolution(resolutionMultiplier)` → int
-
-Create display ON TOP OF monitor blocks (no entity, merged with monitors)
-
-**Parameters:**
-- `resolutionMultiplier` (int)
-
-**Returns:** `int`
-
-**Example:**
-```lua
-gpu.createMonitorDisplayWithResolution(resolutionMultiplier)
-```
-
-### `getPlayerUUID()` → string
-
-**Returns:** `String`
-
-**Example:**
-```lua
-gpu.getPlayerUUID()
-```
-
-### `hasChunk(hash)` → boolean
-
-**Parameters:**
-- `hash` (long)
-
-**Returns:** `boolean`
-
-**Example:**
-```lua
-gpu.hasChunk(hash)
-```
-
-### `lookAt(displayId, targetX, targetY, targetZ)`
-
-**Parameters:**
-- `displayId` (int)
-- `targetX` (double)
-- `targetY` (double)
-- `targetZ` (double)
-
-**Example:**
-```lua
-gpu.lookAt(displayId, targetX, targetY, targetZ)
-```
-
-### `removeDisplay(displayId)` → boolean
-
-**Parameters:**
-- `displayId` (int)
-
-**Returns:** `boolean`
-
-**Example:**
-```lua
-gpu.removeDisplay(displayId)
-```
-
-### `setCalibrationMode(enabled, divisor, subtract)`
-
-**Parameters:**
-- `enabled` (boolean)
-- `divisor` (double)
-- `subtract` (double)
-
-**Example:**
-```lua
-gpu.setCalibrationMode(enabled, divisor, subtract)
-```
-
-### `updateDisplay(displayId)`
-
-**Parameters:**
-- `displayId` (int)
-
-**Example:**
-```lua
-gpu.updateDisplay(displayId)
-```
-
-### Controller Input
-
-22 functions
-
-### `clearControllerEvents(controllerId)`
-
-**Parameters:**
-- `controllerId` (int)
-
-**Example:**
-```lua
-gpu.clearControllerEvents(controllerId)
-```
-
-### `getButton(playerUUID, localControllerId, buttonIndex)` → boolean
-
-**Parameters:**
-- `playerUUID` (String)
-- `localControllerId` (int)
-- `buttonIndex` (int)
-
-**Returns:** `boolean`
-
-**Example:**
-```lua
-gpu.getButton(playerUUID, localControllerId, buttonIndex)
-```
-
-### `getButtonLocal(controllerId, buttonIndex)` → boolean
-
-**Parameters:**
-- `controllerId` (int)
-- `buttonIndex` (int)
-
-**Returns:** `boolean`
-
-**Example:**
-```lua
-gpu.getButtonLocal(controllerId, buttonIndex)
-```
-
-### `getControllerCount(playerUUID)` → int
-
-**Parameters:**
-- `playerUUID` (String)
-
-**Returns:** `int`
-
-**Example:**
-```lua
-gpu.getControllerCount(playerUUID)
-```
-
-### `getControllerCountLocal()` → int
-
-**Returns:** `int`
-
-**Example:**
-```lua
-gpu.getControllerCountLocal()
-```
-
-### `getControllerDeadzone()` → float
-
-**Returns:** `float`
-
-**Example:**
-```lua
-gpu.getControllerDeadzone()
-```
-
-### `getControllerType(controllerId)` → string
-
-Get controller type as string
-
-**Parameters:**
-- `controllerId` (int)
-
-**Returns:** `String`
-
-**Example:**
-```lua
-gpu.getControllerType(controllerId)
-```
-
-### `getMappedButton(controllerId, buttonName)` → boolean
-
-**Parameters:**
-- `controllerId` (int)
-- `buttonName` (String)
-
-**Returns:** `boolean`
-
-**Example:**
-```lua
-gpu.getMappedButton(controllerId, buttonName)
-```
-
-### `getNamedButton(controllerId, buttonName)` → boolean
-
-Get mapped button state by name (e.g., "A", "CROSS", "TRIGGER")
-
-**Parameters:**
-- `controllerId` (int)
-- `buttonName` (String)
-
-**Returns:** `boolean`
-
-**Example:**
-```lua
-gpu.getNamedButton(controllerId, buttonName)
-```
-
-### `getServerControllerAxis(playerUUID, localControllerId, axisIndex)` → float
-
-Get axis state from server-side controller storage using LOCAL controller ID
-@param playerUUID The player's UUID
-@param localControllerId The player's local controller ID (0, 1, 2, ...)
-@param axisIndex The axis index
-
-**Parameters:**
-- `playerUUID` (String)
-- `localControllerId` (int)
-- `axisIndex` (int)
-
-**Returns:** `float`
-
-**Example:**
-```lua
-gpu.getServerControllerAxis(playerUUID, localControllerId, axisIndex)
-```
-
-### `getServerControllerButton(playerUUID, localControllerId, buttonIndex)` → boolean
-
-Get button state from server-side controller storage using LOCAL controller ID
-@param playerUUID The player's UUID
-@param localControllerId The player's local controller ID (0, 1, 2, ...)
-@param buttonIndex The button index
-
-**Parameters:**
-- `playerUUID` (String)
-- `localControllerId` (int)
-- `buttonIndex` (int)
-
-**Returns:** `boolean`
-
-**Example:**
-```lua
-gpu.getServerControllerButton(playerUUID, localControllerId, buttonIndex)
-```
-
-### `getServerControllerCount(playerUUID)` → int
-
-Get number of controllers for a specific player
-Returns how many controllers the player has (0, 1, 2, ...)
-
-**Parameters:**
-- `playerUUID` (String)
-
-**Returns:** `int`
-
-**Example:**
-```lua
-gpu.getServerControllerCount(playerUUID)
-```
-
-### `hasController(playerUUID, localControllerId)` → boolean
-
-**Parameters:**
-- `playerUUID` (String)
-- `localControllerId` (int)
-
-**Returns:** `boolean`
-
-**Example:**
-```lua
-gpu.hasController(playerUUID, localControllerId)
-```
-
-### `hasControllerEvents(controllerId)` → boolean
-
-**Parameters:**
-- `controllerId` (int)
-
-**Returns:** `boolean`
-
-**Example:**
-```lua
-gpu.hasControllerEvents(controllerId)
-```
-
-### `hasServerController(playerUUID, localControllerId)` → boolean
-
-Check if a player has a controller at the given local ID
-@param playerUUID The player's UUID
-@param localControllerId The local controller ID to check (0, 1, 2, ...)
-
-**Parameters:**
-- `playerUUID` (String)
-- `localControllerId` (int)
-
-**Returns:** `boolean`
-
-**Example:**
-```lua
-gpu.hasServerController(playerUUID, localControllerId)
-```
-
-### `refreshControllerProfile(controllerId)`
-
-Refresh controller profile (useful after hot-plugging)
-
 **Parameters:**
-- `controllerId` (int)
+- `base64JpegData` (string)
+- `targetWidth` (number)
+- `targetHeight` (number)
 
 **Example:**
 ```lua
-gpu.refreshControllerProfile(controllerId)
+local result = gpu.decodeAndScaleJPEG("", 0, 0)
 ```
 
-### `resetControllerMapping(controllerId)`
+#### `decodeJPEG(base64JpegData)` → string
 
 **Parameters:**
-- `controllerId` (int)
-
-**Example:**
-```lua
-gpu.resetControllerMapping(controllerId)
-```
-
-### `saveControllerMappings()`
-
-**Example:**
-```lua
-gpu.saveControllerMappings()
-```
+- `base64JpegData` (string)
 
-### `scanForControllers()`
-
 **Example:**
 ```lua
-gpu.scanForControllers()
+local result = gpu.decodeJPEG("")
 ```
 
-### `setButtonMapping(controllerId, buttonName, rawButton)`
+#### `getJPEGDimensions(base64JpegData)` → string
 
 **Parameters:**
-- `controllerId` (int)
-- `buttonName` (String)
-- `rawButton` (int)
+- `base64JpegData` (string)
 
 **Example:**
 ```lua
-gpu.setButtonMapping(controllerId, buttonName, rawButton)
+local result = gpu.getJPEGDimensions("")
 ```
-
-### `setControllerDeadzone(deadzone)`
 
-**Parameters:**
-- `deadzone` (float)
+#### `getJPEGNetworkStats()` → string
 
 **Example:**
 ```lua
-gpu.setControllerDeadzone(deadzone)
+local result = gpu.getJPEGNetworkStats()
 ```
 
-### `updateControllerState(controllerId)`
+#### `getRecommendedJPEGSettings(targetWidth, targetHeight)` → string
 
 **Parameters:**
-- `controllerId` (int)
+- `targetWidth` (number)
+- `targetHeight` (number)
 
 **Example:**
-```lua
-gpu.updateControllerState(controllerId)
-```
-
-
-## Examples
-
-#### Example 1: Draw a Star
-
-```lua
-local gpu = peripheral.find("directgpu")
-local display = gpu.autoDetectAndCreateDisplay()
-
--- Clear to black
-gpu.clear(display, 0, 0, 0)
-
--- Create a 5-pointed star
-local cx, cy = 250, 250
-local outerRadius = 100
-local innerRadius = 40
-
-local star = {}
-for i = 0, 9 do
-    local angle = math.rad(i * 36 - 90)  -- Start at top
-    local radius = (i % 2 == 0) and outerRadius or innerRadius
-    local x = cx + math.cos(angle) * radius
-    local y = cy + math.sin(angle) * radius
-    table.insert(star, {x, y})
-end
-
--- Draw yellow star
-gpu.drawPolygon(display, star, 255, 255, 0)
-gpu.updateDisplay(display)
-```
-
----
-
-#### Example 2: Animated Path Drawing
-
-```lua
-local gpu = peripheral.find("directgpu")
-local display = gpu.autoDetectAndCreateDisplay()
-
-local points = {}
-local maxPoints = 50
-
-print("Move your mouse to draw! Press Q to quit")
-
-local running = true
-parallel.waitForAny(
-    function()
-        while running do
-            gpu.clear(display, 20, 20, 30)
-
-            -- Draw accumulated points as polyline
-            if #points >= 2 then
-                gpu.drawPolylines(display, points, 0, 255, 255)
-            end
-
-            -- Draw points as dots
-            for _, p in ipairs(points) do
-                gpu.drawCircle(display, p[1], p[2], 3, 255, 255, 255, true)
-            end
-
-            gpu.updateDisplay(display)
-            sleep(0.05)
-        end
-    end,
-
-    function()
-        while running do
-            if gpu.hasEvents(display) then
-                local event = gpu.pollEvent(display)
-                if event.type == "mouse_drag" or event.type == "mouse_click" then
-                    -- Add point to path
-                    table.insert(points, {event.x, event.y})
-
-                    -- Limit point count
-                    if #points > maxPoints then
-                        table.remove(points, 1)
-                    end
-                end
-            end
-            sleep(0.05)
-        end
-    end,
-
-    function()
-        while running do
-            local event, key = os.pullEvent("key")
-            if key == keys.q then running = false end
-        end
-    end
-)
-
-gpu.clearAllDisplays()
-```
-
----
-
-#### Example 3: Draw Multiple Polygons
-
-```lua
-local gpu = peripheral.find("directgpu")
-local display = gpu.autoDetectAndCreateDisplay()
-
-gpu.clear(display, 30, 30, 50)
-
--- Triangle
-local triangle = {
-    {50, 100},
-    {100, 50},
-    {150, 100}
-}
-gpu.drawPolygon(display, triangle, 255, 0, 0)
-
--- Hexagon
-local hexagon = {}
-for i = 0, 5 do
-    local angle = math.rad(i * 60)
-    local x = 250 + math.cos(angle) * 50
-    local y = 100 + math.sin(angle) * 50
-    table.insert(hexagon, {x, y})
-end
-gpu.drawPolygon(display, hexagon, 0, 255, 0)
-
--- Arrow (using polylines)
-local arrow = {
-    {400, 100},  -- Tip
-    {350, 80},   -- Top wing
-    {350, 90},   -- Wing join
-    {320, 90},   -- Shaft top
-    {320, 110},  -- Shaft bottom
-    {350, 110},  -- Wing join
-    {350, 120}   -- Bottom wing
-}
-gpu.drawPolylines(display, arrow, 255, 255, 0)
-
-gpu.updateDisplay(display)
-
-print("Press any key to exit")
-os.pullEvent("key")
-gpu.clearAllDisplays()
-```
-
----
-
-#### Example 4: Data Plotting
-
-```lua
-local gpu = peripheral.find("directgpu")
-local display = gpu.autoDetectAndCreateDisplay()
-local info = gpu.getDisplayInfo(display)
-
--- Generate sine wave data
-local points = {}
-local width = info.pixelWidth
-local height = info.pixelHeight
-local centerY = height / 2
-
-for x = 0, width, 5 do
-    local y = centerY + math.sin(x * 0.02) * 100
-    table.insert(points, {x, y})
-end
-
--- Clear and draw
-gpu.clear(display, 0, 0, 40)
-
--- Draw axes
-gpu.drawLine(display, 0, centerY, width, centerY, 100, 100, 100)  -- X axis
-gpu.drawLine(display, 50, 0, 50, height, 100, 100, 100)          -- Y axis
-
--- Draw sine wave
-gpu.drawPolylines(display, points, 0, 255, 255)
-
--- Labels
-gpu.drawText(display, "Sine Wave", 10, 10,
-    255, 255, 255, "Arial", 20, "bold")
-
-gpu.updateDisplay(display)
-
-print("Press any key to exit")
-os.pullEvent("key")
-gpu.clearAllDisplays()
-```
-
----
-
-### Performance Tips
-
-**Polylines and Polygons:**
-- Limit points to < 100 for real-time animation
-- Pre-calculate complex shapes instead of generating each frame
-- Use lower resolution for smoother drawing
-- Combine with `fillRect` for filled polygon effects
-
-**Memory Usage:**
-```lua
--- Efficient: Reuse point table
-local points = {}
-while true do
-    -- Update existing points
-    points[1] = {newX1, newY1}
-    points[2] = {newX2, newY2}
-    gpu.drawPolylines(display, points, r, g, b)
-end
-
--- Less efficient: Create new table each frame
-while true do
-    local points = {{x1, y1}, {x2, y2}}  -- Allocates memory
-    gpu.drawPolylines(display, points, r, g, b)
-end
-```
-
----
-
-### `updateDisplay(displayId)`
-
-Marks display as dirty to trigger render update.
-
-```lua
-gpu.setPixel(display, 10, 10, 255, 0, 0)
-gpu.updateDisplay(display)  -- Render changes
-```
-
----
-
-## Font Rendering
-
-DirectGPU includes built-in system font rendering with anti-aliasing, multiple fonts, sizes, and styles.
-
-### `drawText(displayId, text, x, y, r, g, b, fontName, fontSize, style)` → result
-
-Renders text to the display with anti-aliasing.
-
-```lua
-local result = gpu.drawText(display, "Hello World!", 10, 10, 
-    255, 255, 255,  -- White text
-    "Arial", 24, "plain")
-
-print(string.format("Text size: %dx%d", result.width, result.height))
-```
-
-**Parameters:**
-- `displayId` (number): Target display
-- `text` (string): Text to render
-- `x, y` (number): Top-left position
-- `r, g, b` (number): Text color (0-255)
-- `fontName` (string): Font name (e.g., "Arial", "Times New Roman", "Courier New")
-- `fontSize` (number): Font size in points
-- `style` (string): "plain", "bold", "italic", or "bold_italic"
-
-**Returns:**
-```lua
-{
-    width = 120,     -- Rendered text width
-    height = 24,     -- Rendered text height
-    success = true
-}
-```
-
-**Note:** Does not call `updateDisplay()`. Call it after rendering text.
-
----
-
-### `measureText(text, fontName, fontSize, style)` → metrics
-
-Measures text dimensions without rendering.
-
-```lua
-local metrics = gpu.measureText("Hello World!", "Arial", 24, "plain")
-print(string.format("Text will be %dx%d pixels", metrics.width, metrics.height))
-```
-
-**Returns:**
-```lua
-{
-    width = 120,     -- Text width in pixels
-    height = 24,     -- Text height in pixels
-    ascent = 20,     -- Distance from baseline to top
-    descent = 4,     -- Distance from baseline to bottom
-    success = true
-}
-```
-
-**Use Case:** Layout calculation before rendering.
-
----
-
-### `drawTextWithBg(displayId, text, x, y, fgR, fgG, fgB, bgR, bgG, bgB, padding, fontName, fontSize, style)` → result
-
-Draws text with a background rectangle.
-
-```lua
--- White text on dark blue background with 5px padding
-gpu.drawTextWithBg(display, "Status: OK", 10, 10,
-    255, 255, 255,  -- White foreground
-    0, 0, 128,      -- Dark blue background
-    5,              -- 5px padding
-    "Arial", 16, "bold")
-```
-
-**Parameters:**
-- First 7 parameters: Same as `drawText`
-- `bgR, bgG, bgB` (number): Background color
-- `padding` (number): Padding around text in pixels
-- Last 3 parameters: Font settings
-
----
-
-### `drawTextWrapped(displayId, text, x, y, maxWidth, r, g, b, lineSpacing, fontName, fontSize, style)` → result
-
-Draws multi-line text with word wrapping.
-
-```lua
-local longText = "This is a long paragraph that will automatically wrap to fit within the specified width constraint."
-
-local result = gpu.drawTextWrapped(display, longText, 
-    10, 10,         -- Start position
-    300,            -- Max width (will wrap at this width)
-    255, 255, 255,  -- White text
-    5,              -- 5px line spacing
-    "Arial", 14, "plain")
-
-print("Drew " .. result.linesDrawn .. " lines")
-```
-
-**Parameters:**
-- `maxWidth` (number): Maximum width before wrapping
-- `lineSpacing` (number): Vertical spacing between lines
-
-**Returns:**
-```lua
-{
-    linesDrawn = 4,  -- Number of lines rendered
-    success = true
-}
-```
-
----
-
-### `getAvailableFonts()` → fontNames
-
-Returns list of all available system fonts.
-
-```lua
-local fonts = gpu.getAvailableFonts()
-for i, font in ipairs(fonts) do
-    print(i .. ": " .. font)
-end
-```
-
-**Returns:** Array of font name strings
-
-**Common Fonts:** "Arial", "Courier New", "Times New Roman", "Comic Sans MS", "Verdana", "Georgia", "Trebuchet MS"
-
----
-
-### `clearFontCache()`
-
-Clears the font rendering cache to free memory.
-
-```lua
-gpu.clearFontCache()
-```
-
-**Use Case:** Call after rendering many different font combinations to free memory.
-
----
-
-## Image Loading
-
-### `loadImage(displayId, imageData)`
-
-Loads an image from Lua table format.
-
-```lua
-local imageData = {
-    width = 100,
-    height = 100,
-    pixels = {
-        {{255, 0, 0}, {0, 255, 0}, ...},  -- Row 1
-        {{0, 0, 255}, {255, 255, 0}, ...},  -- Row 2
-        ...
-    }
-}
-
-gpu.loadImage(display, imageData)
-gpu.updateDisplay(display)
-```
-
----
-
-### `decodeJPEG(jpegData)` → result
-
-Decodes JPEG from binary data.
-
-```lua
-local handle = http.get("http://example.com/image.jpg", {}, true)
-local jpegData = handle.readAll()
-handle.close()
-
-local result = gpu.decodeJPEG(jpegData)
-print(string.format("Decoded: %dx%d in %dms", 
-    result.width, result.height, result.decodeTime))
-```
-
----
-
-### `decodeAndScaleJPEG(jpegData, targetWidth, targetHeight)` → result
-
-Decodes and scales JPEG in one operation (faster).
-
-```lua
-local info = gpu.getDisplayInfo(display)
-local result = gpu.decodeAndScaleJPEG(jpegData, info.pixelWidth, info.pixelHeight)
-```
-
----
-
-### `getJPEGDimensions(jpegData)` → dimensions
-
-Gets JPEG dimensions without full decode (<1ms).
-
-```lua
-local dims = gpu.getJPEGDimensions(jpegData)
-print(string.format("Image: %dx%d", dims.width, dims.height))
-```
-
----
-
-### `loadJPEGRegion(displayId, jpegData, x, y, width, height)`
-
-Decodes JPEG and blits to specific region.
-
 ```lua
-gpu.loadJPEGRegion(display, jpegData, 0, 0, 320, 240)
-gpu.updateDisplay(display)
+local result = gpu.getRecommendedJPEGSettings(0, 0)
 ```
-
----
-
-
-
-### `loadJPEGFullscreen(displayId, jpegData)`
 
-[Auto-generated documentation]
+#### `loadJPEGFullscreen(displayId, base64JpegData)`
 
 **Parameters:**
 - `displayId` (number)
-- `jpegData` (string (binary))
+- `base64JpegData` (string)
 
 **Example:**
 ```lua
-gpu.loadJPEGFullscreen(displayId, 255)
+gpu.loadJPEGFullscreen(0, "")
 ```
 
----
-
-### `loadJPEGRegionBytes(displayId, jpegData, x, y, w, h)`
-
-[Auto-generated documentation]
+#### `loadJPEGRegion(displayId, jpegBinaryData, x, y, w, h)`
 
 **Parameters:**
 - `displayId` (number)
-- `jpegData` (string (binary))
+- `jpegBinaryData` (string)
 - `x` (number)
 - `y` (number)
 - `w` (number)
@@ -1901,14 +607,25 @@ gpu.loadJPEGFullscreen(displayId, 255)
 
 **Example:**
 ```lua
-gpu.loadJPEGRegionBytes(displayId, 255, 0, 0, 0, 0)
+gpu.loadJPEGRegion(0, "", 0, 0, 0, 0)
 ```
 
----
+#### `loadJPEGRegionBytes(displayId, base64JpegData, x, y, w, h)`
 
-### `preloadJPEGSequence(displayId, jpegSequence)`
+**Parameters:**
+- `displayId` (number)
+- `base64JpegData` (string)
+- `x` (number)
+- `y` (number)
+- `w` (number)
+- `h` (number)
 
-[Auto-generated documentation]
+**Example:**
+```lua
+gpu.loadJPEGRegionBytes(0, "", 0, 0, 0, 0)
+```
+
+#### `preloadJPEGSequence(displayId, jpegSequence)`
 
 **Parameters:**
 - `displayId` (number)
@@ -1916,695 +633,1203 @@ gpu.loadJPEGRegionBytes(displayId, 255, 0, 0, 0, 0)
 
 **Example:**
 ```lua
-gpu.preloadJPEGSequence(displayId, 255)
+gpu.preloadJPEGSequence(0, value)
 ```
 
----
 
-## Dictionary Compression
+### Dictionary Compression
 
-### `compressWithDict(data)` → stats
-### `decompressFromDict(hashes)` → data
-### `hasChunk(hash)` → boolean
-### `getChunk(hash)` → data
-### `getDictionaryStats()` → stats
-### `clearDictionary()`
+#### `clearDictionary()`
 
-See original README for dictionary compression details.
-
----
-
-## 3D Rendering
-
-DirectGPU includes a full 3D rendering engine with camera projection, primitives, and depth testing.
-
-### `setupCamera(displayId, fov, near, far)` → result
-
-Initializes the 3D camera for a display.
-
+**Example:**
 ```lua
-local result = gpu.setupCamera(display, 60, 0.1, 1000)
-print("Aspect ratio: " .. result.aspect)
+gpu.clearDictionary()
 ```
+
+#### `compressWithDict(base64Data)` → string
 
 **Parameters:**
-- `displayId` (number): Target display
-- `fov` (number): Field of view in degrees (typically 45-90)
-- `near` (number): Near clipping plane (typically 0.1)
-- `far` (number): Far clipping plane (typically 100-1000)
+- `base64Data` (string)
 
-**Returns:**
+**Example:**
 ```lua
-{
-    success = true,
-    aspect = 2.024  -- Calculated aspect ratio
-}
+local result = gpu.compressWithDict("")
 ```
 
-**Note:** Must be called before any 3D drawing. Automatically calculates aspect ratio from display dimensions.
-
----
-
-### `setCameraPosition(displayId, x, y, z)`
-
-Sets the 3D camera position in world space.
-
-```lua
-gpu.setCameraPosition(display, 0, 2, 5)  -- 5 units back, 2 units up
-```
+#### `decompressFromDict(hashMap)` → string
 
 **Parameters:**
-- `x, y, z` (number): Camera position in 3D space
+- `hashMap` (any)
 
-**Coordinate System:**
-- X: Right (+) / Left (-)
-- Y: Up (+) / Down (-)
-- Z: Forward (-) / Back (+)
-
----
-
-### `setCameraRotation(displayId, pitch, yaw, roll)`
-
-Sets camera rotation angles in degrees.
-
+**Example:**
 ```lua
-gpu.setCameraRotation(display, -15, 45, 0)  -- Look down 15°, turn right 45°
+local result = gpu.decompressFromDict(value)
 ```
+
+#### `getChunk(hash)` → string
 
 **Parameters:**
-- `pitch` (number): Rotation around X axis (look up/down)
-- `yaw` (number): Rotation around Y axis (look left/right)
-- `roll` (number): Rotation around Z axis (tilt)
+- `hash` (number)
 
-**Angles:**
-- Pitch: -90 (down) to 90 (up)
-- Yaw: 0-360 (0=north, 90=east, 180=south, 270=west)
-- Roll: -180 to 180
-
----
-
-### `lookAt(displayId, targetX, targetY, targetZ)`
-
-Points camera at a specific 3D point.
-
+**Example:**
 ```lua
--- Look at origin from current position
-gpu.lookAt(display, 0, 0, 0)
-
--- Look at a specific object
-gpu.lookAt(display, objectX, objectY, objectZ)
+local result = gpu.getChunk(value)
 ```
+
+#### `getDictionaryStats()` → string
+
+**Example:**
+```lua
+local result = gpu.getDictionaryStats()
+```
+
+#### `hasChunk(hash)` → boolean
 
 **Parameters:**
-- `targetX, targetY, targetZ` (number): Point to look at
+- `hash` (number)
 
-**Note:** Automatically calculates pitch and yaw. Roll remains unchanged.
-
----
-
-### `getCameraInfo(displayId)` → info
-
-Returns current camera state.
-
+**Example:**
 ```lua
-local cam = gpu.getCameraInfo(display)
-print(string.format("Camera at (%.1f, %.1f, %.1f)", cam.posX, cam.posY, cam.posZ))
-print(string.format("Rotation: pitch=%.1f, yaw=%.1f", cam.pitch, cam.yaw))
+local result = gpu.hasChunk(value)
 ```
 
-**Returns:**
-```lua
-{
-    posX = 0, posY = 2, posZ = 5,     -- Camera position
-    pitch = -15, yaw = 45, roll = 0,  -- Camera rotation
-    fov = 60,                          -- Field of view
-    near = 0.1, far = 1000,           -- Clipping planes
-    aspect = 2.024                     -- Aspect ratio
-}
-```
 
----
+### 3D Camera
 
-### `clearZBuffer(displayId)`
-
-Clears the depth buffer for a new frame.
-
-```lua
--- Typical 3D rendering loop
-gpu.clear(display, 0, 0, 0)          -- Clear color
-gpu.clearZBuffer(display)             -- Clear depth
--- ... draw 3D objects ...
-gpu.updateDisplay(display)
-```
-
-**Important:** Call this at the start of each 3D frame to prevent depth artifacts.
-
----
-
-### `drawCube(displayId, x, y, z, size, rotX, rotY, rotZ, r, g, b)`
-
-Draws a 3D cube with rotation.
-
-```lua
--- Draw a red cube at origin, rotated 45° on Y axis
-gpu.drawCube(display, 0, 0, 0, 2, 0, 45, 0, 255, 0, 0)
-```
+#### `clearZBuffer(displayId)`
 
 **Parameters:**
-- `x, y, z` (number): Cube center position
-- `size` (number): Cube edge length
-- `rotX, rotY, rotZ` (number): Rotation angles in degrees
-- `r, g, b` (number): Cube color (0-255)
+- `displayId` (number)
 
----
-
-### `drawSphere(displayId, x, y, z, radius, segments, r, g, b)`
-
-Draws a 3D sphere.
-
+**Example:**
 ```lua
--- Draw a blue sphere with 16 segments (smoother)
-gpu.drawSphere(display, 0, 0, 0, 1.5, 16, 0, 100, 255)
+gpu.clearZBuffer(0)
 ```
+
+#### `getCameraInfo(displayId)` → string
 
 **Parameters:**
-- `x, y, z` (number): Sphere center
-- `radius` (number): Sphere radius
-- `segments` (number): Detail level (8-32, higher = smoother but slower)
-- `r, g, b` (number): Sphere color
+- `displayId` (number)
 
-**Performance:** 8-12 segments for real-time, 16-24 for quality, 32+ for screenshots.
-
----
-
-### `drawPyramid(displayId, x, y, z, size, rotX, rotY, rotZ, r, g, b)`
-
-Draws a 3D pyramid.
-
+**Example:**
 ```lua
--- Draw a yellow pyramid
-gpu.drawPyramid(display, 0, -1, 0, 2, 0, 0, 0, 255, 255, 0)
+local result = gpu.getCameraInfo(0)
 ```
+
+#### `lookAt(displayId, targetX, targetY, targetZ)`
 
 **Parameters:**
-- `x, y, z` (number): Pyramid base center
-- `size` (number): Base edge length
-- `rotX, rotY, rotZ` (number): Rotation angles
-- `r, g, b` (number): Pyramid color
+- `displayId` (number)
+- `targetX` (number)
+- `targetY` (number)
+- `targetZ` (number)
 
----
-
-### `clear3D(displayId)`
-
-Clears all 3D state for a display (camera, z-buffer).
-
+**Example:**
 ```lua
-gpu.clear3D(display)
+gpu.lookAt(0, 0, 0, 0)
 ```
 
----
-
-## 3D Models (OBJ Files)
-
-DirectGPU can load and render industry-standard .obj 3D model files.
-
-### `load3DModel(objData)` → modelId
-
-Loads an OBJ model from string data.
-
-```lua
-local objFile = [[
-v -1 -1 -1
-v 1 -1 -1
-v 1 1 -1
-v -1 1 -1
-v -1 -1 1
-v 1 -1 1
-v 1 1 1
-v -1 1 1
-f 1 2 3 4
-f 5 8 7 6
-...
-]]
-
-local modelId = gpu.load3DModel(objFile)
-print("Loaded model: " .. modelId)
-```
+#### `setCameraPosition(displayId, x, y, z)`
 
 **Parameters:**
-- `objData` (string): OBJ file content as string
+- `displayId` (number)
+- `x` (number)
+- `y` (number)
+- `z` (number)
 
-**Returns:** Model ID (number)
-
-**Supported OBJ Features:**
-- Vertices (v)
-- Normals (vn)
-- Texture coordinates (vt)
-- Faces (f) - triangles, quads, and polygons
-- Groups (g) and objects (o)
-
----
-
-### `load3DModelFromBytes(objData)` → modelId
-
-Loads OBJ model from byte array.
-
+**Example:**
 ```lua
-local handle = http.get("http://example.com/model.obj", {}, true)
-local objBytes = handle.readAll()
-handle.close()
-
-local modelId = gpu.load3DModelFromBytes(objBytes)
+gpu.setCameraPosition(0, 0, 0, 0)
 ```
 
----
-
-### `draw3DModel(displayId, modelId, x, y, z, rotX, rotY, rotZ, scale, r, g, b)`
-
-Renders a loaded 3D model.
-
-```lua
--- Draw model at origin, scaled 0.5x, with rotation
-gpu.draw3DModel(display, modelId, 
-    0, 0, 0,        -- Position
-    0, 45, 0,       -- Rotation
-    0.5,            -- Scale
-    200, 200, 200)  -- Color
-```
+#### `setCameraRotation(displayId, pitch, yaw, roll)`
 
 **Parameters:**
-- `displayId` (number): Target display
-- `modelId` (number): Model ID from `load3DModel`
-- `x, y, z` (number): Model position
-- `rotX, rotY, rotZ` (number): Rotation in degrees
-- `scale` (number): Uniform scale factor
-- `r, g, b` (number): Model color (modulates texture if present)
+- `displayId` (number)
+- `pitch` (number)
+- `yaw` (number)
+- `roll` (number)
 
----
-
-### `unload3DModel(modelId)` → success
-
-Removes model from memory.
-
+**Example:**
 ```lua
-if gpu.unload3DModel(modelId) then
-    print("Model unloaded")
-end
+gpu.setCameraRotation(0, 0, 0, 0)
 ```
 
-**Returns:** true if model existed and was removed
+#### `setCameraTarget(displayId, x, y, z)`
 
----
+**Parameters:**
+- `displayId` (number)
+- `x` (number)
+- `y` (number)
+- `z` (number)
 
-### `get3DModelInfo(modelId)` → info
-
-Returns model statistics.
-
+**Example:**
 ```lua
-local info = gpu.get3DModelInfo(modelId)
-print(string.format("Model: %d vertices, %d faces", info.vertexCount, info.faceCount))
-print("Has textures: " .. tostring(info.hasTexCoords))
+gpu.setCameraTarget(0, 0, 0, 0)
 ```
 
-**Returns:**
+#### `setupCamera(displayId, fov, near, far)` → string
+
+**Parameters:**
+- `displayId` (number)
+- `fov` (number)
+- `near` (number)
+- `far` (number)
+
+**Example:**
 ```lua
-{
-    name = "unnamed",        -- Model name from OBJ
-    vertexCount = 1234,      -- Number of vertices
-    faceCount = 678,         -- Number of faces
-    hasNormals = true,       -- Has normal data
-    hasTexCoords = false     -- Has UV coordinates
-}
+local result = gpu.setupCamera(0, 0, 0, 0)
 ```
 
----
 
-### `clearAll3DModels()`
+### 3D Primitives
 
-Unloads all models from memory.
+#### `clear3D(displayId)`
 
+**Parameters:**
+- `displayId` (number)
+
+**Example:**
+```lua
+gpu.clear3D(0)
+```
+
+#### `drawCube(displayId, x, y, z, size, rotX, rotY, rotZ, r, g, b)`
+
+**Parameters:**
+- `displayId` (number)
+- `x` (number)
+- `y` (number)
+- `z` (number)
+- `size` (number)
+- `rotX` (number)
+- `rotY` (number)
+- `rotZ` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+
+**Example:**
+```lua
+gpu.drawCube(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+```
+
+#### `drawPyramid(displayId, x, y, z, size, rotX, rotY, rotZ, r, g, b)`
+
+**Parameters:**
+- `displayId` (number)
+- `x` (number)
+- `y` (number)
+- `z` (number)
+- `size` (number)
+- `rotX` (number)
+- `rotY` (number)
+- `rotZ` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+
+**Example:**
+```lua
+gpu.drawPyramid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+```
+
+#### `drawSphere(displayId, x, y, z, radius, segments, r, g, b, textureNameObj)`
+
+**Parameters:**
+- `displayId` (number)
+- `x` (number)
+- `y` (number)
+- `z` (number)
+- `radius` (number)
+- `segments` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+- `textureNameObj` (any)
+
+**Example:**
+```lua
+gpu.drawSphere(0, 0, 0, 0, 0, 0, 0, 0, 0, value)
+```
+
+
+### 3D Models
+
+#### `clearAll3DModels()`
+
+**Example:**
 ```lua
 gpu.clearAll3DModels()
 ```
 
----
-
-## Textures
-
-Textures can be applied to 3D models for realistic rendering.
-
-### `loadTexture(width, height, pixelData)` → textureId
-
-Loads a texture from RGB byte array.
-
-```lua
--- Create 2x2 checkerboard texture
-local pixels = string.char(
-    255, 0, 0,    0, 255, 0,   -- Red, Green
-    0, 0, 255,    255, 255, 0  -- Blue, Yellow
-)
-
-local textureId = gpu.loadTexture(2, 2, pixels)
-```
+#### `draw3DModel(displayId, modelId, x, y, z, rotX, rotY, rotZ, scale, r, g, b)`
 
 **Parameters:**
-- `width, height` (number): Texture dimensions (power of 2 recommended)
-- `pixelData` (string): Flat RGB byte array (width × height × 3 bytes)
+- `displayId` (number)
+- `modelId` (number)
+- `x` (number)
+- `y` (number)
+- `z` (number)
+- `rotX` (number)
+- `rotY` (number)
+- `rotZ` (number)
+- `scale` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
 
-**Returns:** Texture ID (number)
-
----
-
-### `loadTextureFromImage(imageData)` → textureId
-
-Loads texture from image data table.
-
+**Example:**
 ```lua
-local imageData = {
-    width = 64,
-    height = 64,
-    pixels = "\xFF\x00\x00..."  -- RGB byte array
-}
-
-local textureId = gpu.loadTextureFromImage(imageData)
+gpu.draw3DModel(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 ```
 
----
-
-### `unloadTexture(textureId)` → success
-
-Removes texture from memory.
-
-```lua
-gpu.unloadTexture(textureId)
-```
-
----
-
-### `getTextureInfo(textureId)` → info
-
-Returns texture details.
-
-```lua
-local info = gpu.getTextureInfo(textureId)
-print(string.format("Texture: %dx%d", info.width, info.height))
-```
-
----
-
-### `draw3DModelTextured(displayId, modelId, x, y, z, rotX, rotY, rotZ, scale, textureId)`
-
-Renders a model with texture mapping.
-
-```lua
--- Load model and texture
-local modelId = gpu.load3DModel(objData)
-local textureId = gpu.loadTextureFromImage(imageData)
-
--- Draw textured model
-gpu.draw3DModelTextured(display, modelId,
-    0, 0, 0,        -- Position
-    0, 45, 0,       -- Rotation
-    1.0,            -- Scale
-    textureId)      -- Texture
-```
-
-**Note:** Model must have UV coordinates (vt in OBJ file).
-
----
-
-## Lighting
-
-Add realistic lighting to 3D scenes with directional lights.
-
-### `addDirectionalLight(displayId, dirX, dirY, dirZ, r, g, b, intensity)`
-
-Adds a directional light source (like the sun).
-
-```lua
--- Add white light from above
-gpu.addDirectionalLight(display, 
-    0, -1, 0,       -- Direction (down)
-    255, 255, 255,  -- White light
-    0.8)            -- 80% intensity
-```
+#### `draw3DModelTextured(displayId, modelId, x, y, z, rotX, rotY, rotZ, scale, textureId)`
 
 **Parameters:**
-- `displayId` (number): Target display
-- `dirX, dirY, dirZ` (number): Light direction (automatically normalized)
-- `r, g, b` (number): Light color (0-255)
-- `intensity` (number): Light strength (0.0-1.0)
+- `displayId` (number)
+- `modelId` (number)
+- `x` (number)
+- `y` (number)
+- `z` (number)
+- `rotX` (number)
+- `rotY` (number)
+- `rotZ` (number)
+- `scale` (number)
+- `textureId` (number)
 
-**Tips:**
-- Direction points WHERE light is going (not where it comes from)
-- Use intensity 0.6-1.0 for main lights
-- Use intensity 0.2-0.4 for ambient/fill lights
-- Multiple lights are additive
-
----
-
-### `clearLights(displayId)`
-
-Removes all lights from a display.
-
+**Example:**
 ```lua
-gpu.clearLights(display)
+gpu.draw3DModelTextured(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 ```
 
----
-
-## Touch Input
-
-### `hasEvents(displayId)` → boolean
-### `pollEvent(displayId)` → event
-### `clearEvents(displayId)`
-
-Mouse and keyboard event handling. See original README for details.
-
-**Event Types:**
-- `mouse_click` - Button pressed
-- `mouse_drag` - Mouse moved while button held
-- `mouse_up` - Button released
-- `mouse_enter` - Mouse entered display area
-- `mouse_leave` - Mouse left display area
-- `mouse_move` - Mouse moved (no button)
-
----
-
-## World Data
-
-Query Minecraft world information directly from Lua.
-
-### `getWorldInfo()` → info
-
-Returns comprehensive world state.
-
-```lua
-local world = gpu.getWorldInfo()
-print("Time: " .. world.timeOfDay)
-print("Weather: " .. (world.isRaining and "Rain" or "Clear"))
-print("Moon: " .. world.moonPhaseName)
-print("Dimension: " .. world.dimension)
-```
-
-**Returns:**
-```lua
-{
-    -- Time
-    worldTime = 24000,           -- Total ticks since world creation
-    dayTime = 6000,              -- Time of current day (0-24000)
-    isDay = true,                -- Is it daytime?
-    isNight = false,             -- Is it nighttime?
-    timeOfDay = "12:00",         -- Human-readable time
-    
-    -- Weather
-    isRaining = false,           -- Is it raining?
-    isThundering = false,        -- Is there a thunderstorm?
-    rainLevel = 0.0,             -- Rain intensity (0.0-1.0)
-    thunderLevel = 0.0,          -- Thunder intensity (0.0-1.0)
-    
-    -- Moon
-    moonPhase = 0,               -- Moon phase (0-7)
-    moonPhaseName = "Full Moon", -- Human-readable phase
-    
-    -- Dimension
-    dimension = "minecraft:overworld",
-    isOverworld = true,
-    isNether = false,
-    isEnd = false,
-    
-    -- Game Settings
-    difficulty = "normal",       -- easy/normal/hard/peaceful
-    difficultyLocked = false,
-    doDaylightCycle = true,      -- Game rule
-    doWeatherCycle = true,       -- Game rule
-    doMobSpawning = true         -- Game rule
-}
-```
-
-**Use Cases:**
-- Display current time/date
-- Weather-based effects
-- Moon phase tracker
-- Dimension-aware programs
-
----
-
-### `getWeather()` → weather
-
-Returns current weather state.
-
-```lua
-local weather = gpu.getWeather()
-if weather.state == "thundering" then
-    print("Take shelter!")
-elseif weather.state == "raining" then
-    print("Bring an umbrella")
-end
-```
-
-**Returns:**
-```lua
-{
-    isRaining = true,
-    isThundering = false,
-    rainLevel = 0.8,        -- 0.0-1.0
-    thunderLevel = 0.0,     -- 0.0-1.0
-    state = "raining"       -- "clear", "raining", "thundering"
-}
-```
-
----
-
-### `getTimeInfo()` → timeInfo
-
-Returns detailed time information.
-
-```lua
-local time = gpu.getTimeInfo()
-print(string.format("Day %d, %s", time.dayCount, time.timeString))
-```
-
-**Returns:**
-```lua
-{
-    worldTime = 48000,      -- Total ticks
-    dayTime = 6000,         -- Current day time (0-24000)
-    dayCount = 2,           -- Days elapsed
-    isDay = true,
-    isNight = false,
-    hours = 12,             -- 0-23
-    minutes = 0,            -- 0-59
-    timeString = "12:00"
-}
-```
-
-**Note:** Minecraft day cycle: 0=6am, 6000=noon, 12000=6pm, 18000=midnight
-
----
-
-### `getMoonInfo()` → moonInfo
-
-Returns moon phase information.
-
-```lua
-local moon = gpu.getMoonInfo()
-print("Tonight's moon: " .. moon.phaseName)
-```
-
-**Returns:**
-```lua
-{
-    phase = 0,                  -- 0-7
-    phaseName = "Full Moon",    -- Name string
-    brightness = 1.0            -- Light level (0.25-1.0)
-}
-```
-
-**Moon Phases:** Full Moon (0), Waning Gibbous (1), Last Quarter (2), Waning Crescent (3), New Moon (4), Waxing Crescent (5), First Quarter (6), Waxing Gibbous (7)
-
----
-
-### `getDimension()` → dimensionName
-
-Returns current dimension ID.
-
-```lua
-local dim = gpu.getDimension()
-if dim == "minecraft:the_nether" then
-    print("We're in the Nether!")
-end
-```
-
-**Common Values:**
-- `"minecraft:overworld"`
-- `"minecraft:the_nether"`
-- `"minecraft:the_end"`
-
----
-
-### `getBiomeAt(x, y, z)` → biomeInfo
-
-Returns biome information at specific coordinates.
-
-```lua
-local biome = gpu.getBiomeAt(100, 64, 200)
-print("Biome: " .. biome.name)
-print("Temperature: " .. biome.temperature)
-```
+#### `get3DModelInfo(modelId)` → string
 
 **Parameters:**
-- `x, y, z` (number): World coordinates
+- `modelId` (number)
 
-**Returns:**
+**Example:**
 ```lua
-{
-    name = "minecraft:plains",           -- Biome ID
-    temperature = 0.8,                   -- Temperature value
-    hasPrecipitation = true,             -- Can rain/snow here?
-    precipitationType = "rain"           -- "rain", "snow", or "none"
-}
+local result = gpu.get3DModelInfo(0)
 ```
 
-**Use Cases:**
-- Biome-specific displays
-- Weather prediction
-- Environmental monitoring stations
+#### `load3DModel(objData)` → number
+
+**Parameters:**
+- `objData` (string)
+
+**Example:**
+```lua
+local result = gpu.load3DModel("")
+```
+
+#### `load3DModelFromBytes(base64ObjData)` → number
+
+**Parameters:**
+- `base64ObjData` (string)
+
+**Example:**
+```lua
+local result = gpu.load3DModelFromBytes("")
+```
+
+#### `unload3DModel(modelId)` → boolean
+
+**Parameters:**
+- `modelId` (number)
+
+**Example:**
+```lua
+local result = gpu.unload3DModel(0)
+```
+
+
+### 3D Lighting
+
+#### `addAmbientLight(displayId, r, g, b, intensity)`
+
+**Parameters:**
+- `displayId` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+- `intensity` (number)
+
+**Example:**
+```lua
+gpu.addAmbientLight(0, 0, 0, 0, 0)
+```
+
+#### `addDirectionalLight(displayId, dirX, dirY, dirZ, r, g, b, intensity)`
+
+**Parameters:**
+- `displayId` (number)
+- `dirX` (number)
+- `dirY` (number)
+- `dirZ` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+- `intensity` (number)
+
+**Example:**
+```lua
+gpu.addDirectionalLight(0, 0, 0, 0, 0, 0, 0, 0)
+```
+
+#### `clearLights(displayId)`
+
+**Parameters:**
+- `displayId` (number)
+
+**Example:**
+```lua
+gpu.clearLights(0)
+```
+
+#### `setBackfaceCulling(displayId, enabled)`
+
+**Parameters:**
+- `displayId` (number)
+- `enabled` (boolean)
+
+**Example:**
+```lua
+gpu.setBackfaceCulling(0, true)
+```
+
+#### `setPhongShading(displayId, enabled)`
+
+**Parameters:**
+- `displayId` (number)
+- `enabled` (boolean)
+
+**Example:**
+```lua
+gpu.setPhongShading(0, true)
+```
+
+
+### Textures
+
+#### `getTextureInfo(textureId)` → string
+
+**Parameters:**
+- `textureId` (number)
+
+**Example:**
+```lua
+local result = gpu.getTextureInfo(0)
+```
+
+#### `loadTexture(width, height, base64PixelData)` → number
+
+**Parameters:**
+- `width` (number)
+- `height` (number)
+- `base64PixelData` (string)
+
+**Example:**
+```lua
+local result = gpu.loadTexture(0, 0, "")
+```
+
+#### `loadTextureFromImage(imageData)` → number
+
+**Parameters:**
+- `imageData` (any)
+
+**Example:**
+```lua
+local result = gpu.loadTextureFromImage(value)
+```
+
+#### `unloadTexture(textureId)` → boolean
+
+**Parameters:**
+- `textureId` (number)
+
+**Example:**
+```lua
+local result = gpu.unloadTexture(0)
+```
+
+
+### Input Events
+
+#### `clearEvents(displayId)`
+
+**Parameters:**
+- `displayId` (number)
+
+**Example:**
+```lua
+gpu.clearEvents(0)
+```
+
+#### `hasEvents(displayId)` → boolean
+
+**Parameters:**
+- `displayId` (number)
+
+**Example:**
+```lua
+local result = gpu.hasEvents(0)
+```
+
+#### `pollEvent(displayId)` → string
+
+**Parameters:**
+- `displayId` (number)
+
+**Example:**
+```lua
+local result = gpu.pollEvent(0)
+```
+
+
+### World Data
+
+#### `getBiomeAt(x, y, z)` → string
+
+**Parameters:**
+- `x` (number)
+- `y` (number)
+- `z` (number)
+
+**Example:**
+```lua
+local result = gpu.getBiomeAt(0, 0, 0)
+```
+
+#### `getDimension()` → string
+
+**Example:**
+```lua
+local result = gpu.getDimension()
+```
+
+#### `getMoonInfo()` → string
+
+**Example:**
+```lua
+local result = gpu.getMoonInfo()
+```
+
+#### `getTimeInfo()` → string
+
+**Example:**
+```lua
+local result = gpu.getTimeInfo()
+```
+
+#### `getWeather()` → string
+
+**Example:**
+```lua
+local result = gpu.getWeather()
+```
+
+#### `getWorldInfo()` → string
+
+**Example:**
+```lua
+local result = gpu.getWorldInfo()
+```
+
+
+### Controller Input
+
+#### `clearControllerEvents(controllerId)`
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+gpu.clearControllerEvents(0)
+```
+
+#### `getAxes(controllerId)` → table
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.getAxes(0)
+```
+
+#### `getAxis(controllerId, axisIndex)` → number
+
+**Parameters:**
+- `controllerId` (number)
+- `axisIndex` (number)
+
+**Example:**
+```lua
+local result = gpu.getAxis(0, 0)
+```
+
+#### `getButton(controllerId, buttonIndex)` → boolean
+
+**Parameters:**
+- `controllerId` (number)
+- `buttonIndex` (number)
+
+**Example:**
+```lua
+local result = gpu.getButton(0, 0)
+```
+
+#### `getButtons(controllerId)` → table
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.getButtons(0)
+```
+
+#### `getControllerCount()` → number
+
+**Example:**
+```lua
+local result = gpu.getControllerCount()
+```
+
+#### `getControllerDeadzone()` → number
+
+**Example:**
+```lua
+local result = gpu.getControllerDeadzone()
+```
+
+#### `getControllerInfo(controllerId)` → string
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.getControllerInfo(0)
+```
+
+#### `hasControllerEvents(controllerId)` → boolean
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.hasControllerEvents(0)
+```
+
+#### `pollControllerEvent(controllerId)` → string
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.pollControllerEvent(0)
+```
+
+#### `scanForControllers()`
+
+**Example:**
+```lua
+gpu.scanForControllers()
+```
+
+#### `setControllerDeadzone(deadzone)`
+
+**Parameters:**
+- `deadzone` (number)
+
+**Example:**
+```lua
+gpu.setControllerDeadzone(0)
+```
+
+#### `updateControllerState(controllerId)`
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+gpu.updateControllerState(0)
+```
+
+
+### Controller Mapping
+
+#### `exportRawControllerState(controllerId)` → string
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.exportRawControllerState(0)
+```
+
+#### `getControllerMapping(controllerId)` → string
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.getControllerMapping(0)
+```
+
+#### `getMappedAxis(controllerId, axisName)` → number
+
+**Parameters:**
+- `controllerId` (number)
+- `axisName` (string)
+
+**Example:**
+```lua
+local result = gpu.getMappedAxis(0, "")
+```
+
+#### `getMappedButton(controllerId, buttonName)` → boolean
+
+**Parameters:**
+- `controllerId` (number)
+- `buttonName` (string)
+
+**Example:**
+```lua
+local result = gpu.getMappedButton(0, "")
+```
+
+#### `resetControllerMapping(controllerId)`
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+gpu.resetControllerMapping(0)
+```
+
+#### `saveControllerMappings()`
+
+**Example:**
+```lua
+gpu.saveControllerMappings()
+```
+
+#### `setAxisMapping(controllerId, axisName, rawAxis, inverted)`
+
+**Parameters:**
+- `controllerId` (number)
+- `axisName` (string)
+- `rawAxis` (number)
+- `inverted` (boolean)
+
+**Example:**
+```lua
+gpu.setAxisMapping(0, "", 0, true)
+```
+
+#### `setButtonMapping(controllerId, buttonName, rawButton)`
+
+**Parameters:**
+- `controllerId` (number)
+- `buttonName` (string)
+- `rawButton` (number)
+
+**Example:**
+```lua
+gpu.setButtonMapping(0, "", 0)
+```
+
+
+### Controller Profiles
+
+#### `getControllerAxisNames(controllerId)` → string
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.getControllerAxisNames(0)
+```
+
+#### `getControllerButtonNames(controllerId)` → string
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.getControllerButtonNames(0)
+```
+
+#### `getControllerInputs(controllerId)` → table
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.getControllerInputs(0)
+```
+
+#### `getControllerProfile(controllerId)` → string
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.getControllerProfile(0)
+```
+
+#### `getControllerType(controllerId)` → string
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.getControllerType(0)
+```
+
+#### `getNamedAxesActive(controllerId, threshold)` → string
+
+**Parameters:**
+- `controllerId` (number)
+- `threshold` (number)
+
+**Example:**
+```lua
+local result = gpu.getNamedAxesActive(0, 0)
+```
+
+#### `getNamedAxis(controllerId, axisName)` → number
+
+**Parameters:**
+- `controllerId` (number)
+- `axisName` (string)
+
+**Example:**
+```lua
+local result = gpu.getNamedAxis(0, "")
+```
+
+#### `getNamedButton(controllerId, buttonName)` → boolean
+
+**Parameters:**
+- `controllerId` (number)
+- `buttonName` (string)
+
+**Example:**
+```lua
+local result = gpu.getNamedButton(0, "")
+```
+
+#### `getNamedButtonsPressed(controllerId)` → string
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.getNamedButtonsPressed(0)
+```
+
+#### `hasInput(controllerId, inputName)` → boolean
+
+**Parameters:**
+- `controllerId` (number)
+- `inputName` (string)
+
+**Example:**
+```lua
+local result = gpu.hasInput(0, "")
+```
+
+#### `refreshControllerProfile(controllerId)`
+
+**Parameters:**
+- `controllerId` (number)
+
+**Example:**
+```lua
+gpu.refreshControllerProfile(0)
+```
+
+
+### Server-Side Controllers
+
+#### `getPlayerUUID()` → string
+
+**Example:**
+```lua
+local result = gpu.getPlayerUUID()
+```
+
+#### `getServerControllerAxes(playerUUID, localControllerId)` → table
+
+**Parameters:**
+- `playerUUID` (string)
+- `localControllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.getServerControllerAxes("", 0)
+```
+
+#### `getServerControllerAxis(playerUUID, controllerId, axisIndex)` → number
+
+**Parameters:**
+- `playerUUID` (string)
+- `controllerId` (number)
+- `axisIndex` (number)
+
+**Example:**
+```lua
+local result = gpu.getServerControllerAxis("", 0, 0)
+```
+
+#### `getServerControllerButton(playerUUID, controllerId, buttonIndex)` → boolean
+
+**Parameters:**
+- `playerUUID` (string)
+- `controllerId` (number)
+- `buttonIndex` (number)
+
+**Example:**
+```lua
+local result = gpu.getServerControllerButton("", 0, 0)
+```
+
+#### `getServerControllerButtons(playerUUID, localControllerId)` → table
+
+**Parameters:**
+- `playerUUID` (string)
+- `localControllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.getServerControllerButtons("", 0)
+```
+
+#### `getServerControllerCount(playerUUID)` → number
+
+**Parameters:**
+- `playerUUID` (string)
+
+**Example:**
+```lua
+local result = gpu.getServerControllerCount("")
+```
+
+#### `getServerControllerInfo(playerUUID, localControllerId)` → string
+
+**Parameters:**
+- `playerUUID` (string)
+- `localControllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.getServerControllerInfo("", 0)
+```
+
+#### `getServerControllerState(playerUUID, controllerId)` → string
+
+**Parameters:**
+- `playerUUID` (string)
+- `controllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.getServerControllerState("", 0)
+```
+
+#### `hasServerController(playerUUID, localControllerId)` → boolean
+
+**Parameters:**
+- `playerUUID` (string)
+- `localControllerId` (number)
+
+**Example:**
+```lua
+local result = gpu.hasServerController("", 0)
+```
+
+
+### Vector Graphics
+
+#### `drawBezierCurve(displayId, pointsObj, r, g, b, segmentsObj)`
+
+**Parameters:**
+- `displayId` (number)
+- `pointsObj` (any)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+- `segmentsObj` (any)
+
+**Example:**
+```lua
+gpu.drawBezierCurve(0, value, 0, 0, 0, value)
+```
+
+#### `drawRoundedRect(displayId, x, y, w, h, radius, r, g, b, filled)`
+
+**Parameters:**
+- `displayId` (number)
+- `x` (number)
+- `y` (number)
+- `w` (number)
+- `h` (number)
+- `radius` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+- `filled` (boolean)
+
+**Example:**
+```lua
+gpu.drawRoundedRect(0, 0, 0, 0, 0, 0, 0, 0, 0, true)
+```
+
+#### `drawSVGPath(displayId, pathData, x, y, scale, r, g, b)`
+
+**Parameters:**
+- `displayId` (number)
+- `pathData` (string)
+- `x` (number)
+- `y` (number)
+- `scale` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+
+**Example:**
+```lua
+gpu.drawSVGPath(0, "", 0, 0, 0, 0, 0, 0)
+```
+
+#### `drawStar(displayId, cx, cy, points, outerRadius, innerRadius, r, g, b, filled)`
+
+**Parameters:**
+- `displayId` (number)
+- `cx` (number)
+- `cy` (number)
+- `points` (number)
+- `outerRadius` (number)
+- `innerRadius` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+- `filled` (boolean)
+
+**Example:**
+```lua
+gpu.drawStar(0, 0, 0, 0, 0, 0, 0, 0, 0, true)
+```
+
+
+### Metaballs
+
+#### `addMetaball(systemId, x, y, radius, strength)` → number
+
+**Parameters:**
+- `systemId` (number)
+- `x` (number)
+- `y` (number)
+- `radius` (number)
+- `strength` (number)
+
+**Example:**
+```lua
+local result = gpu.addMetaball(0, 0, 0, 0, 0)
+```
+
+#### `clearMetaballs(systemId)`
+
+**Parameters:**
+- `systemId` (number)
+
+**Example:**
+```lua
+gpu.clearMetaballs(0)
+```
+
+#### `createMetaballSystem(displayId)` → number
+
+**Parameters:**
+- `displayId` (number)
+
+**Example:**
+```lua
+local result = gpu.createMetaballSystem(0)
+```
+
+#### `getMetaballCount(systemId)` → number
+
+**Parameters:**
+- `systemId` (number)
+
+**Example:**
+```lua
+local result = gpu.getMetaballCount(0)
+```
+
+#### `getMetaballInfo(systemId, ballId)` → string
+
+**Parameters:**
+- `systemId` (number)
+- `ballId` (number)
+
+**Example:**
+```lua
+local result = gpu.getMetaballInfo(0, 0)
+```
+
+#### `removeMetaballSystem(systemId)`
+
+**Parameters:**
+- `systemId` (number)
+
+**Example:**
+```lua
+gpu.removeMetaballSystem(0)
+```
+
+#### `renderMetaballs(systemId, threshold, renderMode)`
+
+**Parameters:**
+- `systemId` (number)
+- `threshold` (number)
+- `renderMode` (number)
+
+**Example:**
+```lua
+gpu.renderMetaballs(0, 0, 0)
+```
+
+#### `setMetaballColor(systemId, ballId, r, g, b)`
+
+**Parameters:**
+- `systemId` (number)
+- `ballId` (number)
+- `r` (number)
+- `g` (number)
+- `b` (number)
+
+**Example:**
+```lua
+gpu.setMetaballColor(0, 0, 0, 0, 0)
+```
+
+#### `setMetaballPhysics(systemId, enabled, gravity, drag)`
+
+**Parameters:**
+- `systemId` (number)
+- `enabled` (boolean)
+- `gravity` (number)
+- `drag` (number)
+
+**Example:**
+```lua
+gpu.setMetaballPhysics(0, true, 0, 0)
+```
+
+#### `setMetaballVelocity(systemId, ballId, vx, vy)`
+
+**Parameters:**
+- `systemId` (number)
+- `ballId` (number)
+- `vx` (number)
+- `vy` (number)
+
+**Example:**
+```lua
+gpu.setMetaballVelocity(0, 0, 0, 0)
+```
+
+#### `updateMetaballs(systemId, deltaTime)`
+
+**Parameters:**
+- `systemId` (number)
+- `deltaTime` (number)
+
+**Example:**
+```lua
+gpu.updateMetaballs(0, 0)
+```
+
+
+### Calibration
+
+#### `getCalibrationValues()` → string
+
+**Example:**
+```lua
+local result = gpu.getCalibrationValues()
+```
+
+#### `setCalibrationMode(enabled, divisor, subtract)`
+
+**Parameters:**
+- `enabled` (boolean)
+- `divisor` (number)
+- `subtract` (number)
+
+**Example:**
+```lua
+gpu.setCalibrationMode(true, 0, 0)
+```
+
 
 ---
 
-## Examples
+## 💡 Examples
 
-### Example 1: 3D Spinning Cube
+### Interactive Drawing Board
 
 ```lua
 local gpu = peripheral.find("directgpu")
 local display = gpu.autoDetectAndCreateDisplay()
 
--- Setup 3D
-gpu.setupCamera(display, 60, 0.1, 1000)
-gpu.setCameraPosition(display, 0, 0, 5)
+gpu.clear(display, 20, 20, 30)
 
--- Add lighting
-gpu.addDirectionalLight(display, 0, -1, 0, 255, 255, 255, 0.8)
+local drawing = false
+local points = {}
 
-local rotation = 0
-print("Press Q to stop")
+print("Draw with your mouse! Press Q to quit")
 
 local running = true
 parallel.waitForAny(
     function()
         while running do
-            -- Clear frame
-            gpu.clear(display, 20, 20, 40)
-            gpu.clearZBuffer(display)
-            
-            -- Draw spinning cube
-            gpu.drawCube(display, 0, 0, 0, 2, rotation, rotation * 1.5, 0, 
-                255, 100, 100)
-            
-            gpu.updateDisplay(display)
-            rotation = rotation + 2
+            if gpu.hasEvents(display) then
+                local event = gpu.pollEvent(display)
+
+                if event.type == "mouse_click" then
+                    drawing = true
+                    points = {{event.x, event.y}}
+                elseif event.type == "mouse_drag" and drawing then
+                    table.insert(points, {event.x, event.y})
+
+                    -- Draw the line
+                    gpu.drawPolylines(display, points, 0, 255, 255)
+                    gpu.updateDisplay(display)
+                elseif event.type == "mouse_up" then
+                    drawing = false
+                end
+            end
             sleep(0.05)
         end
     end,
@@ -2619,1333 +1844,125 @@ parallel.waitForAny(
 gpu.clearAllDisplays()
 ```
 
----
-
-### Example 2: Text Display with Fonts
+### 3D Model Viewer
 
 ```lua
 local gpu = peripheral.find("directgpu")
 local display = gpu.autoDetectAndCreateDisplay()
 
--- Clear to dark background
-gpu.clear(display, 30, 30, 30)
-
--- Title
-gpu.drawText(display, "DirectGPU Demo", 10, 10, 
-    255, 200, 100, "Arial", 32, "bold")
-
--- Body text with wrapping
-local text = "DirectGPU brings hardware-accelerated graphics to ComputerCraft. "..
-    "Render 2D graphics, 3D models, and interactive UIs at high resolution."
-
-gpu.drawTextWrapped(display, text, 10, 60, 450,
-    200, 200, 200, 8, "Arial", 16, "plain")
-
--- Status box
-gpu.drawTextWithBg(display, "Status: Ready", 10, 150,
-    0, 255, 0,      -- Green text
-    0, 50, 0,       -- Dark green background
-    8,              -- Padding
-    "Courier New", 14, "bold")
-
-gpu.updateDisplay(display)
-
-print("Press any key to continue...")
-os.pullEvent("key")
-gpu.clearAllDisplays()
-```
-
----
-
-### Example 3: 3D Model Viewer
-
-```lua
-local gpu = peripheral.find("directgpu")
-local display = gpu.autoDetectAndCreateDisplay()
-
--- Load your OBJ model
+-- Load OBJ model
 local modelData = [[
 v -1 -1 -1
 v 1 -1 -1
 v 1 1 -1
 v -1 1 -1
-v -1 -1 1
-v 1 -1 1
-v 1 1 1
-v -1 1 1
+-- ... more vertices ...
 f 1 2 3 4
-f 5 8 7 6
-f 1 5 6 2
-f 2 6 7 3
-f 3 7 8 4
-f 4 8 5 1
+-- ... more faces ...
 ]]
 
 local modelId = gpu.load3DModel(modelData)
-local info = gpu.get3DModelInfo(modelId)
-print(string.format("Loaded: %d vertices, %d faces", info.vertexCount, info.faceCount))
 
--- Setup 3D
+-- Setup camera
 gpu.setupCamera(display, 60, 0.1, 1000)
 gpu.setCameraPosition(display, 0, 0, 5)
-
--- Add two lights
-gpu.addDirectionalLight(display, 0, -1, -0.5, 255, 255, 255, 0.8)  -- Main
-gpu.addDirectionalLight(display, 1, 0, 0, 100, 100, 150, 0.3)      -- Fill
-
-local rotation = 0
-print("Model viewer - Press Q to quit")
-
-local running = true
-parallel.waitForAny(
-    function()
-        while running do
-            gpu.clear(display, 0, 0, 0)
-            gpu.clearZBuffer(display)
-            
-            gpu.draw3DModel(display, modelId,
-                0, 0, 0,            -- Position
-                20, rotation, 0,    -- Rotation
-                1.0,                -- Scale
-                200, 200, 255)      -- Color
-            
-            gpu.updateDisplay(display)
-            rotation = rotation + 1
-            sleep(0.05)
-        end
-    end,
-    function()
-        while running do
-            local event, key = os.pullEvent("key")
-            if key == keys.q then running = false end
-        end
-    end
-)
-
-gpu.unload3DModel(modelId)
-gpu.clearAllDisplays()
-```
-
----
-
-### Example 4: Weather Display
-
-```lua
-local gpu = peripheral.find("directgpu")
-local display = gpu.autoDetectAndCreateDisplay()
-local info = gpu.getDisplayInfo(display)
-
-local function drawWeatherDisplay()
-    local world = gpu.getWorldInfo()
-    local time = gpu.getTimeInfo()
-    local weather = gpu.getWeather()
-    
-    -- Background based on time
-    local bgColor
-    if time.isDay then
-        bgColor = weather.isRaining and {100, 100, 120} or {135, 206, 235}
-    else
-        bgColor = {20, 20, 40}
-    end
-    
-    gpu.clear(display, table.unpack(bgColor))
-    
-    -- Time
-    gpu.drawTextWithBg(display, "Time: " .. time.timeString, 10, 10,
-        255, 255, 255, 0, 0, 0, 8, "Arial", 24, "bold")
-    
-    -- Date
-    gpu.drawText(display, "Day " .. time.dayCount, 10, 50,
-        220, 220, 220, "Arial", 18, "plain")
-    
-    -- Weather
-    local weatherText = "Weather: " .. weather.state:gsub("^%l", string.upper)
-    local weatherColor = weather.isThundering and {255, 255, 0} or 
-                        weather.isRaining and {100, 150, 255} or {255, 255, 255}
-    
-    gpu.drawText(display, weatherText, 10, 90,
-        weatherColor[1], weatherColor[2], weatherColor[3],
-        "Arial", 20, "bold")
-    
-    -- Moon phase
-    gpu.drawText(display, "Moon: " .. world.moonPhaseName, 10, 130,
-        200, 200, 200, "Arial", 16, "plain")
-    
-    -- Biome at GPU block
-    local biome = gpu.getBiomeAt(info.x, info.y, info.z)
-    local biomeName = biome.name:match("minecraft:(.+)") or biome.name
-    gpu.drawText(display, "Biome: " .. biomeName:gsub("_", " "), 10, 160,
-        180, 255, 180, "Arial", 16, "plain")
-    
-    gpu.updateDisplay(display)
-end
-
-print("Weather Display - Press Ctrl+T to exit")
-
-while true do
-    drawWeatherDisplay()
-    sleep(1)  -- Update every second
-end
-```
-
----
-
-### Example 5: Interactive 3D Scene with Mouse
-
-```lua
-local gpu = peripheral.find("directgpu")
-local display = gpu.autoDetectAndCreateDisplay()
-
--- Setup 3D
-gpu.setupCamera(display, 60, 0.1, 1000)
-gpu.setCameraPosition(display, 0, 2, 8)
 gpu.addDirectionalLight(display, 0, -1, 0, 255, 255, 255, 0.8)
 
--- Scene objects
-local objects = {
-    {type="cube", x=-2, y=0, z=0, size=1.5, color={255,100,100}},
-    {type="sphere", x=0, y=0, z=0, size=1, color={100,255,100}},
-    {type="pyramid", x=2, y=0, z=0, size=1.5, color={100,100,255}}
-}
-
-local selectedIndex = nil
+-- Render loop
 local rotation = 0
-
-local function drawScene()
-    gpu.clear(display, 20, 20, 30)
+while true do
+    gpu.clear(display, 0, 0, 0)
     gpu.clearZBuffer(display)
-    
-    for i, obj in ipairs(objects) do
-        local rot = (selectedIndex == i) and rotation or 0
-        local col = obj.color
-        
-        -- Highlight selected object
-        if selectedIndex == i then
-            col = {math.min(255, col[1] + 50), 
-                   math.min(255, col[2] + 50), 
-                   math.min(255, col[3] + 50)}
-        end
-        
-        if obj.type == "cube" then
-            gpu.drawCube(display, obj.x, obj.y, obj.z, obj.size, 
-                rot, rot, 0, col[1], col[2], col[3])
-        elseif obj.type == "sphere" then
-            gpu.drawSphere(display, obj.x, obj.y, obj.z, obj.size, 
-                12, col[1], col[2], col[3])
-        elseif obj.type == "pyramid" then
-            gpu.drawPyramid(display, obj.x, obj.y, obj.z, obj.size, 
-                rot, rot, 0, col[1], col[2], col[3])
-        end
-    end
-    
-    -- Instructions
-    gpu.drawTextWithBg(display, "Click objects to select", 10, 10,
-        255, 255, 255, 0, 0, 0, 5, "Arial", 14, "plain")
-    
-    if selectedIndex then
-        gpu.drawTextWithBg(display, "Selected: " .. objects[selectedIndex].type, 
-            10, 40, 255, 255, 100, 50, 50, 0, 5, "Arial", 14, "bold")
-    end
-    
+
+    gpu.draw3DModel(display, modelId, 0, 0, 0,
+        20, rotation, 0, 1.0, 200, 200, 255)
+
     gpu.updateDisplay(display)
+    rotation = rotation + 1
+    sleep(0.05)
 end
-
-print("Interactive 3D Scene")
-print("Close terminal and click objects")
-print("Press Q to quit")
-
-local running = true
-
-parallel.waitForAny(
-    -- Render loop
-    function()
-        while running do
-            drawScene()
-            if selectedIndex then
-                rotation = rotation + 2
-            end
-            sleep(0.05)
-        end
-    end,
-    
-    -- Input loop
-    function()
-        while running do
-            if gpu.hasEvents(display) then
-                local event = gpu.pollEvent(display)
-                if event.type == "mouse_click" then
-                    -- Simple object selection (normally you'd do ray-object intersection)
-                    local info = gpu.getDisplayInfo(display)
-                    local clickX = event.x / info.pixelWidth
-                    
-                    if clickX < 0.33 then
-                        selectedIndex = 1
-                        print("Selected: Cube")
-                    elseif clickX < 0.66 then
-                        selectedIndex = 2
-                        print("Selected: Sphere")
-                    else
-                        selectedIndex = 3
-                        print("Selected: Pyramid")
-                    end
-                end
-            end
-            sleep(0.05)
-        end
-    end,
-    
-    -- Exit handler
-    function()
-        while running do
-            local event, key = os.pullEvent("key")
-            if key == keys.q then running = false end
-        end
-    end
-)
-
-gpu.clearAllDisplays()
 ```
 
----
-
-### Example 6: Real-Time Clock with Graphics
+### Controller-Based Game
 
 ```lua
 local gpu = peripheral.find("directgpu")
-local display = gpu.autoDetectAndCreateDisplayWithResolution(2)
-local info = gpu.getDisplayInfo(display)
+local display = gpu.autoDetectAndCreateDisplay()
 
-local centerX = info.pixelWidth / 2
-local centerY = info.pixelHeight / 2
-local clockRadius = math.min(centerX, centerY) - 20
-
-local function drawClock()
-    local time = gpu.getTimeInfo()
-    local world = gpu.getWorldInfo()
-    
-    -- Background (sky color based on time)
-    local bgR, bgG, bgB
-    if time.isDay then
-        bgR, bgG, bgB = 135, 206, 235  -- Day sky
-    else
-        bgR, bgG, bgB = 20, 20, 40     -- Night sky
-    end
-    gpu.clear(display, bgR, bgG, bgB)
-    
-    -- Clock face
-    gpu.drawCircle(display, centerX, centerY, clockRadius, 255, 255, 255, true)
-    gpu.drawCircle(display, centerX, centerY, clockRadius, 0, 0, 0, false)
-    
-    -- Hour marks
-    for i = 0, 11 do
-        local angle = math.rad(i * 30 - 90)
-        local x1 = centerX + math.cos(angle) * (clockRadius - 15)
-        local y1 = centerY + math.sin(angle) * (clockRadius - 15)
-        local x2 = centerX + math.cos(angle) * (clockRadius - 5)
-        local y2 = centerY + math.sin(angle) * (clockRadius - 5)
-        gpu.drawLine(display, x1, y1, x2, y2, 0, 0, 0)
-    end
-    
-    -- Hour hand
-    local hourAngle = math.rad((time.hours % 12) * 30 + time.minutes * 0.5 - 90)
-    local hourX = centerX + math.cos(hourAngle) * (clockRadius * 0.5)
-    local hourY = centerY + math.sin(hourAngle) * (clockRadius * 0.5)
-    gpu.drawLine(display, centerX, centerY, hourX, hourY, 0, 0, 0)
-    
-    -- Minute hand
-    local minAngle = math.rad(time.minutes * 6 - 90)
-    local minX = centerX + math.cos(minAngle) * (clockRadius * 0.7)
-    local minY = centerY + math.sin(minAngle) * (clockRadius * 0.7)
-    gpu.drawLine(display, centerX, centerY, minX, minY, 255, 0, 0)
-    
-    -- Center dot
-    gpu.drawCircle(display, centerX, centerY, 5, 0, 0, 0, true)
-    
-    -- Digital time display
-    gpu.drawTextWithBg(display, time.timeString, centerX - 40, 
-        info.pixelHeight - 50, 255, 255, 255, 0, 0, 0, 8, 
-        "Arial", 24, "bold")
-    
-    -- Date and weather
-    local dateStr = string.format("Day %d - %s", time.dayCount, world.moonPhaseName)
-    gpu.drawText(display, dateStr, centerX - 80, info.pixelHeight - 20,
-        200, 200, 200, "Arial", 14, "plain")
-    
-    gpu.updateDisplay(display)
+gpu.scanForControllers()
+if gpu.getControllerCount() == 0 then
+    print("No controller found!")
+    return
 end
 
-print("Minecraft Clock - Press Ctrl+T to exit")
+local playerX, playerY = 320, 240
+local speed = 5
 
 while true do
-    drawClock()
-    sleep(0.5)  -- Update twice per second
-end
-```
+    -- Get input
+    local moveX = gpu.getNamedAxis(0, "LEFT_STICK_X")
+    local moveY = gpu.getNamedAxis(0, "LEFT_STICK_Y")
 
----
+    -- Update position
+    playerX = playerX + (moveX * speed)
+    playerY = playerY + (moveY * speed)
 
-## Performance Tips
+    -- Render
+    gpu.clear(display, 20, 20, 40)
+    gpu.drawCircle(display, playerX, playerY, 10, 255, 255, 0, true)
 
-### 2D Graphics Optimization
-
-1. **Batch drawing operations:**
-```lua
--- Good: 1 update
-for i = 1, 1000 do
-    gpu.setPixel(display, x, y, r, g, b)
-end
-gpu.updateDisplay(display)
-
--- Bad: 1000 updates
-for i = 1, 1000 do
-    gpu.setPixel(display, x, y, r, g, b)
-    gpu.updateDisplay(display)  -- Too many!
-end
-```
-
-2. **Use primitives over pixels:**
-```lua
--- Faster
-gpu.fillRect(display, x, y, 100, 50, r, g, b)
-
--- Slower
-for py = y, y + 50 do
-    for px = x, x + 100 do
-        gpu.setPixel(display, px, py, r, g, b)
+    -- Show button state
+    if gpu.getNamedButton(0, "A") then
+        gpu.drawText(display, "A Pressed!", 10, 10,
+            255, 255, 0, "Arial", 16, "bold")
     end
+
+    gpu.updateDisplay(display)
+    sleep(0.05)
 end
 ```
 
-3. **Limit frame rate:**
-```lua
-local lastUpdate = 0
-while running do
-    -- ... drawing code ...
-    
-    local now = os.clock()
-    if now - lastUpdate >= 1/60 then  -- Max 60 FPS
-        gpu.updateDisplay(display)
-        lastUpdate = now
-    end
-end
-```
-
-### 3D Graphics Optimization
-
-1. **Use appropriate detail levels:**
-```lua
--- Close objects: high detail
-gpu.drawSphere(display, x, y, z, radius, 24, r, g, b)
-
--- Far objects: low detail
-gpu.drawSphere(display, x, y, z, radius, 8, r, g, b)
-```
-
-2. **Minimize state changes:**
-```lua
--- Good: Group by type
-for _, cube in ipairs(cubes) do
-    gpu.drawCube(display, ...)
-end
-for _, sphere in ipairs(spheres) do
-    gpu.drawSphere(display, ...)
-end
-
--- Less efficient: Mixed types
-for _, obj in ipairs(objects) do
-    if obj.type == "cube" then gpu.drawCube(...)
-    elseif obj.type == "sphere" then gpu.drawSphere(...) end
-end
-```
-
-3. **Always clear Z-buffer:**
-```lua
--- Required at start of each 3D frame
-gpu.clear(display, 0, 0, 0)
-gpu.clearZBuffer(display)
-```
-
-### Resolution and Memory
-
-```lua
--- Memory usage per block:
--- 1x: ~40 KB   (164×81)
--- 2x: ~160 KB  (328×162) - Recommended for HD
--- 4x: ~640 KB  (656×324) - Only for small displays
-
--- Use appropriate resolution
-local display = gpu.autoDetectAndCreateDisplayWithResolution(2)
-```
-
-### Video Streaming
-
-```lua
--- Use dictionary compression for >90% bandwidth reduction
-local stats = gpu.compressWithDict(jpegData)
--- First frame: ~100 KB
--- Subsequent: ~10 KB (90% cache hit)
-
--- Target 10-15 FPS for smooth video
-sleep(1 / 10)
-```
+More examples: [DirectGPU-Projects Repository](https://github.com/tiktop101/CCDirectGPU-Projects/tree/main)
 
 ---
 
-## Troubleshooting
-
-### Common Issues
-
-**"Display not found" or "No monitor found"**
-- Monitors must form complete rectangle
-- Maximum 16 blocks away
-- Must be CC monitors
-
-```lua
-local info = gpu.autoDetectMonitor()
-print("Found: " .. tostring(info.found))
-```
-
-**"Resource limits exceeded"**
-- Max 50 displays
-- Max 10 megapixels total
-
-```lua
-local stats = gpu.getResourceStats()
-print(string.format("Usage: %.1f%%", stats.pixelUsagePercent))
-gpu.clearAllDisplays()  -- Free resources
-```
-
-**Touch input not working**
-- Close CC terminal (press E)
-- Click physical monitor blocks
-- Verify display exists
-
-**Low FPS / Stuttering**
-- Reduce resolution multiplier
-- Use smaller monitors
-- Limit update rate
-- Reduce 3D detail level
-
-**3D objects not rendering**
-- Call `setupCamera()` first
-- Call `clearZBuffer()` each frame
-- Check camera position (not inside objects)
-- Verify objects are in view frustum
-
-**Textures not loading**
-- Model must have UV coordinates (vt in OBJ)
-- Texture dimensions should be power of 2
-- Use `getTextureInfo()` to verify load
-
----
-
-## Technical Specifications
+## 📊 Technical Specifications
 
 | Specification | Value |
 |---------------|-------|
-| **Resolution (1x-4x)** | 164×81 to 656×324 pixels/block |
-| **Color depth** | 24-bit RGB (16.7M colors) |
-| **Max monitor size** | 16×16 blocks |
-| **Max displays** | 50 per world |
-| **Max total pixels** | 10 megapixels |
-| **Render distance** | 64 blocks |
-| **Update rate** | 60 FPS (hardware limited) |
-| **Input latency** | <50ms |
-| **JPEG decode** | 5-15ms (hardware accelerated) |
-| **3D primitives** | Cube, Sphere, Pyramid |
-| **3D file format** | OBJ (with textures) |
-| **Lighting** | Directional lights, diffuse shading |
-| **Font rendering** | System fonts with anti-aliasing |
-
----
-
-## Controller Input
-
-DirectGPU provides comprehensive game controller support with automatic device detection, button/axis mapping, and multi-controller support. Works with Xbox, PlayStation, Nintendo, racing wheels, flight sticks, and generic gamepads.
-
-**Features:**
-- Auto-detection of controller types (Xbox, PlayStation, Switch, etc.)
-- Raw button and axis access
-- Named input mapping (e.g., "A" button, "LEFT_STICK_X")
-- Configurable deadzones and calibration
-- Event system for input changes
-- Multiplayer support (server-side state access)
-- Hot-plug support
-
-### Controller Support Overview
-
-DirectGPU automatically profiles controllers to provide consistent, named access to buttons and axes across different devices:
-
-| Controller Type | Detection | Named Buttons | Named Axes |
-|----------------|-----------|---------------|------------|
-| Xbox (360, One, Series) | Auto | A, B, X, Y, LB, RB, START, BACK, LS, RS | LEFT_STICK_X/Y, RIGHT_STICK_X/Y, LEFT_TRIGGER, RIGHT_TRIGGER |
-| PlayStation (DS4, DS5) | Auto | CROSS, CIRCLE, SQUARE, TRIANGLE, L1, R1, L2, R2, PS | LEFT_STICK_X/Y, RIGHT_STICK_X/Y, L2_TRIGGER, R2_TRIGGER |
-| Nintendo Switch Pro | Auto | A, B, X, Y, L, R, ZL, ZR, PLUS, MINUS | LEFT_STICK_X/Y, RIGHT_STICK_X/Y |
-| Nintendo 64 | Auto | A, B, Z, START, L, R, C buttons, D-pad | STICK_X, STICK_Y |
-| GameCube | Auto | A, B, X, Y, Z, START, L, R | MAIN_STICK_X/Y, C_STICK_X/Y, L_TRIGGER, R_TRIGGER |
-| Racing Wheels | Auto | Shifter paddles, buttons | STEERING, THROTTLE, BRAKE, CLUTCH |
-| Flight Sticks | Auto | TRIGGER, THUMB, numbered buttons | STICK_X/Y, THROTTLE, RUDDER |
-| Generic Gamepad | Auto | A, B, X, Y, LB, RB, START, BACK | LEFT_STICK_X/Y, RIGHT_STICK_X/Y |
-
-### Basic Controller Functions
-
-#### `getControllerCount()`
-
-Get number of connected controllers
-
-```lua
-local count = gpu.getControllerCount()
-print("Controllers: " .. count)
-```
-
----
-
-#### `scanForControllers()`
-
-Rescan for new/removed controllers
-
-```lua
-gpu.scanForControllers()  -- Refresh controller list
-```
-
----
-
-#### `getControllerInfo()`
-
-Get controller details
-
-```lua
-local info = gpu.getControllerInfo(0)
-print(info.name)      -- "Xbox Controller"
-print(info.guid)      -- Controller GUID
-print(info.buttonCount)  -- 15
-print(info.axisCount)    -- 6
-```
-
----
-
-#### `listControllers()`
-
-List all connected controllers
-
-```lua
-local controllers = gpu.listControllers()
-for i, ctrl in ipairs(controllers) do
-    print(i .. ": " .. ctrl.name)
-end
-```
-
----
-
-#### `getButton()`
-
-Get raw button state (by index)
-
-```lua
-local pressed = gpu.getButton(0, 0)  -- Controller 0, button 0
-if pressed then
-    print("Button 0 pressed!")
-end
-```
-
----
-
-#### `getButtons()`
-
-Get all button states
-
-```lua
-local buttons = gpu.getButtons(0)
-for i, pressed in ipairs(buttons) do
-    if pressed then
-        print("Button " .. (i-1) .. " pressed")
-    end
-end
-```
-
----
-
-#### `getAxis()`
-
-Get raw axis value (by index)
-
-```lua
-local value = gpu.getAxis(0, 0)  -- Controller 0, axis 0
-print("Axis 0: " .. value)  -- -1.0 to 1.0
-```
-
----
-
-#### `getAxes()`
-
-Get all axis values
-
-```lua
-local axes = gpu.getAxes(0)
-for i, value in ipairs(axes) do
-    print("Axis " .. (i-1) .. ": " .. value)
-end
-```
-
-### State Tracking and Events
-
-#### `setControllerDeadzone(deadzone)`
-
-Set the deadzone threshold for axis values (0.0-1.0).
-
-```lua
-gpu.setControllerDeadzone(0.15)  -- Ignore axis values < 0.15
-```
-
-#### `getControllerDeadzone()` → deadzone
-
-Get current deadzone setting.
-
-```lua
-local dz = gpu.getControllerDeadzone()
-print("Deadzone: " .. dz)
-```
-
-#### `updateControllerState(controllerId)`
-
-Update state tracker and generate events for changes.
-
-```lua
-gpu.updateControllerState(0)  -- Track changes for controller 0
-```
-
-#### `pollControllerEvent(controllerId)` → event
-
-Get next input event from queue.
-
-```lua
-local event = gpu.pollControllerEvent(0)
-if event then
-    print("Type: " .. event.type)        -- "button_down", "button_up", "axis"
-    print("Index: " .. event.index)      -- Button/axis index
-    print("Value: " .. event.value)      -- New value
-    print("Time: " .. event.timestamp)
-end
-```
-
-**Event Types:**
-- `button_down` - Button was pressed
-- `button_up` - Button was released
-- `axis` - Axis value changed (beyond deadzone)
-
-#### `hasControllerEvents(controllerId)` → boolean
-
-Check if controller has pending events.
-
-```lua
-if gpu.hasControllerEvents(0) then
-    local event = gpu.pollControllerEvent(0)
-    -- Process event
-end
-```
-
-#### `clearControllerEvents(controllerId)`
-
-Clear all pending events for a controller.
-
-```lua
-gpu.clearControllerEvents(0)
-```
-
-### Named Input Functions (Auto-Profiling)
-
-DirectGPU automatically detects controller types and provides named access to buttons and axes.
-
-#### `getControllerProfile(controllerId)` → profile
-
-Get auto-detected controller profile.
-
-```lua
-local profile = gpu.getControllerProfile(0)
-print("Controller: " .. profile.name)
-print("Type: " .. profile.type)          -- "Xbox Controller"
-print("Description: " .. profile.description)
-print("Buttons: " .. profile.mappedButtons)
-print("Axes: " .. profile.mappedAxes)
-```
-
-#### `getControllerType(controllerId)` → type
-
-Get controller type string.
-
-```lua
-local type = gpu.getControllerType(0)
--- "Xbox Controller", "PlayStation Controller", "Nintendo Switch Pro", etc.
-```
-
-#### `getNamedButton(controllerId, buttonName)` → boolean
-
-Get button state by name (cross-platform).
-
-```lua
--- Works on any controller type!
-if gpu.getNamedButton(0, "A") then          -- Xbox A / PS Cross
-    print("Primary action button pressed")
-end
-
-if gpu.getNamedButton(0, "START") then      -- Any controller
-    print("Start button pressed")
-end
-
--- PlayStation-specific
-if gpu.getNamedButton(0, "CROSS") then
-    print("Cross button")
-end
-
--- N64-specific
-if gpu.getNamedButton(0, "Z") then
-    print("Z trigger")
-end
-```
-
-#### `getNamedAxis(controllerId, axisName)` → value
-
-Get axis value by name.
-
-```lua
--- Left stick
-local lx = gpu.getNamedAxis(0, "LEFT_STICK_X")   -- -1.0 to 1.0
-local ly = gpu.getNamedAxis(0, "LEFT_STICK_Y")
-
--- Right stick
-local rx = gpu.getNamedAxis(0, "RIGHT_STICK_X")
-local ry = gpu.getNamedAxis(0, "RIGHT_STICK_Y")
-
--- Triggers (normalized to 0.0 to 1.0)
-local lt = gpu.getNamedAxis(0, "LEFT_TRIGGER")   -- 0.0 = not pressed
-local rt = gpu.getNamedAxis(0, "RIGHT_TRIGGER")  -- 1.0 = fully pressed
-
--- Racing wheel
-local steering = gpu.getNamedAxis(0, "STEERING")
-local throttle = gpu.getNamedAxis(0, "THROTTLE")
-```
-
-#### `getControllerButtonNames(controllerId)` → names
-
-Get list of all available button names.
-
-```lua
-local buttons = gpu.getControllerButtonNames(0)
-for _, name in ipairs(buttons) do
-    print("Button: " .. name)
-end
--- Output (Xbox): A, B, X, Y, LB, RB, START, BACK, LS, RS
-```
-
-#### `getControllerAxisNames(controllerId)` → names
-
-Get list of all available axis names.
-
-```lua
-local axes = gpu.getControllerAxisNames(0)
-for _, name in ipairs(axes) do
-    print("Axis: " .. name)
-end
--- Output: LEFT_STICK_X, LEFT_STICK_Y, RIGHT_STICK_X, RIGHT_STICK_Y, LEFT_TRIGGER, RIGHT_TRIGGER
-```
-
-#### `getNamedButtonsPressed(controllerId)` → buttonNames
-
-Get all currently pressed buttons by name.
-
-```lua
-local pressed = gpu.getNamedButtonsPressed(0)
-for _, name in ipairs(pressed) do
-    print("Pressed: " .. name)
-end
-```
-
-#### `getNamedAxesActive(controllerId, threshold)` → axes
-
-Get all active axes (above threshold) with values.
-
-```lua
-local active = gpu.getNamedAxesActive(0, 0.2)
-for name, value in pairs(active) do
-    print(name .. " = " .. value)
-end
-```
-
-#### `hasInput(controllerId, inputName)` → boolean
-
-Check if controller has a specific button/axis.
-
-```lua
-if gpu.hasInput(0, "Z") then
-    print("N64 controller detected!")
-end
-
-if gpu.hasInput(0, "STEERING") then
-    print("Racing wheel detected!")
-end
-```
-
-#### `getControllerInputs(controllerId)` → inputs
-
-Get all input definitions for advanced mapping.
-
-```lua
-local inputs = gpu.getControllerInputs(0)
-for name, def in pairs(inputs) do
-    print(name .. ": " .. def.description)
-    print("  Type: " .. def.type)
-    print("  Raw Index: " .. def.rawIndex)
-end
-```
-
-#### `refreshControllerProfile(controllerId)`
-
-Refresh controller profile (useful after hot-plugging).
-
-```lua
-gpu.refreshControllerProfile(0)
-```
-
-### Multiplayer Support (Server-Side Access)
-
-Access controller state on the server for multiplayer games.
-
-#### `getPlayerUUID()` → uuid
-
-Get current player's UUID.
-
-```lua
-local uuid = gpu.getPlayerUUID()
-print("Player UUID: " .. uuid)
-```
-
-#### `getServerControllerCount(playerUUID)` → count
-
-Get number of controllers for a player (server-side).
-
-```lua
-local count = gpu.getServerControllerCount(uuid)
-print("Player has " .. count .. " controllers")
-```
-
-#### `listServerControllers(playerUUID)` → controllers
-
-List controllers for a player (server-side).
-
-```lua
-local controllers = gpu.listServerControllers(uuid)
-for _, ctrl in ipairs(controllers) do
-    print(ctrl.name .. " (ID: " .. ctrl.id .. ")")
-end
-```
-
-#### `getServerControllerButton(playerUUID, controllerId, buttonIndex)` → boolean
-
-Get button state on server.
-
-```lua
-if gpu.getServerControllerButton(uuid, 0, 0) then
-    print("Player pressed button 0")
-end
-```
-
-#### `getServerControllerAxis(playerUUID, controllerId, axisIndex)` → value
-
-Get axis value on server.
-
-```lua
-local value = gpu.getServerControllerAxis(uuid, 0, 0)
-print("Axis 0: " .. value)
-```
-
-#### `getServerControllerState(playerUUID, controllerId)` → state
-
-Get complete controller state on server.
-
-```lua
-local state = gpu.getServerControllerState(uuid, 0)
-print("Buttons:", state.buttons)
-print("Axes:", state.axes)
-print("Timestamp:", state.timestamp)
-```
-
----
-
-
-
-### `getServerControllerAxes(playerUUID, localControllerId)` → table
-
-[Auto-generated documentation]
-
-**Parameters:**
-- `playerUUID` (string)
-- `localControllerId` (number)
-
-**Returns:** table
-
-**Example:**
-```lua
-local result = gpu.getServerControllerAxes(255, 255)
-```
-
----
-
-### `getServerControllerButtons(playerUUID, localControllerId)` → table
-
-[Auto-generated documentation]
-
-**Parameters:**
-- `playerUUID` (string)
-- `localControllerId` (number)
-
-**Returns:** table
-
-**Example:**
-```lua
-local result = gpu.getServerControllerButtons(255, 255)
-```
-
----
-
-## Controller Examples
-
-### Example 1: Basic Controller Input
-
-```lua
-local gpu = peripheral.find("directgpu")
-
--- Scan for controllers
-gpu.scanForControllers()
-local count = gpu.getControllerCount()
-print("Found " .. count .. " controllers")
-
-if count == 0 then
-    print("No controllers connected!")
-    return
-end
-
--- Get info
-local info = gpu.getControllerInfo(0)
-print("Using: " .. info.name)
-print("Type: " .. gpu.getControllerType(0))
-
--- Main loop
-while true do
-    -- Check primary action button
-    if gpu.getNamedButton(0, "A") then
-        print("A button pressed!")
-    end
-
-    -- Read analog stick
-    local lx = gpu.getNamedAxis(0, "LEFT_STICK_X")
-    local ly = gpu.getNamedAxis(0, "LEFT_STICK_Y")
-
-    if math.abs(lx) > 0.2 or math.abs(ly) > 0.2 then
-        print(string.format("Left stick: %.2f, %.2f", lx, ly))
-    end
-
-    sleep(0.05)
-end
-```
-
----
-
-### Example 2: Display Controller Inputs on Screen
-
-```lua
-local gpu = peripheral.find("directgpu")
-local display = gpu.autoDetectAndCreateDisplay()
-
-gpu.scanForControllers()
-if gpu.getControllerCount() == 0 then
-    print("No controllers!")
-    return
-end
-
-local info = gpu.getControllerInfo(0)
-print("Controller: " .. info.name)
-
-while true do
-    gpu.clear(display, 20, 20, 30)
-
-    -- Title
-    gpu.drawText(display, "Controller: " .. info.name, 10, 10,
-        255, 255, 255, "Arial", 20, "bold")
-
-    -- Show pressed buttons
-    local pressed = gpu.getNamedButtonsPressed(0)
-    local y = 50
-    for _, name in ipairs(pressed) do
-        gpu.drawTextWithBg(display, name, 10, y,
-            255, 255, 0,  -- Yellow text
-            50, 50, 0,    -- Dark yellow bg
-            5, "Arial", 16, "bold")
-        y = y + 30
-    end
-
-    -- Show active axes
-    local axes = gpu.getNamedAxesActive(0, 0.15)
-    y = 250
-    for name, value in pairs(axes) do
-        local text = string.format("%s: %.2f", name, value)
-        gpu.drawText(display, text, 10, y,
-            100, 255, 100, "Arial", 14, "plain")
-
-        -- Draw bar graph
-        local barW = math.abs(value) * 200
-        local barX = value > 0 and 250 or (250 - barW)
-        gpu.fillRect(display, barX, y, barW, 15, 0, 255, 0)
-
-        y = y + 25
-    end
-
-    gpu.updateDisplay(display)
-    sleep(0.05)
-end
-```
-
----
-
-### Example 3: Racing Game with Steering Wheel
-
-```lua
-local gpu = peripheral.find("directgpu")
-local display = gpu.autoDetectAndCreateDisplay()
-
-gpu.scanForControllers()
-local controllerId = 0
-
--- Check if it's a wheel
-local type = gpu.getControllerType(controllerId)
-print("Controller type: " .. type)
-
-local carX = 320
-local carY = 400
-local speed = 0
-
-while true do
-    gpu.clear(display, 50, 100, 50)  -- Grass
-
-    -- Get steering input (works for both wheel and gamepad)
-    local steering = 0
-    if gpu.hasInput(controllerId, "STEERING") then
-        steering = gpu.getNamedAxis(controllerId, "STEERING")
-    else
-        steering = gpu.getNamedAxis(controllerId, "LEFT_STICK_X")
-    end
-
-    -- Get throttle/brake
-    local throttle = 0
-    local brake = 0
-
-    if gpu.hasInput(controllerId, "THROTTLE") then
-        -- Racing wheel
-        throttle = gpu.getNamedAxis(controllerId, "THROTTLE")
-        brake = gpu.getNamedAxis(controllerId, "BRAKE")
-    else
-        -- Gamepad
-        throttle = gpu.getNamedAxis(controllerId, "RIGHT_TRIGGER")
-        brake = gpu.getNamedAxis(controllerId, "LEFT_TRIGGER")
-    end
-
-    -- Update car position
-    speed = speed + (throttle * 0.5) - (brake * 0.8)
-    speed = math.max(0, math.min(10, speed))
-
-    carX = carX + (steering * speed)
-    carX = math.max(50, math.min(600, carX))
-
-    -- Draw road
-    gpu.fillRect(display, 200, 0, 250, 600, 80, 80, 80)
-
-    -- Draw car
-    gpu.fillRect(display, carX - 20, carY - 40, 40, 80, 255, 0, 0)
-
-    -- HUD
-    gpu.drawTextWithBg(display, string.format("Speed: %.1f", speed),
-        10, 10, 255, 255, 255, 0, 0, 0, 5, "Arial", 18, "bold")
-
-    gpu.drawTextWithBg(display, string.format("Steering: %.2f", steering),
-        10, 45, 255, 255, 255, 0, 0, 0, 5, "Arial", 14, "plain")
-
-    gpu.updateDisplay(display)
-    sleep(0.05)
-end
-```
-
----
-
-### Example 4: Event-Based Input (Efficient)
-
-```lua
-local gpu = peripheral.find("directgpu")
-
-gpu.scanForControllers()
-if gpu.getControllerCount() == 0 then
-    print("No controllers!")
-    return
-end
-
--- Set up event tracking
-gpu.setControllerDeadzone(0.15)
-
-print("Press buttons or move sticks. Press START to exit.")
-
-local running = true
-while running do
-    -- Update state tracker
-    gpu.updateControllerState(0)
-
-    -- Process events
-    while gpu.hasControllerEvents(0) do
-        local event = gpu.pollControllerEvent(0)
-
-        if event.type == "button_down" then
-            print("Button " .. event.index .. " pressed")
-
-            -- Check if it's START button
-            if gpu.getNamedButton(0, "START") then
-                print("Exiting...")
-                running = false
-            end
-
-        elseif event.type == "button_up" then
-            print("Button " .. event.index .. " released")
-
-        elseif event.type == "axis" then
-            print(string.format("Axis %d: %.2f", event.index, event.value))
-        end
-    end
-
-    sleep(0.05)
-end
-```
-
----
-
-### Example 5: Cross-Platform Button Prompts
-
-```lua
-local gpu = peripheral.find("directgpu")
-local display = gpu.autoDetectAndCreateDisplay()
-
-gpu.scanForControllers()
-local controllerId = 0
-
--- Get controller type to show correct prompts
-local controllerType = gpu.getControllerType(controllerId)
-
-local function getButtonName(action)
-    if controllerType:find("Xbox") then
-        if action == "primary" then return "A" end
-        if action == "secondary" then return "B" end
-        if action == "jump" then return "A" end
-        if action == "attack" then return "X" end
-    elseif controllerType:find("PlayStation") then
-        if action == "primary" then return "CROSS" end
-        if action == "secondary" then return "CIRCLE" end
-        if action == "jump" then return "CROSS" end
-        if action == "attack" then return "SQUARE" end
-    else
-        if action == "primary" then return "A" end
-        if action == "secondary" then return "B" end
-    end
-end
-
-while true do
-    gpu.clear(display, 30, 30, 50)
-
-    -- Show controller-specific prompts
-    local y = 50
-
-    gpu.drawText(display, "Controller: " .. controllerType, 10, y,
-        255, 200, 100, "Arial", 20, "bold")
-    y = y + 40
-
-    local actions = {
-        {"Jump", "primary"},
-        {"Attack", "attack"},
-        {"Cancel", "secondary"}
-    }
-
-    for _, action in ipairs(actions) do
-        local label = action[1]
-        local button = getButtonName(action[2])
-
-        local text = string.format("Press [%s] to %s", button, label)
-
-        -- Highlight if pressed
-        if gpu.getNamedButton(controllerId, button) then
-            gpu.drawTextWithBg(display, text, 10, y,
-                255, 255, 0, 50, 50, 0, 5, "Arial", 16, "bold")
-        else
-            gpu.drawText(display, text, 10, y,
-                200, 200, 200, "Arial", 16, "plain")
-        end
-
-        y = y + 35
-    end
-
-    gpu.updateDisplay(display)
-    sleep(0.05)
-end
-```
-
----
-
-### Example 6: Multiplayer Server-Side Controller
-
-```lua
--- SERVER-SIDE SCRIPT
-local gpu = peripheral.find("directgpu")
-
--- Track players and their controller states
-local players = {}
-
-while true do
-    -- Update player controller states
-    -- (In real scenario, you'd get UUIDs from player join events)
-
-    for uuid, playerData in pairs(players) do
-        local controllers = gpu.listServerControllers(uuid)
-
-        if #controllers > 0 then
-            local state = gpu.getServerControllerState(uuid, 0)
-
-            -- Process player input server-side
-            -- This prevents cheating and reduces network traffic
-
-            -- Example: Check if player pressed attack button
-            if state.buttons[1] then  -- Button 0 (A/Cross)
-                print("Player " .. uuid .. " attacked!")
-                -- Handle attack logic server-side
-            end
-
-            -- Get movement from analog stick
-            if #state.axes >= 2 then
-                local moveX = state.axes[1]
-                local moveY = state.axes[2]
-
-                if math.abs(moveX) > 0.2 or math.abs(moveY) > 0.2 then
-                    print(string.format("Player %s moving: %.2f, %.2f",
-                        uuid, moveX, moveY))
-                    -- Update player position server-side
-                end
-            end
-        end
-    end
-
-    sleep(0.05)
-end
-```
-
-## Credits
-
-**Author:** Tom  
-**Minecraft Version:** 1.20.1  
-**Forge Version:** 47.3.0+  
-**CC: Tweaked Version:** 1.20.1  
-
+| **Max Resolution** | 656×324 pixels per block (4x multiplier) |
+| **Color Depth** | 24-bit RGB (16.7M colors) |
+| **Max Monitor Size** | 16×16 blocks |
+| **Max Displays** | 50 per world |
+| **Total Pixel Limit** | 10 megapixels |
+| **Render Distance** | 64 blocks |
+| **Max Frame Rate** | 60 FPS |
+| **Input Latency** | <50ms |
+| **JPEG Decode Time** | 5-15ms (hardware accelerated) |
+
+## 🤝 Support
+
+- **Issues:** [GitHub Issues](https://github.com/tiktop101/CCDirectGPU-Projects/issues)
+- **Discord:** [Join Server](https://discord.gg/zr2CScq7Gf)
+- **Documentation:** This README + in-game examples
+
+## 📜 License
+
+This project is licensed under **All Rights Reserved (ARR)**.
+
+**You may:**
+- ✅ Use this mod in personal gameplay
+- ✅ Use this mod on servers
+- ✅ Create content (videos, streams) featuring this mod
+
+**You may not:**
+- ❌ Redistribute or reupload this mod
+- ❌ Modify and redistribute this mod
+- ❌ Use code from this mod in other projects without permission
+
+## 👏 Credits
+
+**Author:** Tom
 **Special Thanks:**
 - Minecraft Forge team
 - CC: Tweaked developers
@@ -3953,26 +1970,10 @@ end
 
 ---
 
-## License
+<div align="center">
 
-This project is licensed under **All Rights Reserved (ARR)**.
+Made with ❤️ for the ComputerCraft community
 
-**You may:**
-- Use this mod in personal gameplay
-- Use this mod on servers
-- Create content (videos, streams) featuring this mod
+[⬆ Back to Top](#directgpu)
 
-**You may not:**
-- Redistribute or reupload this mod
-- Modify and redistribute this mod
-- Use code from this mod in other projects without permission
-
----
-
-## Support & Community
-
-- **Issues:** Report bugs on GitHub
-- **Discord:** [https://discord.gg/zr2CScq7Gf]
-- **Documentation:** This README + in-game examples
-
----
+</div>
