@@ -126,7 +126,7 @@ end
 - [Display Management](#display-management) (13 functions)
 - [2D Drawing](#2d-drawing) (10 functions)
 - [Text Rendering](#text-rendering) (5 functions)
-- [Image & JPEG](#image-and-jpeg) (10 functions)
+- [Image & JPEG](#image--jpeg) (10 functions)
 - [Dictionary Compression](#dictionary-compression) (6 functions)
 - [3D Camera](#3d-camera) (7 functions)
 - [3D Primitives](#3d-primitives) (4 functions)
