@@ -6,7 +6,7 @@
 
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1-green.svg)](https://www.minecraft.net/)
 [![CC: Tweaked](https://img.shields.io/badge/CC%3A%20Tweaked-1.20.1-blue.svg)](https://tweaked.cc/)
-[![License]](LICENSE)
+[![License](https://img.shields.io/badge/License-ARR-red.svg)](LICENSE)
 
 Transform ComputerCraft monitors into powerful graphics displays with hardware-accelerated 2D/3D rendering, image decoding, and real-time input support.
 
