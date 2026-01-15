@@ -1942,7 +1942,7 @@ More examples: [DirectGPU-Projects Repository](https://github.com/tiktop101/CCDi
 
 ## 🤝 Support
 
-- **Issues:** [GitHub Issues](https://github.com/tiktop101/CCDirectGPU-Projects/issues)
+- **Issues:** [GitHub Issues](https://github.com/tiktop101/CC-DirectGPU-Mod/issues)
 - **Discord:** [Join Server](https://discord.gg/zr2CScq7Gf)
 - **Documentation:** This README + in-game examples
 
