@@ -142,6 +142,7 @@ end
 - [Vector Graphics](#vector-graphics) (4 functions)
 - [Metaballs](#metaballs) (11 functions)
 - [Calibration](#calibration) (2 functions)
+- [Map Reader Peripheral](#map-reader-peripheral) (6 functions)
 
 ---
 
@@ -1790,6 +1791,118 @@ local result = gpu.getCalibrationValues()
 **Example:**
 ```lua
 gpu.setCalibrationMode(true, 0, 0)
+```
+
+
+---
+
+### Map Reader Peripheral
+
+**Description:** The Map Reader peripheral scans and reads Minecraft maps from its internal 9-slot inventory. It can extract map data including pixel colors, decorations (markers, banners), scale, dimension, and coordinates.
+
+**Peripheral Type:** `map_reader`
+
+**Usage:**
+```lua
+local reader = peripheral.find("map_reader")
+local maps = reader.scanAll()
+```
+
+#### `scanAll()` → table
+
+**Description:** Scans all map items in the internal 9-slot inventory. Returns a list of map info including mapId, slot number, display name, and stack size.
+
+**Example:**
+```lua
+local result = reader.scanAll()
+```
+
+#### `scanInternal()` → table
+
+**Description:** Alias for scanAll() - scans the internal inventory for maps.
+
+**Example:**
+```lua
+local result = reader.scanInternal()
+```
+
+#### `scanAdjacent()` → table
+
+**Description:** Returns empty list - adjacent container scanning is no longer supported (internal inventory only).
+
+**Example:**
+```lua
+local result = reader.scanAdjacent()
+```
+
+#### `getMapCounts()` → table
+
+**Description:** Returns the count of maps found. Provides internal, adjacent (always 0), and total counts.
+
+**Example:**
+```lua
+local result = reader.getMapCounts()
+```
+
+#### `getAdjacentContainers()` → table
+
+**Description:** Returns empty list - no adjacent containers are supported.
+
+**Example:**
+```lua
+local result = reader.getAdjacentContainers()
+```
+
+#### `readMap(mapId)` → table
+
+**Description:** Reads a map by its MAP ID (not slot number). Returns complete map data including: scale, dimension, center coordinates, locked status, pixel data (base64 RGB), and decorations (markers/banners).
+
+**Parameters:**
+- `mapId` (number)
+
+**Example:**
+```lua
+local result = reader.readMap(0)
+```
+
+
+**Complete Example - Reading and Displaying Maps:**
+
+```lua
+-- Find the Map Reader peripheral
+local reader = peripheral.find("map_reader")
+
+-- Scan for maps in the internal inventory
+local maps = reader.scanAll()
+print("Found " .. #maps .. " maps")
+
+for _, mapInfo in ipairs(maps) do
+    print(string.format("Map #%d in slot %d: %s",
+        mapInfo.mapId, mapInfo.slot, mapInfo.displayName))
+end
+
+-- Read the first map's data
+if #maps > 0 then
+    local mapId = maps[1].mapId
+    local mapData = reader.readMap(mapId)
+    
+    print(string.format("Map #%d Details:", mapId))
+    print("  Scale: " .. mapData.scale)
+    print("  Dimension: " .. mapData.dimension)
+    print("  Center: " .. mapData.centerX .. ", " .. mapData.centerZ)
+    print("  Locked: " .. tostring(mapData.locked))
+    print("  Decorations: " .. #mapData.decorations)
+    
+    -- The pixel data is base64-encoded RGB data (128x128 pixels)
+    -- Each pixel is 3 bytes (R, G, B)
+    print("  Pixel data length: " .. #mapData.pixels .. " chars (base64)")
+    
+    -- Display decorations (markers, banners, etc.)
+    for _, decoration in ipairs(mapData.decorations) do
+        print(string.format("    Marker '%s': type=%s at (%d, %d)",
+            decoration.id, decoration.type, decoration.x, decoration.z))
+    end
+end
 ```
 
 
