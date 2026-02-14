@@ -1,4 +1,4 @@
-# DirectGPU
+# DirectGPU , VS Compatible
 
 <div align="center">
 
