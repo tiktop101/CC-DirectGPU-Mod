@@ -257,8 +257,6 @@ end
 
 ---
 
-## Mental model
-
 ### 1. Create a display
 
 You either auto-detect a monitor or manually create a display.
