@@ -1,4 +1,4 @@
-# DirectGPU , VS Compatible
+# DirectGPU , VS Compatible, Sable compatible, ALSO with the 1.0.20 prerelease as of now and eventually official full release of 1.0.20 "CREATE support"
 
 <div align="center">
 
