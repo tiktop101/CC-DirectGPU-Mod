@@ -1,4 +1,4 @@
-# DirectGPU , VS Compatible, Sable compatible, Create support, 1.0.20 pre-release: NeoForge 1.21.1. Forge 1.20.1:inprogress
+# DirectGPU , VS Compatible, Sable compatible, Create support, 1.0.20 pre-release: NeoForge 1.21.1. Forge 1.20.1 abandoned. 
 
 <div align="center">
 
