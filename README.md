@@ -4,8 +4,8 @@
 
 **High-Performance Graphics for ComputerCraft**
 
-[![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1-green.svg)](https://www.minecraft.net/)
-[![CC: Tweaked](https://img.shields.io/badge/CC%3A%20Tweaked-1.20.1-blue.svg)](https://tweaked.cc/)
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1-green.svg)](https://www.minecraft.net/)
+[![CC: Tweaked](https://img.shields.io/badge/CC%3A%20Tweaked-1.21.1-blue.svg)](https://tweaked.cc/)
 [![License](https://img.shields.io/badge/License-ARR-red.svg)](LICENSE)
 
 Turn ComputerCraft monitors into high-resolution RGB displays with fast 2D drawing, 3D rendering, JPEG loading, input events, controller support, and extra world data.
