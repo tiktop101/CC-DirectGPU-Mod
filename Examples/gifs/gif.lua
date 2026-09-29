@@ -75,6 +75,16 @@ for i = 1, len, 3 do
                 print(string.format("Done | %.1fs | %.1f FPS | %d dropped", elapsed, framesDisplayed/elapsed, frameDrops))
                 end
 
-                local ok, err = pcall(function() playGIF("linkclick.gif", 11) end)
-                if not ok then print("ERROR: "..tostring(err)) end
-                  gpu.removeDisplay(displayId)
+                local args = { ... }
+                local found
+                if not args[1] then
+                  local list = fs.list("")
+                  table.sort(list)
+                  for _, n in ipairs(list) do
+                    if n:lower():match("%.gif$") and not fs.isDir(n) then found = n break end
+                      end
+                      if not found then print("No gif found in /") gpu.removeDisplay(displayId) return end
+                        end
+                        local ok, err = pcall(function() playGIF(args[1] or found, tonumber(args[2]) or 11) end)
+                        if not ok then print("ERROR: "..tostring(err)) end
+                          gpu.removeDisplay(displayId)
