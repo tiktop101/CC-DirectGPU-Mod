@@ -1,4 +1,4 @@
-# DirectGPU , VS Compatible, Sable compatible, Create support, 1.0.20 pre-release: NeoForge 1.21.1. Forge 1.20.1 abandoned. 
+# DirectGPU For Neoforge 1.21.1 "Sable/Create Aeronautics Support", Forge 1.20.1 abandoned at 1.0.19 W Valkyrien skies support. 
 
 <div align="center">
 
